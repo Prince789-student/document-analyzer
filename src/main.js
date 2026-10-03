@@ -331,8 +331,15 @@ class DocuMatrixStudioApp {
   }
 
   handleRouting() {
-    const rawHash = window.location.hash || '';
-    const clean = rawHash.replace(/^#\/?/, '').trim();
+    let clean = '';
+    const rawHash = (window.location.hash || '').replace(/^#\/?/, '').trim();
+    const rawPath = (window.location.pathname || '').replace(/^\//, '').replace(/\/$/, '').trim();
+
+    if (rawHash) {
+      clean = rawHash;
+    } else if (rawPath && rawPath !== 'index.html') {
+      clean = rawPath;
+    }
 
     // Home route
     if (!clean || clean === 'home' || clean === '/') {

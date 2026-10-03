@@ -95,6 +95,7 @@ html {
   background-color: var(--bg-app);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
 body {
@@ -104,12 +105,13 @@ body {
               radial-gradient(circle at 90% 45%, rgba(236, 72, 153, 0.06) 0%, transparent 45%),
               var(--bg-app);
   background-attachment: fixed;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   color: var(--text-heading);
+  font-style: normal;
   line-height: 1.25;
 }
 

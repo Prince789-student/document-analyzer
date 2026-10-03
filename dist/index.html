@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuMatrix Studio — Next-Gen Client-Side PDF Engine</title>
+  <meta name="description" content="Next-generation private document engineering suite. 30 professional PDF tools powered by WebAssembly running 100% locally in browser memory with zero data retention.">
+
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600&family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script type="module" crossorigin src="/assets/index-DbKahxMH.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-C0FnF6B9.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-C8KMT5PX.css">
+</head>
+<body>
+  <div id="app" class="app-root">
+
+    <!-- ====================================================================
+         DISTINCTIVE STUDIO HEADER
+         ==================================================================== -->
+    <header class="studio-header">
+      <div class="studio-header__inner">
+
+        <!-- Unique Brand Logo -->
+        <div class="brand-container" id="brand-home-link" title="DocuMatrix Studio Home">
+          <div class="brand-logo-gem">
+            <svg viewBox="0 0 36 36" width="30" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 3L32 11V25L18 33L4 25V11L18 3Z" stroke="url(#gem-grad)" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="M18 8L28 14V22L18 28L8 22V14L18 8Z" fill="url(#gem-fill)" fill-opacity="0.25"/>
+              <circle cx="18" cy="18" r="4" fill="url(#gem-grad)"/>
+              <defs>
+                <linearGradient id="gem-grad" x1="4" y1="3" x2="32" y2="33" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#6366F1"/>
+                  <stop offset="0.5" stop-color="#A855F7"/>
+                  <stop offset="1" stop-color="#EC4899"/>
+                </linearGradient>
+                <linearGradient id="gem-fill" x1="8" y1="8" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#6366F1"/>
+                  <stop offset="1" stop-color="#06B6D4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span class="brand-pulse-dot"></span>
+          </div>
+          <div class="brand-titles">
+            <div class="brand-name">DocuMatrix <span class="brand-name__accent">Studio</span></div>
+            <span class="brand-tagline">30-in-1 WebAssembly Engine</span>
+          </div>
+        </div>
+
+        <!-- MAIN TOOL TABS NAVIGATION (Identical to requested iLovePDF header structure) -->
+        <nav class="header-nav-tabs" id="header-nav-tabs" aria-label="Main Tool Navigation">
+          <a href="#/merge-pdf" class="nav-tab-item" data-nav-tool="merge-pdf">MERGE PDF</a>
+          <a href="#/split-pdf" class="nav-tab-item" data-nav-tool="split-pdf">SPLIT PDF</a>
+          <a href="#/compress-pdf" class="nav-tab-item" data-nav-tool="compress-pdf">COMPRESS PDF</a>
+
+          <!-- CONVERT PDF Dropdown -->
+          <div class="nav-tab-dropdown" id="dropdown-convert">
+            <button type="button" class="nav-tab-dropdown-btn" id="btn-convert-dropdown">
+              <span>CONVERT PDF</span>
+              <i data-lucide="chevron-down" class="nav-arrow-icon"></i>
+            </button>
+            <div class="nav-dropdown-pane nav-convert-pane" id="menu-convert-dropdown">
+              <div class="nav-dropdown-col">
+                <div class="nav-col-header">CONVERT TO PDF</div>
+                <a href="#/jpg-to-pdf" class="nav-dropdown-link" data-nav-tool="jpg-to-pdf">
+                  <i data-lucide="image" class="link-ic" style="color: #eab308;"></i>
+                  <span>JPG to PDF</span>
+                </a>
+                <a href="#/word-to-pdf" class="nav-dropdown-link" data-nav-tool="word-to-pdf">
+                  <i data-lucide="file-text" class="link-ic" style="color: #2563eb;"></i>
+                  <span>WORD to PDF</span>
+                </a>
+                <a href="#/powerpoint-to-pdf" class="nav-dropdown-link" data-nav-tool="powerpoint-to-pdf">
+                  <i data-lucide="presentation" class="link-ic" style="color: #ea580c;"></i>
+                  <span>POWERPOINT to PDF</span>
+                </a>
+                <a href="#/excel-to-pdf" class="nav-dropdown-link" data-nav-tool="excel-to-pdf">
+                  <i data-lucide="file-spreadsheet" class="link-ic" style="color: #16a34a;"></i>
+                  <span>EXCEL to PDF</span>
+                </a>
+                <a href="#/html-to-pdf" class="nav-dropdown-link" data-nav-tool="html-to-pdf">
+                  <i data-lucide="code-2" class="link-ic" style="color: #8b5cf6;"></i>
+                  <span>HTML to PDF</span>
+                </a>
+              </div>
+              <div class="nav-dropdown-col">
+                <div class="nav-col-header">CONVERT FROM PDF</div>
+                <a href="#/pdf-to-jpg" class="nav-dropdown-link" data-nav-tool="pdf-to-jpg">
+                  <i data-lucide="images" class="link-ic" style="color: #f59e0b;"></i>
+                  <span>PDF to JPG</span>
+                </a>
+                <a href="#/pdf-to-word" class="nav-dropdown-link" data-nav-tool="pdf-to-word">
+                  <i data-lucide="file-text" class="link-ic" style="color: #3b82f6;"></i>
+                  <span>PDF to WORD</span>
+                </a>
+                <a href="#/pdf-to-powerpoint" class="nav-dropdown-link" data-nav-tool="pdf-to-powerpoint">
+                  <i data-lucide="presentation" class="link-ic" style="color: #f97316;"></i>
+                  <span>PDF to POWERPOINT</span>
+                </a>
+                <a href="#/pdf-to-excel" class="nav-dropdown-link" data-nav-tool="pdf-to-excel">
+                  <i data-lucide="file-spreadsheet" class="link-ic" style="color: #10b981;"></i>
+                  <span>PDF to EXCEL</span>
+                </a>
+                <a href="#/pdf-to-pdfa" class="nav-dropdown-link" data-nav-tool="pdf-to-pdfa">
+                  <i data-lucide="archive" class="link-ic" style="color: #6366f1;"></i>
+                  <span>PDF to PDF/A</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ALL PDF TOOLS Mega Dropdown -->
+          <div class="nav-tab-dropdown" id="dropdown-all-tools">
+            <button type="button" class="nav-tab-dropdown-btn" id="btn-all-tools-dropdown">
+              <span>ALL PDF TOOLS</span>
+              <i data-lucide="chevron-down" class="nav-arrow-icon"></i>
+            </button>
+            <div class="nav-dropdown-pane nav-all-tools-pane" id="menu-all-tools-dropdown">
+              <div class="nav-dropdown-col">
+                <div class="nav-col-header">ORGANIZE PDF</div>
+                <a href="#/merge-pdf" class="nav-dropdown-link" data-nav-tool="merge-pdf"><i data-lucide="layers" class="link-ic" style="color:#ef4444;"></i><span>Merge PDF</span></a>
+                <a href="#/split-pdf" class="nav-dropdown-link" data-nav-tool="split-pdf"><i data-lucide="scissors" class="link-ic" style="color:#f97316;"></i><span>Split PDF</span></a>
+                <a href="#/remove-pages" class="nav-dropdown-link" data-nav-tool="remove-pages"><i data-lucide="trash-2" class="link-ic" style="color:#e11d48;"></i><span>Remove Pages</span></a>
+                <a href="#/extract-pages" class="nav-dropdown-link" data-nav-tool="extract-pages"><i data-lucide="file-symlink" class="link-ic" style="color:#d97706;"></i><span>Extract Pages</span></a>
+                <a href="#/organize-pdf" class="nav-dropdown-link" data-nav-tool="organize-pdf"><i data-lucide="layout-dashboard" class="link-ic" style="color:#ea580c;"></i><span>Organize PDF</span></a>
+                <a href="#/scan-to-pdf" class="nav-dropdown-link" data-nav-tool="scan-to-pdf"><i data-lucide="camera" class="link-ic" style="color:#0284c7;"></i><span>Scan to PDF</span></a>
+              </div>
+              <div class="nav-dropdown-col">
+                <div class="nav-col-header">OPTIMIZE PDF</div>
+                <a href="#/compress-pdf" class="nav-dropdown-link" data-nav-tool="compress-pdf"><i data-lucide="minimize-2" class="link-ic" style="color:#10b981;"></i><span>Compress PDF</span></a>
+                <a href="#/repair-pdf" class="nav-dropdown-link" data-nav-tool="repair-pdf"><i data-lucide="wrench" class="link-ic" style="color:#14b8a6;"></i><span>Repair PDF</span></a>
+                <a href="#/ocr-pdf" class="nav-dropdown-link" data-nav-tool="ocr-pdf"><i data-lucide="scan-text" class="link-ic" style="color:#06b6d4;"></i><span>OCR PDF</span></a>
+              </div>
+              <div class="nav-dropdown-col">
+                <div class="nav-col-header">EDIT & PAGES</div>
+                <a href="#/rotate-pdf" class="nav-dropdown-link" data-nav-tool="rotate-pdf"><i data-lucide="rotate-cw" class="link-ic" style="color:#6366f1;"></i><span>Rotate PDF</span></a>
+                <a href="#/page-numbers" class="nav-dropdown-link" data-nav-tool="page-numbers"><i data-lucide="binary" class="link-ic" style="color:#8b5cf6;"></i><span>Page Numbers</span></a>
+                <a href="#/add-watermark" class="nav-dropdown-link" data-nav-tool="add-watermark"><i data-lucide="stamp" class="link-ic" style="color:#a855f7;"></i><span>Add Watermark</span></a>
+                <a href="#/crop-pdf" class="nav-dropdown-link" data-nav-tool="crop-pdf"><i data-lucide="crop" class="link-ic" style="color:#d946ef;"></i><span>Crop PDF</span></a>
+                <a href="#/edit-pdf" class="nav-dropdown-link" data-nav-tool="edit-pdf"><i data-lucide="edit-3" class="link-ic" style="color:#ec4899;"></i><span>Edit PDF</span></a>
+              </div>
+              <div class="nav-dropdown-col">
+                <div class="nav-col-header">SECURITY</div>
+                <a href="#/unlock-pdf" class="nav-dropdown-link" data-nav-tool="unlock-pdf"><i data-lucide="unlock" class="link-ic" style="color:#10b981;"></i><span>Unlock PDF</span></a>
+                <a href="#/protect-pdf" class="nav-dropdown-link" data-nav-tool="protect-pdf"><i data-lucide="lock" class="link-ic" style="color:#ef4444;"></i><span>Protect PDF</span></a>
+                <a href="#/sign-pdf" class="nav-dropdown-link" data-nav-tool="sign-pdf"><i data-lucide="pen-tool" class="link-ic" style="color:#6366f1;"></i><span>Sign PDF</span></a>
+                <a href="#/redact-pdf" class="nav-dropdown-link" data-nav-tool="redact-pdf"><i data-lucide="eye-off" class="link-ic" style="color:#334155;"></i><span>Redact PDF</span></a>
+                <a href="#/compare-pdf" class="nav-dropdown-link" data-nav-tool="compare-pdf"><i data-lucide="git-compare" class="link-ic" style="color:#8b5cf6;"></i><span>Compare PDF</span></a>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Header Actions -->
+        <div class="header-actions-group">
+          <!-- Compact Search Bar -->
+          <div class="header-search-container">
+            <i data-lucide="search" class="search-lead-icon"></i>
+            <input type="text" id="global-search-input" placeholder="Search tools... (/)" autocomplete="off">
+            <button type="button" id="global-search-clear" class="search-clear-btn" title="Clear search">&times;</button>
+          </div>
+          <!-- Sample Docs Dropdown -->
+          <div class="dropdown-wrapper">
+            <button type="button" id="sample-docs-dropdown-btn" class="action-btn-ghost" title="Load sample test files">
+              <i data-lucide="sparkles" class="icon-accent-sparkle"></i>
+              <span>Sample Docs</span>
+              <i data-lucide="chevron-down" class="icon-dropdown-arrow"></i>
+            </button>
+            <div id="sample-docs-menu" class="glass-dropdown-menu">
+              <div class="dropdown-category-title">Quick Test Documents</div>
+              <button type="button" class="glass-dropdown-item" data-sample="pdf">
+                <div class="item-icon-box" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;"><i data-lucide="file-text"></i></div>
+                <div>
+                  <div class="item-name">Business Report PDF</div>
+                  <div class="item-sub">Multi-page document with tables</div>
+                </div>
+              </button>
+              <button type="button" class="glass-dropdown-item" data-sample="excel">
+                <div class="item-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><i data-lucide="file-spreadsheet"></i></div>
+                <div>
+                  <div class="item-name">Sales Spreadsheet (.xlsx)</div>
+                  <div class="item-sub">Financial grid workbook</div>
+                </div>
+              </button>
+              <button type="button" class="glass-dropdown-item" data-sample="word">
+                <div class="item-icon-box" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;"><i data-lucide="file-code"></i></div>
+                <div>
+                  <div class="item-name">Architecture Spec (.docx)</div>
+                  <div class="item-sub">Formatted Word document</div>
+                </div>
+              </button>
+              <button type="button" class="glass-dropdown-item" data-sample="image">
+                <div class="item-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><i data-lucide="image"></i></div>
+                <div>
+                  <div class="item-name">Invoice Image (.jpg)</div>
+                  <div class="item-sub">High-resolution receipt scan</div>
+                </div>
+              </button>
+              <button type="button" class="glass-dropdown-item" data-sample="html">
+                <div class="item-icon-box" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;"><i data-lucide="code-2"></i></div>
+                <div>
+                  <div class="item-name">Web Proposal (.html)</div>
+                  <div class="item-sub">Responsive HTML markup</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- History Drawer Button -->
+          <button type="button" id="open-history-btn" class="action-btn-ghost" title="View downloaded files">
+            <i data-lucide="history"></i>
+            <span>History</span>
+            <span id="history-counter-chip" class="badge-chip">0</span>
+          </button>
+
+          <!-- Theme Toggle -->
+          <button type="button" id="theme-toggle-btn" class="icon-toggle-btn" title="Toggle dark/light appearance">
+            <i data-lucide="moon" id="icon-moon"></i>
+            <i data-lucide="sun" id="icon-sun" style="display: none;"></i>
+          </button>
+
+          <!-- Privacy Security Pill -->
+          <div class="privacy-status-pill" title="100% In-Memory Processing. Files never touch any remote server.">
+            <span class="status-indicator-dot"></span>
+            <span class="status-text">Zero-Upload Privacy</span>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- ====================================================================
+         VIEW 1: DIRECTORY / HOMEPAGE VIEW
+         ==================================================================== -->
+    <main id="home-view" class="view-panel active">
+      <!-- High-Tech Hero Section -->
+      <section class="studio-hero">
+        <div class="hero-chip-badge">
+          <i data-lucide="zap" class="chip-icon"></i>
+          <span>Client-Side WebAssembly Architecture &bull; 100% Free & Unlimited</span>
+        </div>
+        <h1 class="hero-main-title">
+          Master Your Documents With <br>
+          <span class="text-gradient-hero">Precision & Cryptographic Privacy</span>
+        </h1>
+        <p class="hero-main-subtitle">
+          An elite 30-tool document manipulation suite running completely inside your browser memory.
+          Convert, organize, optimize, annotate, sign, and securely protect PDFs with zero latency.
+        </p>
+
+        <!-- Category Nav Filter Pills -->
+        <nav class="category-filter-nav" aria-label="Tool Categories">
+          <div class="category-pills-bar" id="category-pills-bar">
+            <!-- Dynamically populated from toolsList.js -->
+          </div>
+        </nav>
+      </section>
+
+      <!-- Search Meta Indicator -->
+      <div class="directory-meta-bar">
+        <div class="meta-left-group">
+          <span id="current-category-label" class="current-cat-name">All Tools</span>
+          <span id="tools-count-badge" class="count-tag">30 Tools</span>
+        </div>
+        <div id="search-feedback-chip" class="search-feedback-chip" style="display: none;">
+          <span>Filtering by "<strong id="search-feedback-text"></strong>"</span>
+          <button type="button" id="clear-search-chip-btn">&times;</button>
+        </div>
+      </div>
+
+      <!-- 30 Tools Directory Grid -->
+      <section class="tools-directory-section">
+        <div class="tools-directory-grid" id="tools-directory-grid">
+          <!-- Dynamically populated tool cards -->
+        </div>
+
+        <div id="empty-search-state" class="empty-results-card" style="display: none;">
+          <i data-lucide="search-x" class="empty-icon"></i>
+          <h3>No matching tools found</h3>
+          <p>Try searching for a different keyword or reset category filter.</p>
+          <button type="button" id="reset-all-filters-btn" class="btn-reset-filters">Show All 30 Tools</button>
+        </div>
+      </section>
+
+      <!-- Trust Features Section -->
+      <section class="studio-features-section">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #6366f1;"><i data-lucide="shield-check"></i></div>
+            <h4>Air-Gapped Client Privacy</h4>
+            <p>Every calculation runs locally via WebAssembly. Your sensitive files and credentials never leave your device.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #10b981;"><i data-lucide="gauge"></i></div>
+            <h4>Zero-Latency Processing</h4>
+            <p>Instantaneous execution without slow network uploads or server queue wait times, even on large documents.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #f59e0b;"><i data-lucide="sparkles"></i></div>
+            <h4>30 Professional Utilities</h4>
+            <p>From Office format conversions and OCR extraction to digital sign-off and side-by-side audit comparison.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #ec4899;"><i data-lucide="infinity"></i></div>
+            <h4>Free & Unrestricted</h4>
+            <p>No arbitrary file size throttles, no mandatory accounts, and no subscriptions or watermarks added.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Studio Footer -->
+      <footer class="studio-footer">
+        <div class="footer-inner">
+          <div class="footer-brand-col">
+            <div class="brand-container">
+              <div class="brand-name">DocuMatrix <span class="brand-name__accent">Studio</span></div>
+            </div>
+            <p class="footer-copy">
+              The modern standard for decentralized, confidential document management and multi-format conversion.
+            </p>
+          </div>
+          <div class="footer-links-col">
+            <h5>Organize & Optimize</h5>
+            <ul>
+              <li><a href="#/merge-pdf" data-route-tool="merge-pdf">Merge PDF</a></li>
+              <li><a href="#/split-pdf" data-route-tool="split-pdf">Split PDF</a></li>
+              <li><a href="#/compress-pdf" data-route-tool="compress-pdf">Compress PDF</a></li>
+              <li><a href="#/organize-pdf" data-route-tool="organize-pdf">Organize Pages</a></li>
+              <li><a href="#/ocr-pdf" data-route-tool="ocr-pdf">OCR Text Recognition</a></li>
+            </ul>
+          </div>
+          <div class="footer-links-col">
+            <h5>Conversions</h5>
+            <ul>
+              <li><a href="#/pdf-to-word" data-route-tool="pdf-to-word">PDF to Word</a></li>
+              <li><a href="#/word-to-pdf" data-route-tool="word-to-pdf">Word to PDF</a></li>
+              <li><a href="#/pdf-to-excel" data-route-tool="pdf-to-excel">PDF to Excel</a></li>
+              <li><a href="#/excel-to-pdf" data-route-tool="excel-to-pdf">Excel to PDF</a></li>
+              <li><a href="#/jpg-to-pdf" data-route-tool="jpg-to-pdf">Image to PDF</a></li>
+            </ul>
+          </div>
+          <div class="footer-links-col">
+            <h5>Security & Studio</h5>
+            <ul>
+              <li><a href="#/protect-pdf" data-route-tool="protect-pdf">Protect & Encrypt</a></li>
+              <li><a href="#/unlock-pdf" data-route-tool="unlock-pdf">Unlock PDF</a></li>
+              <li><a href="#/sign-pdf" data-route-tool="sign-pdf">Digital Signatures</a></li>
+              <li><a href="#/redact-pdf" data-route-tool="redact-pdf">Blackout & Redact</a></li>
+              <li><a href="#/compare-pdf" data-route-tool="compare-pdf">Visual Difference Diff</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom-line">
+          <span>&copy; 2026 DocuMatrix Studio &bull; Private, Fast, Client-Side Document Intelligence</span>
+        </div>
+      </footer>
+    </main>
+
+    <!-- ====================================================================
+         VIEW 2: DEDICATED STUDIO WORKSPACE (3-STAGE WORKFLOW)
+         ==================================================================== -->
+    <section id="studio-tool-view" class="view-panel" style="display: none;">
+
+      <!-- Studio Breadcrumbs Top Bar -->
+      <div class="workspace-top-bar">
+        <button type="button" id="btn-back-to-directory" class="back-nav-btn">
+          <i data-lucide="arrow-left"></i>
+          <span>Directory</span>
+        </button>
+        <div class="workspace-top-bar__center">
+          <span id="ws-category-tag" class="workspace-cat-tag">Category</span>
+          <span id="ws-badge-tag" class="workspace-badge-tag">Pro</span>
+        </div>
+        <div class="workspace-top-bar__right">
+          <button type="button" id="ws-quick-sample-btn" class="btn-ghost-sm" title="Inject testing sample file">
+            <i data-lucide="sparkles"></i> Try Sample
+          </button>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           STAGE 1: DOCUMENT INGESTION / DROPZONE STAGE
+           ================================================================ -->
+      <div id="studio-stage-upload" class="studio-stage active">
+        <div class="stage-upload-card">
+          <div class="tool-hero-badge">
+            <div id="stage-upload-icon" class="tool-hero-icon"></div>
+            <div>
+              <h1 id="stage-upload-title" class="stage-title">Tool Title</h1>
+              <p id="stage-upload-desc" class="stage-subtitle">Tool description goes here.</p>
+            </div>
+          </div>
+
+          <!-- Futuristic Ingestion Drop Zone -->
+          <div class="ingestion-zone" id="ingestion-drop-zone">
+            <div class="zone-glow-ring"></div>
+            <div class="zone-content">
+              <div class="zone-icon-circle">
+                <i data-lucide="cloud-upload" class="zone-lead-icon"></i>
+              </div>
+              <h3 class="zone-heading">Drag and drop your file here</h3>
+              <p id="zone-supported-types" class="zone-subtext">Supported format: .pdf</p>
+
+              <div class="zone-actions-row">
+                <label class="btn-primary-glow" for="studio-file-input">
+                  <i data-lucide="folder-open"></i>
+                  <span id="btn-browse-label">Select Document</span>
+                </label>
+                <input type="file" id="studio-file-input" style="display: none;">
+
+                <button type="button" id="btn-try-sample-stage1" class="btn-secondary-glow">
+                  <i data-lucide="sparkles"></i>
+                  <span>Test With Sample</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           STAGE 2: DEDICATED SPLIT WORKBENCH
+           ================================================================ -->
+      <div id="studio-stage-workbench" class="studio-stage" style="display: none;">
+        <div class="workbench-split-layout">
+
+          <!-- Left / Center Main Stage (Document Cards, Thumbnails, or Interactive Canvases) -->
+          <div class="workbench-main-stage" id="workbench-main-stage">
+
+            <!-- Workarea Top Floating Control Bar -->
+            <div class="main-stage-toolbar">
+              <div class="toolbar-left">
+                <label class="btn-add-more" for="studio-add-more-input" title="Add additional files">
+                  <i data-lucide="plus"></i>
+                  <span>Add Files</span>
+                </label>
+                <input type="file" id="studio-add-more-input" style="display: none;">
+                <span id="main-stage-file-count" class="stage-count-chip">1 file loaded</span>
+              </div>
+              <div class="toolbar-right">
+                <button type="button" class="btn-stage-tool" id="btn-sort-files" title="Sort files alphabetically">
+                  <i data-lucide="arrow-down-a-z"></i> Sort
+                </button>
+                <button type="button" class="btn-stage-tool btn-danger-tool" id="btn-clear-files" title="Clear all files">
+                  <i data-lucide="trash-2"></i> Clear
+                </button>
+              </div>
+            </div>
+
+            <!-- Standard File Cards Grid -->
+            <div class="workbench-file-deck" id="workbench-file-deck">
+              <!-- Dynamically populated file cards -->
+            </div>
+
+            <!-- Visual Stage (For Interactive tools: Edit, Crop, Sign, Redact, Compare PDF) -->
+            <div class="workbench-visual-stage" id="workbench-visual-stage" style="display: none;">
+              <!-- Visual canvas tools render here -->
+            </div>
+          </div>
+
+          <!-- Right Studio Control Panel (Tool Options & Sticky Execution Bar) -->
+          <aside class="workbench-sidebar" id="workbench-sidebar">
+            <div class="sidebar-header">
+              <div class="sidebar-title-row">
+                <div id="sidebar-icon-gem" class="sidebar-icon-gem"></div>
+                <div>
+                  <h3 id="sidebar-tool-title" class="sidebar-heading">Tool Name</h3>
+                  <span class="sidebar-sub">Configuration Panel</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tool Specific Form Inputs -->
+            <div class="sidebar-scrollable-body" id="sidebar-dynamic-options">
+              <!-- Rendered by currentTool.renderOptions() -->
+            </div>
+
+            <!-- Sticky Execution Control Footer -->
+            <div class="sidebar-sticky-footer">
+              <!-- Real-time Progress Animation Bar -->
+              <div class="sidebar-progress-container" id="sidebar-progress-container" style="display: none;">
+                <div class="progress-labels">
+                  <span id="progress-status-label" class="progress-status-label">Processing...</span>
+                  <span id="progress-percentage-label" class="progress-pct-label">0%</span>
+                </div>
+                <div class="progress-track-bar">
+                  <div class="progress-fill-glow" id="sidebar-progress-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <!-- Grand CTA Button -->
+              <button type="button" id="sidebar-action-execute-btn" class="btn-grand-execute">
+                <span id="sidebar-execute-label">Process Document</span>
+                <i data-lucide="arrow-right" class="btn-arrow-icon"></i>
+              </button>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+
+      <!-- ================================================================
+           STAGE 3: SUCCESS & DOWNLOAD CELEBRATION
+           ================================================================ -->
+      <div id="studio-stage-download" class="studio-stage" style="display: none;">
+        <div class="download-celebration-card">
+          <div class="celebration-gem-icon">
+            <i data-lucide="check" class="celebration-check"></i>
+          </div>
+
+          <h2 id="download-heading" class="celebration-title">Document Successfully Processed!</h2>
+          <p id="download-description" class="celebration-subtitle">Your file has been synthesized in memory and is ready for download.</p>
+
+          <div class="download-cta-box">
+            <button type="button" id="btn-instant-download" class="btn-grand-download">
+              <i data-lucide="download"></i>
+              <span id="btn-download-text">Download Document</span>
+            </button>
+            <div id="download-filesize-chip" class="filesize-chip">File Size: 1.2 MB</div>
+          </div>
+
+          <div class="celebration-actions-row">
+            <button type="button" id="btn-process-another-file" class="celebration-link-btn">
+              <i data-lucide="rotate-ccw"></i> Process Another File
+            </button>
+            <button type="button" id="btn-return-directory" class="celebration-link-btn">
+              <i data-lucide="layout-grid"></i> Return to Directory
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         RECENT DOWNLOADS HISTORY DRAWER
+         ==================================================================== -->
+    <div id="history-drawer-overlay" class="drawer-backdrop" aria-hidden="true">
+      <aside class="history-drawer-pane">
+        <div class="drawer-header-bar">
+          <div class="drawer-title-box">
+            <i data-lucide="history" style="color: #6366f1;"></i>
+            <h3>Processing History</h3>
+          </div>
+          <button type="button" id="close-history-drawer-btn" class="drawer-close-btn">&times;</button>
+        </div>
+        <div class="drawer-scroll-body">
+          <div id="history-empty-view" class="history-empty-view">
+            <i data-lucide="inbox"></i>
+            <p>No recent downloads yet.<br>Documents you process will appear here.</p>
+          </div>
+          <div id="history-items-container" class="history-cards-list"></div>
+        </div>
+        <div class="drawer-footer-bar">
+          <button type="button" id="clear-all-history-records" class="btn-clear-history">Clear History</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Toast Notifications Root -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+</body>
+</html>

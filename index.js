@@ -2,11 +2,23 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DIST_DIR = path.join(__dirname, 'dist');
 const PORT = process.env.PORT || 10000;
+
+// Ensure build exists
+if (!fs.existsSync(path.join(DIST_DIR, 'index.html'))) {
+  console.log('dist/index.html not found, running npm run build...');
+  try {
+    execSync('npm run build', { stdio: 'inherit', cwd: __dirname });
+    console.log('Build completed successfully.');
+  } catch (err) {
+    console.error('Failed to run build:', err);
+  }
+}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',

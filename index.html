@@ -266,7 +266,7 @@
             <span>Get Pro</span>
           </button>
 
-          <!-- User Authentication Area (Exclusive Google Login) -->
+          <!-- User Authentication Area (Exclusive Google Login & My Account) -->
           <div id="auth-header-slot" class="auth-header-slot">
             <!-- Unauthenticated State -->
             <button type="button" id="btn-header-login" class="header-btn-auth header-btn-google" title="Sign in with Google">
@@ -276,37 +276,47 @@
                 <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.17 0 9.99 0 12s.46 3.83 1.26 5.42l4.02-3.15z"/>
                 <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.59 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
               </svg>
-              <span class="btn-text-responsive">Sign In</span>
+              <span>Sign In</span>
             </button>
 
-            <!-- Authenticated State (Hidden by default) -->
+            <!-- Authenticated State: Prominent MY ACCOUNT Button -->
             <div id="user-header-widget" class="user-header-widget" style="display: none;">
-              <button type="button" id="btn-user-avatar" class="user-avatar-btn">
+              <button type="button" id="btn-user-avatar" class="header-btn-my-account" title="Open My Account">
                 <span id="user-avatar-initial" class="avatar-initial">U</span>
+                <span class="my-account-label">My Account</span>
                 <span id="user-plan-badge" class="user-plan-badge">FREE</span>
+                <i data-lucide="chevron-down" class="my-account-arrow"></i>
               </button>
               <div id="user-dropdown-menu" class="glass-dropdown-menu user-dropdown-menu">
                 <div class="user-info-box">
-                  <div id="dropdown-user-name" class="user-name">User Name</div>
-                  <div id="dropdown-user-email" class="user-email">user@example.com</div>
+                  <div class="user-info-header">
+                    <div class="user-info-text">
+                      <div id="dropdown-user-name" class="user-name">User Name</div>
+                      <div id="dropdown-user-email" class="user-email">user@example.com</div>
+                    </div>
+                  </div>
+                  <div class="user-sub-status-tag" id="dropdown-sub-status">
+                    <i data-lucide="shield-check" class="status-ic"></i>
+                    <span id="dropdown-plan-title">DocStudio Free Starter</span>
+                  </div>
                 </div>
                 <div class="quota-mini-meter">
                   <div class="quota-meter-label">
-                    <span>Daily Quota</span>
-                    <span id="user-quota-count">0 / 5 Used</span>
+                    <span>Operations Quota</span>
+                    <strong id="user-quota-count">0 / 5 Used</strong>
                   </div>
                   <div class="quota-meter-bar">
                     <div id="user-quota-fill" class="quota-meter-fill" style="width: 0%;"></div>
                   </div>
                 </div>
                 <div class="dropdown-divider"></div>
-                <button type="button" id="dropdown-upgrade-btn" class="glass-dropdown-item highlight-item">
-                  <i data-lucide="zap" style="color: #f59e0b;"></i>
-                  <span>Upgrade to Pro</span>
-                </button>
                 <button type="button" id="dropdown-admin-btn" class="glass-dropdown-item admin-item" style="display: none;">
                   <i data-lucide="shield" style="color: #6366f1;"></i>
-                  <span>Admin Dashboard</span>
+                  <span>Admin Command Center</span>
+                </button>
+                <button type="button" id="dropdown-upgrade-btn" class="glass-dropdown-item highlight-item">
+                  <i data-lucide="crown" style="color: #f59e0b;"></i>
+                  <span>Upgrade / Extend Pro</span>
                 </button>
                 <button type="button" id="dropdown-logout-btn" class="glass-dropdown-item">
                   <i data-lucide="log-out" style="color: #ef4444;"></i>
@@ -670,7 +680,7 @@
           </div>
         </div>
 
-        <!-- KPI Metrics Grid (4 Cards) -->
+        <!-- KPI Metrics Grid (5 Cards) -->
         <div class="admin-kpi-grid">
           <div class="admin-kpi-card">
             <div class="kpi-icon-wrap" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">
@@ -695,13 +705,27 @@
           </div>
 
           <div class="admin-kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
+              <i data-lucide="layers"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Plan Breakdown</span>
+              <div id="kpi-plans-breakdown" class="kpi-value" style="font-size: 1.05rem; line-height: 1.3; font-weight: 700;">
+                <span id="kpi-daily-count">0 Daily (₹5)</span> &bull; 
+                <span id="kpi-monthly-count">0 Monthly (₹100)</span>
+              </div>
+              <span id="kpi-yearly-count" class="kpi-trend text-indigo">0 Yearly (₹1,000)</span>
+            </div>
+          </div>
+
+          <div class="admin-kpi-card">
             <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
               <i data-lucide="indian-rupee"></i>
             </div>
             <div class="kpi-info">
               <span class="kpi-label">Total Revenue</span>
               <div id="kpi-total-revenue" class="kpi-value">₹0</div>
-              <span class="kpi-trend text-emerald">Subscriptions & Upgrades</span>
+              <span class="kpi-trend text-emerald">Verified UPI Payments</span>
             </div>
           </div>
 
@@ -717,19 +741,19 @@
           </div>
         </div>
 
-        <!-- User Management Table Section -->
+        <!-- User Accounts & Subscription Controls Section -->
         <div class="admin-section-card">
           <div class="section-card-header">
             <div>
-              <h3 class="section-card-title">User Accounts & Subscription Controls</h3>
-              <p class="section-card-sub">Manage tiers, toggle pro privileges, and inspect member quotas</p>
+              <h3 class="section-card-title">User Accounts & Subscription Status</h3>
+              <p class="section-card-sub">Inspect registered users, active subscription duration, and grant or revoke quotas</p>
             </div>
             <div class="table-filter-group">
               <input type="text" id="admin-user-search" class="admin-search-input" placeholder="Search name or email...">
               <select id="admin-plan-filter" class="admin-select-filter">
                 <option value="all">All Plans</option>
-                <option value="free">Free Starter</option>
-                <option value="pro">Pro Studio</option>
+                <option value="free">Free Accounts</option>
+                <option value="pro">Pro Subscribers</option>
                 <option value="admin">Administrators</option>
               </select>
               <button type="button" id="btn-admin-refresh-users" class="btn-admin-refresh" title="Reload User Table">
@@ -744,14 +768,45 @@
                 <tr>
                   <th>User Profile</th>
                   <th>Role</th>
-                  <th>Subscription Plan</th>
+                  <th>Active Plan & Duration</th>
+                  <th>Payment & UTR Reference</th>
                   <th>Daily Quota</th>
                   <th>Registered</th>
                   <th style="text-align: right;">Actions</th>
                 </tr>
               </thead>
               <tbody id="admin-users-tbody">
-                <!-- Dynamically rendered by adminService.js -->
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- All Subscription Purchases & UPI Receipts Section -->
+        <div class="admin-section-card">
+          <div class="section-card-header">
+            <div>
+              <h3 class="section-card-title"><i data-lucide="receipt"></i> All Subscription Purchases & UPI Receipts</h3>
+              <p class="section-card-sub">Live records of all purchases: Daily Pass (₹5), Monthly Pro (₹100), and Yearly Pro (₹1,000)</p>
+            </div>
+            <div id="kpi-subscriptions-count-badge" class="count-tag">0 Transactions</div>
+          </div>
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order / Txn ID</th>
+                  <th>User Account</th>
+                  <th>Subscription Duration</th>
+                  <th>Amount</th>
+                  <th>Payment Mode & UPI</th>
+                  <th>UTR / Reference ID</th>
+                  <th>Purchase Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="admin-subscriptions-tbody">
+                <!-- Dynamically rendered -->
               </tbody>
             </table>
           </div>
@@ -1057,7 +1112,7 @@
           <p class="pricing-subtitle">Pick the duration that fits your schedule: Instant Day Pass, Monthly, or Yearly.</p>
         </div>
 
-        <!-- 3 Duration Tiers for Pro Plan -->
+        <!-- 3 Duration Tiers for Pro Plan (All identical Pro features, only validity time differs) -->
         <div class="pro-tiers-grid">
           <!-- 1. DAILY PASS (₹5) -->
           <div class="pro-tier-card" data-tier-duration="daily" data-tier-price="5">
@@ -1066,15 +1121,17 @@
             <div class="tier-price-row">
               <span class="currency">₹</span>
               <span class="amount">5</span>
-              <span class="period">/ 1 day</span>
+              <span class="period">/ 24 Hours</span>
             </div>
-            <p class="tier-desc">Unlimited access for urgent single-day tasks</p>
+            <p class="tier-desc">Complete Pro power for 1 full day of urgent work</p>
             <ul class="tier-features-list">
-              <li><i data-lucide="check"></i> <span>Unlimited Operations (24h)</span></li>
-              <li><i data-lucide="check"></i> <span>All 30 Document Tools</span></li>
-              <li><i data-lucide="check"></i> <span>Full High-Speed Processing</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>All 30 Document Tools Unlocked</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Unlimited Daily Operations</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Turbo Multi-Threaded OCR & Speed</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>200 MB File Upload Capacity</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Gold PRO Badge on Profile</span></li>
             </ul>
-            <button type="button" class="btn-tier-select" data-select-tier="daily">Select Daily — ₹5</button>
+            <button type="button" class="btn-tier-select" data-select-tier="daily">Select 24-Hour Pass — ₹5</button>
           </div>
 
           <!-- 2. MONTHLY PRO (₹100) - FEATURED -->
@@ -1085,16 +1142,17 @@
             <div class="tier-price-row">
               <span class="currency">₹</span>
               <span class="amount">100</span>
-              <span class="period">/ month</span>
+              <span class="period">/ 30 Days</span>
             </div>
-            <p class="tier-desc">Only ₹3.3/day &bull; Unrestricted document engine</p>
+            <p class="tier-desc">Only ₹3.3/day &bull; 1 Month of full unrestricted access</p>
             <ul class="tier-features-list">
-              <li><i data-lucide="check" class="text-emerald"></i> <strong>Unlimited Operations (30 Days)</strong></li>
-              <li><i data-lucide="check" class="text-emerald"></i> <strong>Up to 200 MB File Sizes</strong></li>
-              <li><i data-lucide="check" class="text-emerald"></i> <strong>Turbo Multi-Threaded OCR</strong></li>
-              <li><i data-lucide="check" class="text-emerald"></i> <strong>Gold Pro Badge on Profile</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>All 30 Document Tools Unlocked</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Unlimited Daily Operations (30 Days)</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Turbo Multi-Threaded OCR & Speed</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>200 MB File Upload Capacity</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Gold PRO Badge on Profile</strong></li>
             </ul>
-            <button type="button" class="btn-tier-select btn-primary-tier" data-select-tier="monthly">Select Monthly — ₹100</button>
+            <button type="button" class="btn-tier-select btn-primary-tier" data-select-tier="monthly">Select Monthly Pro — ₹100</button>
           </div>
 
           <!-- 3. YEARLY PRO (₹1,000) -->
@@ -1104,16 +1162,17 @@
             <div class="tier-price-row">
               <span class="currency">₹</span>
               <span class="amount">1,000</span>
-              <span class="period">/ year</span>
+              <span class="period">/ 365 Days</span>
             </div>
-            <p class="tier-desc">Save ₹200 &bull; Equivalent to ₹83/month</p>
+            <p class="tier-desc">Save ₹200 &bull; Full 365 days of continuous Pro access</p>
             <ul class="tier-features-list">
-              <li><i data-lucide="check"></i> <span>365 Days Unlimited Access</span></li>
-              <li><i data-lucide="check"></i> <span>Everything in Monthly Pro</span></li>
-              <li><i data-lucide="check"></i> <span>Priority Customer Support</span></li>
-              <li><i data-lucide="check"></i> <span>Best ROI for Power Users</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>All 30 Document Tools Unlocked</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Unlimited Daily Operations (365 Days)</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Turbo Multi-Threaded OCR & Speed</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>200 MB File Upload Capacity</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Gold PRO Badge on Profile</span></li>
             </ul>
-            <button type="button" class="btn-tier-select" data-select-tier="yearly">Select Yearly — ₹1,000</button>
+            <button type="button" class="btn-tier-select" data-select-tier="yearly">Select Yearly Pro — ₹1,000</button>
           </div>
         </div>
 
@@ -1127,7 +1186,7 @@
               <p class="upi-checkout-sub">Scan the QR code or pay to the UPI ID from any app (GPay, PhonePe, Paytm, BHIM)</p>
             </div>
             <div class="upi-payable-pill">
-              <span>Payable:</span>
+              <span id="label-selected-plan-name">Selected: Monthly Pro (30 Days)</span>
               <strong id="display-payable-amount">₹100</strong>
             </div>
           </div>

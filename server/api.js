@@ -299,6 +299,9 @@ export async function handleApiRoute(req, res, path) {
           email: updated.email,
           role: updated.role,
           plan: updated.plan,
+          planDuration: duration,
+          planAmount: Number(amount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100)),
+          planUtr: utrRef,
           dailyOperationsUsed: updated.dailyOperationsUsed || 0,
           dailyQuota: updated.dailyQuota
         }

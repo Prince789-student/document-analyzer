@@ -58,9 +58,9 @@
       "email": "rahul@gmail.com",
       "password": "$2b$10$.yV6nnRtG.Xd1/yM1vYM3uC4F9M2yWgvVymksTj.kddE/OtIGNALy",
       "role": "user",
-      "plan": "pro",
+      "plan": "free",
       "dailyOperationsUsed": 0,
-      "dailyQuota": 9999,
+      "dailyQuota": 5,
       "lastQuotaReset": "2026-10-03T16:50:30.389Z",
       "createdAt": "2026-10-03T16:50:30.389Z",
       "_id": "usr_1791046230389n9hd"
@@ -80,6 +80,38 @@
     }
   ],
   "logs": [
+    {
+      "id": "log_1791047570171",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-03T17:12:50.171Z"
+    },
+    {
+      "id": "log_1791047556046",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-03T17:12:36.046Z"
+    },
+    {
+      "id": "log_1791047174536",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "ADMIN_UPDATE_USER",
+      "details": "Admin updated user usr_1791046230389n9hd (Plan: free, Role: undefined)",
+      "createdAt": "2026-10-03T17:06:14.536Z"
+    },
+    {
+      "id": "log_1791047158410",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-03T17:05:58.410Z"
+    },
     {
       "id": "log_1791046345249",
       "userId": "usr_1791044602872r8eb",

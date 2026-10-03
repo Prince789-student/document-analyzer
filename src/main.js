@@ -93,6 +93,8 @@ class DocuMatrixStudioApp {
     this.btnTierSelects = document.querySelectorAll('.btn-tier-select');
     this.fastUpiDrawer = document.getElementById('fast-upi-payment-drawer');
     this.displayPayableAmount = document.getElementById('display-payable-amount');
+    this.labelSelectedPlanName = document.getElementById('label-selected-plan-name');
+    this.btnVerifyLabel = document.getElementById('btn-verify-label');
     this.displayUpiId = document.getElementById('display-upi-id');
     this.btnCopyUpiId = document.getElementById('btn-copy-upi-id');
     this.btnUpiDeeplink = document.getElementById('btn-upi-deeplink');
@@ -111,14 +113,22 @@ class DocuMatrixStudioApp {
     this.adminUserSearch = document.getElementById('admin-user-search');
     this.adminPlanFilter = document.getElementById('admin-plan-filter');
     this.adminUsersTbody = document.getElementById('admin-users-tbody');
+    this.adminSubscriptionsTbody = document.getElementById('admin-subscriptions-tbody');
     this.adminLogsContainer = document.getElementById('admin-logs-container');
     this.kpiTotalUsers = document.getElementById('kpi-total-users');
     this.kpiProUsers = document.getElementById('kpi-pro-users');
     this.kpiProRatio = document.getElementById('kpi-pro-ratio');
+    this.kpiDailyCount = document.getElementById('kpi-daily-count');
+    this.kpiMonthlyCount = document.getElementById('kpi-monthly-count');
+    this.kpiYearlyCount = document.getElementById('kpi-yearly-count');
+    this.kpiSubscriptionsCountBadge = document.getElementById('kpi-subscriptions-count-badge');
     this.kpiTotalRevenue = document.getElementById('kpi-total-revenue');
     this.kpiTotalOps = document.getElementById('kpi-total-ops');
     this.mongoStatusPill = document.getElementById('mongo-status-pill');
     this.mongoStatusText = document.getElementById('mongo-status-text');
+    this.myAccountLabel = document.querySelector('.my-account-label');
+    this.dropdownPlanTitle = document.getElementById('dropdown-plan-title');
+    this.dropdownSubStatus = document.getElementById('dropdown-sub-status');
     this.globalSearchInput = document.getElementById('global-search-input');
     this.globalSearchClear = document.getElementById('global-search-clear');
     this.sampleDocsDropdownBtn = document.getElementById('sample-docs-dropdown-btn');
@@ -1568,23 +1578,35 @@ class DocuMatrixStudioApp {
 
     const updateSelectedTier = (duration, amount) => {
       this.selectedPlanDuration = duration;
-      this.selectedPlanAmount = Number(amount) || 100;
+      this.selectedPlanAmount = Number(amount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
       this.proTierCards?.forEach(card => {
         card.classList.toggle('selected', card.dataset.tierDuration === duration);
       });
       if (this.displayPayableAmount) {
         this.displayPayableAmount.textContent = `₹${this.selectedPlanAmount.toLocaleString('en-IN')}`;
       }
+      if (this.labelSelectedPlanName) {
+        const nameMap = {
+          daily: '24-Hour Pass (₹5)',
+          monthly: 'Monthly Pro (₹100)',
+          yearly: 'Yearly Pro (₹1,000)'
+        };
+        this.labelSelectedPlanName.textContent = `Selected: ${nameMap[duration] || 'Monthly Pro (₹100)'}`;
+      }
+      if (this.btnVerifyLabel) {
+        this.btnVerifyLabel.textContent = `I Have Paid ₹${this.selectedPlanAmount} • Activate Pro Instantly`;
+      }
       if (this.btnUpiDeeplink) {
         const upiId = this.activeUpiId || 'apnacollegebihar@slc';
         this.btnUpiDeeplink.href = `upi://pay?pa=${upiId}&pn=DocStudio&am=${this.selectedPlanAmount}&cu=INR&tn=DocStudio%20Pro%20${duration.toUpperCase()}`;
       }
     };
+    this.updateSelectedTier = updateSelectedTier;
 
     this.proTierCards?.forEach(card => {
       card.addEventListener('click', () => {
         const dur = card.dataset.tierDuration || 'monthly';
-        const amt = card.dataset.tierPrice || 100;
+        const amt = card.dataset.tierPrice || (dur === 'daily' ? 5 : (dur === 'yearly' ? 1000 : 100));
         updateSelectedTier(dur, amt);
       });
     });
@@ -1704,17 +1726,19 @@ class DocuMatrixStudioApp {
   updateAuthHeader(user) {
     if (user) {
       if (this.btnHeaderLogin) this.btnHeaderLogin.style.display = 'none';
-      if (this.userHeaderWidget) this.userHeaderWidget.style.display = 'flex';
+      if (this.userHeaderWidget) this.userHeaderWidget.style.display = 'inline-flex';
 
       const initial = (user.name || user.email || 'U').charAt(0).toUpperCase();
       if (this.userAvatarInitial) this.userAvatarInitial.textContent = initial;
+      if (this.myAccountLabel) this.myAccountLabel.textContent = 'My Account';
 
       if (this.userPlanBadge) {
         if (user.role === 'admin') {
           this.userPlanBadge.textContent = 'ADMIN';
           this.userPlanBadge.className = 'user-plan-badge admin';
         } else if (user.plan === 'pro') {
-          this.userPlanBadge.textContent = 'PRO';
+          const dBadge = user.planDuration === 'daily' ? 'PRO (1D)' : (user.planDuration === 'yearly' ? 'PRO (1Y)' : 'PRO');
+          this.userPlanBadge.textContent = dBadge;
           this.userPlanBadge.className = 'user-plan-badge pro';
         } else {
           this.userPlanBadge.textContent = 'FREE';
@@ -1724,6 +1748,17 @@ class DocuMatrixStudioApp {
 
       if (this.dropdownUserName) this.dropdownUserName.textContent = user.name || 'DocStudio User';
       if (this.dropdownUserEmail) this.dropdownUserEmail.textContent = user.email;
+
+      if (this.dropdownPlanTitle) {
+        if (user.role === 'admin') {
+          this.dropdownPlanTitle.textContent = 'Super Admin • Lifetime Access';
+        } else if (user.plan === 'pro') {
+          const durText = user.planDuration === 'daily' ? 'Daily Pass (₹5)' : (user.planDuration === 'yearly' ? 'Yearly Pro (₹1,000)' : 'Monthly Pro (₹100)');
+          this.dropdownPlanTitle.textContent = `DocStudio Pro • ${durText}`;
+        } else {
+          this.dropdownPlanTitle.textContent = 'DocStudio Free Starter (5 ops/day)';
+        }
+      }
 
       const isUnlimited = user.role === 'admin' || user.plan === 'pro' || user.plan === 'enterprise';
       if (this.userQuotaCount) {
@@ -1790,15 +1825,8 @@ class DocuMatrixStudioApp {
     if (this.pricingModalOverlay) {
       this.pricingModalOverlay.style.display = 'flex';
       this.pricingModalOverlay.setAttribute('aria-hidden', 'false');
-      this.selectedPlanDuration = 'monthly';
-      this.selectedPlanAmount = 100;
-      this.proTierCards?.forEach(card => {
-        card.classList.toggle('selected', card.dataset.tierDuration === 'monthly');
-      });
-      if (this.displayPayableAmount) this.displayPayableAmount.textContent = '₹100';
-      if (this.btnUpiDeeplink) {
-        const upiId = this.activeUpiId || 'apnacollegebihar@slc';
-        this.btnUpiDeeplink.href = `upi://pay?pa=${upiId}&pn=DocStudio&am=100&cu=INR&tn=DocStudio%20Pro%20MONTHLY`;
+      if (typeof this.updateSelectedTier === 'function') {
+        this.updateSelectedTier(this.selectedPlanDuration || 'monthly', this.selectedPlanAmount || 100);
       }
     }
     this.refreshIcons();
@@ -1836,6 +1864,12 @@ class DocuMatrixStudioApp {
         const ratio = metrics.totalUsers ? Math.round((metrics.proSubscribers / metrics.totalUsers) * 100) : 0;
         this.kpiProRatio.textContent = `${ratio}% Pro Conversion`;
       }
+      if (this.kpiDailyCount) this.kpiDailyCount.textContent = `${metrics.dailyPasses || 0} Daily (₹5)`;
+      if (this.kpiMonthlyCount) this.kpiMonthlyCount.textContent = `${metrics.monthlySubs || 0} Monthly (₹100)`;
+      if (this.kpiYearlyCount) this.kpiYearlyCount.textContent = `${metrics.yearlySubs || 0} Yearly (₹1,000)`;
+      if (this.kpiSubscriptionsCountBadge) {
+        this.kpiSubscriptionsCountBadge.textContent = `${(metrics.subscriptions || []).length} Transactions`;
+      }
       if (this.kpiTotalRevenue) this.kpiTotalRevenue.textContent = `₹${(metrics.totalRevenue || 0).toLocaleString('en-IN')}`;
       if (this.kpiTotalOps) this.kpiTotalOps.textContent = metrics.totalOperations || 0;
 
@@ -1844,6 +1878,10 @@ class DocuMatrixStudioApp {
       }
       if (this.mongoStatusPill) {
         this.mongoStatusPill.className = metrics.isMongoConnected ? 'mongo-status-pill connected' : 'mongo-status-pill local';
+      }
+
+      if (metrics.subscriptions) {
+        this.renderAdminSubscriptions(metrics.subscriptions);
       }
 
       if (metrics.recentLogs) {
@@ -1884,7 +1922,7 @@ class DocuMatrixStudioApp {
     if (users.length === 0) {
       this.adminUsersTbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-dim);">
+          <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-dim);">
             <i data-lucide="users" style="width: 24px; height: 24px; margin-bottom: 8px; display: inline-block;"></i>
             <div>No matching user accounts found.</div>
           </td>
@@ -1919,7 +1957,31 @@ class DocuMatrixStudioApp {
             <span class="user-tag ${roleClass}">${u.role.toUpperCase()}</span>
           </td>
           <td>
-            <span class="user-tag ${planClass}">${(u.plan || 'free').toUpperCase()}</span>
+            <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+              <span class="user-tag ${planClass}">${(u.plan || 'free').toUpperCase()}</span>
+              ${u.plan === 'pro' ? `
+                <span class="sub-plan-badge ${u.planDuration || 'monthly'}">
+                  <i data-lucide="${u.planDuration === 'daily' ? 'clock' : (u.planDuration === 'yearly' ? 'crown' : 'calendar')}"></i>
+                  ${u.planDuration === 'daily' ? '24-Hr Pass' : (u.planDuration === 'yearly' ? '365-Day Pro' : '30-Day Pro')}
+                </span>
+              ` : (u.role === 'admin' ? `
+                <span class="sub-plan-badge yearly"><i data-lucide="shield"></i> Lifetime</span>
+              ` : `
+                <span class="sub-plan-badge free">Free Tier</span>
+              `)}
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span class="sub-amount-tag ${u.planAmount ? '' : 'free'}">
+                ${u.planAmount ? `₹${u.planAmount}` : (u.role === 'admin' ? 'Exempt' : 'Free (₹0)')}
+              </span>
+              ${u.planUtr ? `
+                <span class="sub-utr-tag" title="UTR Reference: ${u.planUtr}"><i data-lucide="hash"></i> ${u.planUtr}</span>
+              ` : `
+                <span class="sub-utr-tag empty">No UTR</span>
+              `}
+            </div>
           </td>
           <td>
             <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-heading);">
@@ -1927,7 +1989,7 @@ class DocuMatrixStudioApp {
             </div>
             <div style="font-size: 0.72rem; color: var(--text-dim);">Operations / day</div>
           </td>
-          <td style="font-size: 0.82rem; color: var(--text-dim);">
+          <td style="font-size: 0.82rem; color: var(--text-dim); white-space: nowrap;">
             ${regDate}
           </td>
           <td style="text-align: right;">
@@ -1987,6 +2049,78 @@ class DocuMatrixStudioApp {
         }
       });
     });
+
+    this.refreshIcons();
+  }
+
+  renderAdminSubscriptions(subscriptions) {
+    if (!this.adminSubscriptionsTbody) return;
+
+    if (!subscriptions || subscriptions.length === 0) {
+      this.adminSubscriptionsTbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-dim);">
+            <i data-lucide="receipt" style="width: 24px; height: 24px; margin-bottom: 8px; display: inline-block;"></i>
+            <div>No UPI subscription receipts recorded yet.</div>
+          </td>
+        </tr>
+      `;
+      this.refreshIcons();
+      return;
+    }
+
+    this.adminSubscriptionsTbody.innerHTML = subscriptions.map((s, idx) => {
+      const txnId = s.id || s._id || `TXN-${String(idx + 1001).padStart(6, '0')}`;
+      const duration = s.duration || 'monthly';
+      const durLabel = duration === 'daily' ? '24 Hours (Daily)' : (duration === 'yearly' ? '365 Days (Yearly)' : '30 Days (Monthly)');
+      const amount = s.amount || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
+      const dateStr = s.createdAt ? new Date(s.createdAt).toLocaleString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : 'Recent';
+
+      return `
+        <tr>
+          <td>
+            <span class="sub-txn-id">${txnId}</span>
+          </td>
+          <td>
+            <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-heading);">${s.userEmail || s.userId || 'User'}</div>
+          </td>
+          <td>
+            <span class="sub-plan-badge ${duration}">
+              <i data-lucide="${duration === 'daily' ? 'clock' : (duration === 'yearly' ? 'crown' : 'calendar')}"></i>
+              ${durLabel}
+            </span>
+          </td>
+          <td>
+            <span style="font-weight: 800; font-size: 0.95rem; color: #10b981; font-family: var(--font-heading);">
+              ₹${amount.toLocaleString('en-IN')}
+            </span>
+          </td>
+          <td>
+            <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-heading);">${s.paymentMethod || 'UPI Instant'}</div>
+            <div style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);">${s.upiId || 'apnacollegebihar@slc'}</div>
+          </td>
+          <td>
+            <span class="sub-utr-tag ${s.utrRef ? '' : 'empty'}" title="${s.utrRef || 'No UTR Reference'}">
+              <i data-lucide="hash"></i> ${s.utrRef || 'Direct UPI'}
+            </span>
+          </td>
+          <td style="font-size: 0.8rem; color: var(--text-dim); white-space: nowrap;">
+            ${dateStr}
+          </td>
+          <td>
+            <span class="sub-status-pill active">
+              <i data-lucide="check-circle-2"></i> ${s.status || 'Active'}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
 
     this.refreshIcons();
   }

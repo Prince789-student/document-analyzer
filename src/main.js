@@ -353,7 +353,7 @@ class DocuMatrixStudioApp {
         }
         this.showHomeView(false);
         this.renderToolsGrid();
-        document.title = `${catObj.name} — DocuMatrix Studio`;
+        document.title = `${catObj.name} — DocStudio`;
         return;
       }
     }
@@ -388,7 +388,7 @@ class DocuMatrixStudioApp {
     this.activeFiles = [];
     this.lastProcessedResult = null;
     this.updateNavTabsActiveState(null);
-    document.title = 'DocuMatrix Studio — Next-Gen Client-Side PDF Engine';
+    document.title = 'DocStudio — Next-Gen Client-Side PDF Engine';
   }
 
   updateNavTabsActiveState(activeId) {
@@ -442,7 +442,7 @@ class DocuMatrixStudioApp {
     this.pendingFilesForRoute = null;
     this.activeFiles = [...filesToLoad];
 
-    document.title = `${meta.title} — DocuMatrix Studio`;
+    document.title = `${meta.title} — DocStudio`;
     this.updateNavTabsActiveState(toolId);
 
     // Switch Views

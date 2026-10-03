@@ -87,5 +87,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`DocuMatrix Studio server running on port ${PORT}`);
+  console.log(`DocStudio server running on port ${PORT}`);
 });

@@ -45,16 +45,104 @@
       "email": "prince86944@gmail.com",
       "password": "$2b$10$a9OigBHSV33XqxLs/TVcPOA/0tYrjFAzGI9xM.NLimWDYxjBdb.me",
       "role": "admin",
-      "plan": "pro",
+      "plan": "enterprise",
       "dailyOperationsUsed": 0,
       "dailyQuota": 9999,
       "lastQuotaReset": "2026-10-03T16:23:22.872Z",
       "createdAt": "2026-10-03T16:23:22.873Z",
       "_id": "usr_1791044602872r8eb"
+    },
+    {
+      "id": "usr_1791046230389n9hd",
+      "name": "Rahul Sharma",
+      "email": "rahul@gmail.com",
+      "password": "$2b$10$.yV6nnRtG.Xd1/yM1vYM3uC4F9M2yWgvVymksTj.kddE/OtIGNALy",
+      "role": "user",
+      "plan": "pro",
+      "dailyOperationsUsed": 0,
+      "dailyQuota": 9999,
+      "lastQuotaReset": "2026-10-03T16:50:30.389Z",
+      "createdAt": "2026-10-03T16:50:30.389Z",
+      "_id": "usr_1791046230389n9hd"
     }
   ],
-  "subscriptions": [],
+  "subscriptions": [
+    {
+      "id": "sub_1791046242879",
+      "userId": "usr_1791046230389n9hd",
+      "userEmail": "rahul@gmail.com",
+      "plan": "pro",
+      "amount": 100,
+      "currency": "INR",
+      "status": "active",
+      "paymentMethod": "UPI",
+      "createdAt": "2026-10-03T16:50:42.879Z"
+    }
+  ],
   "logs": [
+    {
+      "id": "log_1791046302172",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "ADMIN_UPDATE_USER",
+      "details": "Admin updated user usr_1791044602872r8eb (Plan: enterprise, Role: undefined)",
+      "createdAt": "2026-10-03T16:51:42.172Z"
+    },
+    {
+      "id": "log_1791046300453",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "ADMIN_UPDATE_USER",
+      "details": "Admin updated user usr_1791044602872r8eb (Plan: free, Role: undefined)",
+      "createdAt": "2026-10-03T16:51:40.453Z"
+    },
+    {
+      "id": "log_1791046283381",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-03T16:51:23.381Z"
+    },
+    {
+      "id": "log_1791046254525",
+      "userEmail": "rahul@gmail.com",
+      "action": "CONTACT_SUBMITTED",
+      "details": "From: Rahul (rahul@gmail.com) | Subject: Pro Subscription | Message: I paid via UPI ID apnacollegebihar@slc, activate my pro!",
+      "createdAt": "2026-10-03T16:50:54.525Z"
+    },
+    {
+      "id": "log_1791046242879",
+      "userId": "usr_1791046230389n9hd",
+      "userEmail": "rahul@gmail.com",
+      "action": "PRO_SUBSCRIPTION_ACTIVE",
+      "details": "Activated PRO (MONTHLY - ₹100) via UPI (Ref: UPI-428901239845)",
+      "createdAt": "2026-10-03T16:50:42.879Z"
+    },
+    {
+      "id": "log_1791046230391",
+      "userId": "usr_1791046230389n9hd",
+      "userEmail": "rahul@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Rahul Sharma (rahul@gmail.com) - user",
+      "createdAt": "2026-10-03T16:50:30.391Z"
+    },
+    {
+      "id": "log_1791046217488",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-03T16:50:17.488Z"
+    },
+    {
+      "id": "log_1791045714586",
+      "userId": "usr_1791043874792llz3",
+      "userEmail": "pro@docstudio.com",
+      "action": "USER_LOGIN",
+      "details": "User logged in from web",
+      "createdAt": "2026-10-03T16:41:54.586Z"
+    },
     {
       "id": "log_1791044632624",
       "userId": "usr_1791043874792llz3",
@@ -71,5 +159,10 @@
       "details": "User logged in from web",
       "createdAt": "2026-10-03T16:23:30.973Z"
     }
-  ]
+  ],
+  "config": {
+    "upiId": "apnacollegebihar@slc",
+    "upiName": "DocStudio Pro",
+    "qrCodeUrl": "/upi-qr.png"
+  }
 }

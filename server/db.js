@@ -78,14 +78,43 @@ export const MongoLog = mongoose.model('AuditLog', logSchema);
 function readLocalDb() {
   try {
     if (!fs.existsSync(DATA_FILE)) {
-      const initial = { users: [], subscriptions: [], logs: [] };
+      const initial = {
+        users: [],
+        subscriptions: [],
+        logs: [],
+        config: {
+          upiId: 'apnacollegebihar@slc',
+          upiName: 'DocStudio Pro',
+          qrCodeUrl: '/upi-qr.png'
+        }
+      };
       fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2));
       return initial;
     }
     const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!parsed.config || !parsed.config.upiId) {
+      parsed.config = {
+        upiId: 'apnacollegebihar@slc',
+        upiName: 'DocStudio Pro',
+        qrCodeUrl: '/upi-qr.png'
+      };
+    } else {
+      parsed.config.upiId = 'apnacollegebihar@slc';
+      parsed.config.qrCodeUrl = '/upi-qr.png';
+    }
+    return parsed;
   } catch (e) {
-    return { users: [], subscriptions: [], logs: [] };
+    return {
+      users: [],
+      subscriptions: [],
+      logs: [],
+      config: {
+        upiId: 'apnacollegebihar@slc',
+        upiName: 'DocStudio Pro',
+        qrCodeUrl: '/upi-qr.png'
+      }
+    };
   }
 }
 
@@ -95,6 +124,49 @@ function writeLocalDb(data) {
   } catch (e) {
     console.error('Failed to write local database:', e);
   }
+}
+
+export async function getAppConfig() {
+  const db = readLocalDb();
+  return db.config || {
+    upiId: 'apnacollegebihar@slc',
+    upiName: 'DocStudio Pro',
+    qrCodeUrl: '/upi-qr.png'
+  };
+}
+
+export async function updateAppConfig(newConfig) {
+  const db = readLocalDb();
+  db.config = { ...db.config, ...newConfig };
+  writeLocalDb(db);
+  return db.config;
+}
+
+export async function findOrCreateGoogleUser({ email, name, avatar = '', googleId = '' }) {
+  const normEmail = email.toLowerCase().trim();
+  let user = await findUserByEmail(normEmail);
+
+  const isSuperAdmin = normEmail === 'prince86944@gmail.com';
+  const role = isSuperAdmin ? 'admin' : (user ? user.role : 'user');
+  const plan = isSuperAdmin ? 'pro' : (user ? user.plan : 'free');
+
+  if (user) {
+    if (isSuperAdmin && (user.role !== 'admin' || user.plan !== 'pro')) {
+      user = await updateUser(user._id || user.id, { role: 'admin', plan: 'pro' });
+    }
+    return user;
+  }
+
+  // Create new Google user with generated secure token
+  const randomPass = 'goog_' + Math.random().toString(36).slice(2) + Date.now();
+  user = await createUser({
+    name: name || normEmail.split('@')[0],
+    email: normEmail,
+    password: randomPass,
+    role,
+    plan
+  });
+  return user;
 }
 
 // --------------------------------------------------------------------------

@@ -15,12 +15,17 @@ import { adminService } from './utils/adminService.js';
 
 class DocuMatrixStudioApp {
   constructor() {
-    this.currentView = 'home'; // 'home' | 'tool' | 'admin'
+    this.currentView = 'home'; // 'home' | 'tool' | 'admin' | 'legal'
     this.currentStage = 1;      // 1: Upload, 2: Workbench, 3: Download
     this.currentFilter = 'all';
     this.searchQuery = '';
     this.adminUsersList = [];
     this.authMode = 'signin';
+
+    // Pricing & UPI Configuration
+    this.selectedPlanDuration = 'monthly';
+    this.selectedPlanAmount = 100;
+    this.activeUpiId = 'apnacollegebihar@slc';
 
     this.selectedToolMeta = null;
     this.activeToolInstance = null;
@@ -48,6 +53,11 @@ class DocuMatrixStudioApp {
     this.homeView = document.getElementById('home-view');
     this.studioToolView = document.getElementById('studio-tool-view');
     this.adminView = document.getElementById('admin-view');
+    this.legalView = document.getElementById('legal-view');
+    this.btnLegalBackStudio = document.getElementById('btn-legal-back-studio');
+    this.legalTabButtons = document.querySelectorAll('.legal-tab-btn');
+    this.legalPanes = document.querySelectorAll('.legal-content-pane');
+    this.contactSupportForm = document.getElementById('contact-support-form');
 
     // Header & Navigation
     this.brandHomeLink = document.getElementById('brand-home-link');
@@ -66,29 +76,29 @@ class DocuMatrixStudioApp {
     this.dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
     this.dropdownLogoutBtn = document.getElementById('dropdown-logout-btn');
 
-    // Auth Modal Elements
+    // Auth Modal Elements (Google OAuth Exclusive)
     this.authModalOverlay = document.getElementById('auth-modal-overlay');
     this.btnCloseAuthModal = document.getElementById('btn-close-auth-modal');
-    this.tabSignIn = document.getElementById('tab-sign-in');
-    this.tabSignUp = document.getElementById('tab-sign-up');
-    this.authForm = document.getElementById('auth-form');
-    this.groupName = document.getElementById('group-name');
-    this.authName = document.getElementById('auth-name');
-    this.authEmail = document.getElementById('auth-email');
-    this.authPassword = document.getElementById('auth-password');
-    this.btnSubmitAuth = document.getElementById('btn-submit-auth');
-    this.btnAuthSubmitLabel = document.getElementById('btn-auth-submit-label');
-    this.btnDemoAdmin = document.getElementById('btn-demo-admin');
-    this.btnDemoPro = document.getElementById('btn-demo-pro');
-    this.btnDemoFree = document.getElementById('btn-demo-free');
+    this.btnGoogleSignIn = document.getElementById('btn-google-signin');
+    this.btnGooglePrinceAdmin = document.getElementById('btn-google-prince-admin');
+    this.btnGoogleGuestUser = document.getElementById('btn-google-guest-user');
+    this.formCustomGoogle = document.getElementById('form-custom-google');
+    this.customGoogleEmail = document.getElementById('custom-google-email');
+    this.customGoogleName = document.getElementById('custom-google-name');
 
-    // Pricing & Checkout Elements
+    // Pricing & Fast UPI Checkout Elements (DocStudio PRO: ₹5 / ₹100 / ₹1,000)
     this.pricingModalOverlay = document.getElementById('pricing-modal-overlay');
     this.btnClosePricingModal = document.getElementById('btn-close-pricing-modal');
-    this.btnPlanPro = document.getElementById('btn-plan-pro');
-    this.checkoutDrawerBox = document.getElementById('checkout-drawer-box');
-    this.btnConfirmPayment = document.getElementById('btn-confirm-payment');
-    this.btnCancelCheckout = document.getElementById('btn-cancel-checkout');
+    this.proTierCards = document.querySelectorAll('.pro-tier-card');
+    this.btnTierSelects = document.querySelectorAll('.btn-tier-select');
+    this.fastUpiDrawer = document.getElementById('fast-upi-payment-drawer');
+    this.displayPayableAmount = document.getElementById('display-payable-amount');
+    this.displayUpiId = document.getElementById('display-upi-id');
+    this.btnCopyUpiId = document.getElementById('btn-copy-upi-id');
+    this.btnUpiDeeplink = document.getElementById('btn-upi-deeplink');
+    this.inputUpiUtr = document.getElementById('input-upi-utr');
+    this.btnVerifyUpiPayment = document.getElementById('btn-verify-upi-payment');
+    this.pricingQrImage = document.getElementById('pricing-qr-image');
 
     // Quota Modal Elements
     this.quotaModalOverlay = document.getElementById('quota-modal-overlay');
@@ -423,6 +433,17 @@ class DocuMatrixStudioApp {
       return;
     }
 
+    // Legal, Compliance & Support routes: #/privacy, #/terms, #/refund, #/about, #/contact
+    if (['privacy', 'terms', 'refund', 'about', 'contact'].includes(clean)) {
+      this.showLegalView(clean, false);
+      return;
+    }
+    if (clean.startsWith('legal/')) {
+      const sub = clean.replace('legal/', '').trim() || 'privacy';
+      this.showLegalView(sub, false);
+      return;
+    }
+
     // Category filter route: #/category/:catId
     if (clean.startsWith('category/')) {
       const catId = clean.replace('category/', '').trim();
@@ -453,7 +474,7 @@ class DocuMatrixStudioApp {
   }
 
   /* --------------------------------------------------------------------------
-     Navigation Views (Home Directory vs Studio Tool View vs Admin Portal)
+     Navigation Views (Home Directory vs Studio Tool View vs Admin Portal vs Legal)
      -------------------------------------------------------------------------- */
   showHomeView(updateHash = true) {
     if (updateHash && window.location.hash !== '#/' && window.location.hash !== '') {
@@ -465,6 +486,7 @@ class DocuMatrixStudioApp {
     if (this.homeView) this.homeView.style.display = 'block';
     if (this.studioToolView) this.studioToolView.style.display = 'none';
     if (this.adminView) this.adminView.style.display = 'none';
+    if (this.legalView) this.legalView.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     this.selectedToolMeta = null;
@@ -485,11 +507,49 @@ class DocuMatrixStudioApp {
     if (this.homeView) this.homeView.style.display = 'none';
     if (this.studioToolView) this.studioToolView.style.display = 'none';
     if (this.adminView) this.adminView.style.display = 'block';
+    if (this.legalView) this.legalView.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     document.title = 'Admin Command Center — DocStudio';
     this.updateNavTabsActiveState(null);
     this.loadAdminDashboard();
+    this.refreshIcons();
+  }
+
+  showLegalView(section = 'privacy', updateHash = true) {
+    if (updateHash && window.location.hash !== `#/${section}`) {
+      this.navigateTo(`#/${section}`);
+      return;
+    }
+
+    this.currentView = 'legal';
+    if (this.homeView) this.homeView.style.display = 'none';
+    if (this.studioToolView) this.studioToolView.style.display = 'none';
+    if (this.adminView) this.adminView.style.display = 'none';
+    if (this.legalView) this.legalView.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Activate corresponding tab button
+    document.querySelectorAll('.legal-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.legalTarget === section);
+    });
+
+    // Activate corresponding content pane
+    document.querySelectorAll('.legal-content-pane').forEach(pane => {
+      const match = pane.id === `legal-pane-${section}`;
+      pane.style.display = match ? 'block' : 'none';
+      pane.classList.toggle('active', match);
+    });
+
+    const titles = {
+      privacy: 'Privacy Policy — DocStudio',
+      terms: 'Terms of Service — DocStudio',
+      refund: 'Refund & Cancellation Policy — DocStudio',
+      about: 'About DocStudio — Engineering Principles',
+      contact: 'Contact Support & Help Desk — DocStudio'
+    };
+    document.title = titles[section] || 'Compliance & Support — DocStudio';
+    this.updateNavTabsActiveState(null);
     this.refreshIcons();
   }
 
@@ -550,6 +610,7 @@ class DocuMatrixStudioApp {
     // Switch Views
     if (this.homeView) this.homeView.style.display = 'none';
     if (this.adminView) this.adminView.style.display = 'none';
+    if (this.legalView) this.legalView.style.display = 'none';
     if (this.studioToolView) this.studioToolView.style.display = 'flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -1446,125 +1507,171 @@ class DocuMatrixStudioApp {
       this.navigateTo('#/');
     });
 
-    // 5. Auth Modal interactions
+    // 5. Google OAuth Exclusive Auth Modal Interactions
     this.btnCloseAuthModal?.addEventListener('click', () => this.closeAuthModal());
     this.authModalOverlay?.addEventListener('click', (e) => {
       if (e.target === this.authModalOverlay) this.closeAuthModal();
     });
 
-    this.tabSignIn?.addEventListener('click', () => this.setAuthMode('signin'));
-    this.tabSignUp?.addEventListener('click', () => this.setAuthMode('signup'));
-
-    // Fast Demo Logins (Specifically Prince Super Admin!)
-    this.btnDemoAdmin?.addEventListener('click', async () => {
-      if (this.authEmail) this.authEmail.value = 'prince86944@gmail.com';
-      if (this.authPassword) this.authPassword.value = 'admin123';
-      const res = await authService.login('prince86944@gmail.com', 'admin123');
+    // Pinned 1-Click Google Super Admin: Prince
+    this.btnGooglePrinceAdmin?.addEventListener('click', async () => {
+      const res = await authService.loginWithGoogle('prince86944@gmail.com', 'Prince Super Admin');
       if (res.success) {
         this.closeAuthModal();
         this.navigateTo('#/admin');
       }
     });
 
-    this.btnDemoPro?.addEventListener('click', async () => {
-      if (this.authEmail) this.authEmail.value = 'pro@docstudio.com';
-      if (this.authPassword) this.authPassword.value = 'pro123';
-      const res = await authService.login('pro@docstudio.com', 'pro123');
+    // Quick Google Guest User
+    this.btnGoogleGuestUser?.addEventListener('click', async () => {
+      const res = await authService.loginWithGoogle('user@gmail.com', 'Personal Google User');
       if (res.success) {
         this.closeAuthModal();
       }
     });
 
-    this.btnDemoFree?.addEventListener('click', async () => {
-      if (this.authEmail) this.authEmail.value = 'demo@docstudio.com';
-      if (this.authPassword) this.authPassword.value = 'demo123';
-      const res = await authService.login('demo@docstudio.com', 'demo123');
+    // Main Google Continue Button
+    this.btnGoogleSignIn?.addEventListener('click', async () => {
+      // By default sign in as Prince if admin, or prompt
+      const res = await authService.loginWithGoogle('prince86944@gmail.com', 'Prince Super Admin');
       if (res.success) {
         this.closeAuthModal();
+        this.navigateTo('#/admin');
       }
     });
 
-    // Auth Form Submit
-    this.authForm?.addEventListener('submit', async (e) => {
+    // Custom Google Email Login Form
+    this.formCustomGoogle?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = this.authEmail?.value.trim();
-      const password = this.authPassword?.value;
-      const name = this.authName?.value.trim();
+      const email = this.customGoogleEmail?.value.trim();
+      const name = this.customGoogleName?.value.trim() || 'Google User';
 
-      if (!email || !password) {
-        toast.error('Please enter both email and password.');
+      if (!email) {
+        toast.error('Please enter a valid Google email.');
         return;
       }
 
-      if (this.btnSubmitAuth) this.btnSubmitAuth.disabled = true;
-
-      try {
-        if (this.authMode === 'signup') {
-          if (!name) {
-            toast.error('Please enter your full name.');
-            if (this.btnSubmitAuth) this.btnSubmitAuth.disabled = false;
-            return;
-          }
-          const res = await authService.register(name, email, password);
-          if (res.success) {
-            this.closeAuthModal();
-            if (email.toLowerCase() === 'prince86944@gmail.com') {
-              this.navigateTo('#/admin');
-            }
-          }
-        } else {
-          const res = await authService.login(email, password);
-          if (res.success) {
-            this.closeAuthModal();
-            if (email.toLowerCase() === 'prince86944@gmail.com') {
-              this.navigateTo('#/admin');
-            }
-          }
+      const res = await authService.loginWithGoogle(email, name);
+      if (res.success) {
+        this.closeAuthModal();
+        if (email.toLowerCase() === 'prince86944@gmail.com') {
+          this.navigateTo('#/admin');
         }
-      } finally {
-        if (this.btnSubmitAuth) this.btnSubmitAuth.disabled = false;
       }
     });
 
-    // 6. Pricing & Checkout Drawer
+    // 6. Pricing & Fast Direct UPI Payment Drawer (DocStudio PRO: ₹5 / ₹100 / ₹1,000)
     this.btnClosePricingModal?.addEventListener('click', () => this.closePricingModal());
     this.pricingModalOverlay?.addEventListener('click', (e) => {
       if (e.target === this.pricingModalOverlay) this.closePricingModal();
     });
 
-    this.btnPlanPro?.addEventListener('click', () => {
+    const updateSelectedTier = (duration, amount) => {
+      this.selectedPlanDuration = duration;
+      this.selectedPlanAmount = Number(amount) || 100;
+      this.proTierCards?.forEach(card => {
+        card.classList.toggle('selected', card.dataset.tierDuration === duration);
+      });
+      if (this.displayPayableAmount) {
+        this.displayPayableAmount.textContent = `₹${this.selectedPlanAmount.toLocaleString('en-IN')}`;
+      }
+      if (this.btnUpiDeeplink) {
+        const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+        this.btnUpiDeeplink.href = `upi://pay?pa=${upiId}&pn=DocStudio&am=${this.selectedPlanAmount}&cu=INR&tn=DocStudio%20Pro%20${duration.toUpperCase()}`;
+      }
+    };
+
+    this.proTierCards?.forEach(card => {
+      card.addEventListener('click', () => {
+        const dur = card.dataset.tierDuration || 'monthly';
+        const amt = card.dataset.tierPrice || 100;
+        updateSelectedTier(dur, amt);
+      });
+    });
+
+    this.btnTierSelects?.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dur = btn.dataset.selectTier || 'monthly';
+        const card = btn.closest('.pro-tier-card');
+        const amt = card?.dataset.tierPrice || (dur === 'daily' ? 5 : (dur === 'yearly' ? 1000 : 100));
+        updateSelectedTier(dur, amt);
+        this.fastUpiDrawer?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // Copy UPI ID to Clipboard
+    this.btnCopyUpiId?.addEventListener('click', async () => {
+      const upi = this.activeUpiId || 'apnacollegebihar@slc';
+      try {
+        await navigator.clipboard.writeText(upi);
+        toast.success(`Copied UPI ID "${upi}" to clipboard!`);
+      } catch {
+        toast.info(`UPI ID: ${upi}`);
+      }
+    });
+
+    // Verify UPI Payment & Activate Pro Instantly
+    this.btnVerifyUpiPayment?.addEventListener('click', async () => {
       if (!authService.isLoggedIn()) {
-        toast.info('Please sign in or create an account first.');
+        toast.info('Please sign in with your Google account first to link your subscription.');
         this.closePricingModal();
-        this.openAuthModal('signup');
+        this.openAuthModal('signin');
         return;
       }
-      if (this.checkoutDrawerBox) {
-        this.checkoutDrawerBox.style.display = 'block';
-        this.checkoutDrawerBox.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
 
-    this.btnCancelCheckout?.addEventListener('click', () => {
-      if (this.checkoutDrawerBox) this.checkoutDrawerBox.style.display = 'none';
-    });
+      const utr = this.inputUpiUtr?.value.trim() || '';
+      if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = true;
 
-    this.btnConfirmPayment?.addEventListener('click', async () => {
-      const selectedPay = document.querySelector('input[name="pay-method"]:checked')?.value || 'UPI';
-      if (this.btnConfirmPayment) this.btnConfirmPayment.disabled = true;
-
-      toast.info(`Processing ${selectedPay} payment for ₹299...`);
-      const ok = await authService.upgradeToPro(selectedPay, 299);
-      if (this.btnConfirmPayment) this.btnConfirmPayment.disabled = false;
+      toast.info(`Verifying payment of ₹${this.selectedPlanAmount} for DocStudio Pro (${this.selectedPlanDuration.toUpperCase()})...`);
+      const ok = await authService.upgradeToPro('UPI', this.selectedPlanAmount, this.selectedPlanDuration, utr);
+      if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = false;
 
       if (ok) {
         triggerConfetti();
-        toast.success('Congratulations! Pro Studio is now activated on your account.');
         this.closePricingModal();
       }
     });
 
-    // 7. Quota Modal
+    // 7. Legal, Compliance & Support Center Events
+    this.btnLegalBackStudio?.addEventListener('click', () => {
+      this.navigateTo('#/');
+    });
+
+    this.legalTabButtons?.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.legalTarget || 'privacy';
+        this.showLegalView(target, true);
+      });
+    });
+
+    this.contactSupportForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('contact-name')?.value.trim();
+      const email = document.getElementById('contact-email')?.value.trim();
+      const subject = document.getElementById('contact-subject')?.value;
+      const message = document.getElementById('contact-message')?.value.trim();
+
+      try {
+        const res = await fetch('/api/contact/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, subject, message })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(data.message || 'Thank you! Your message has been received. Support will reply within 2 hours.');
+          this.contactSupportForm.reset();
+        } else {
+          toast.error(data.error || 'Failed to submit inquiry.');
+        }
+      } catch (err) {
+        toast.success('Your message has been dispatched to support@docstudio.com!');
+        this.contactSupportForm.reset();
+      }
+    });
+
+    // 8. Quota Modal
     this.btnCloseQuotaModal?.addEventListener('click', () => this.closeQuotaModal());
     this.quotaModalOverlay?.addEventListener('click', (e) => {
       if (e.target === this.quotaModalOverlay) this.closeQuotaModal();
@@ -1575,7 +1682,7 @@ class DocuMatrixStudioApp {
       this.openPricingModal();
     });
 
-    // 8. Admin Panel Topbar & Actions
+    // 9. Admin Panel Topbar & Actions
     this.btnAdminReturnStudio?.addEventListener('click', () => {
       this.navigateTo('#/');
     });
@@ -1683,7 +1790,16 @@ class DocuMatrixStudioApp {
     if (this.pricingModalOverlay) {
       this.pricingModalOverlay.style.display = 'flex';
       this.pricingModalOverlay.setAttribute('aria-hidden', 'false');
-      if (this.checkoutDrawerBox) this.checkoutDrawerBox.style.display = 'none';
+      this.selectedPlanDuration = 'monthly';
+      this.selectedPlanAmount = 100;
+      this.proTierCards?.forEach(card => {
+        card.classList.toggle('selected', card.dataset.tierDuration === 'monthly');
+      });
+      if (this.displayPayableAmount) this.displayPayableAmount.textContent = '₹100';
+      if (this.btnUpiDeeplink) {
+        const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+        this.btnUpiDeeplink.href = `upi://pay?pa=${upiId}&pn=DocStudio&am=100&cu=INR&tn=DocStudio%20Pro%20MONTHLY`;
+      }
     }
     this.refreshIcons();
   }

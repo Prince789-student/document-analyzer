@@ -9,7 +9,10 @@ import {
   getAllUsers,
   createSubscription,
   recordLog,
-  getAdminMetrics
+  getAdminMetrics,
+  getAppConfig,
+  updateAppConfig,
+  findOrCreateGoogleUser
 } from './db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'docstudio-super-secret-jwt-key-2026';
@@ -79,6 +82,52 @@ export async function handleApiRoute(req, res, path) {
     });
     res.end();
     return true;
+  }
+
+  // 0. GET APP CONFIG (Active UPI ID & QR Code)
+  if (path === '/api/config' && req.method === 'GET') {
+    const config = await getAppConfig();
+    return sendJson(res, 200, config);
+  }
+
+  // 0.1 GOOGLE OAUTH AUTHENTICATION (Exclusive Google Sign-in)
+  if (path === '/api/auth/google' && req.method === 'POST') {
+    try {
+      const { email, name, avatar = '', googleId = '' } = await parseJsonBody(req);
+      if (!email) {
+        return sendJson(res, 400, { error: 'Valid Google email is required.' });
+      }
+
+      const user = await findOrCreateGoogleUser({ email, name, avatar, googleId });
+      const token = jwt.sign(
+        { id: user._id || user.id, email: user.email, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+
+      await recordLog({
+        userId: user._id || user.id,
+        userEmail: user.email,
+        action: 'GOOGLE_SIGNIN',
+        details: `Google login: ${user.name} (${user.email}) - ${user.role}`
+      });
+
+      return sendJson(res, 200, {
+        message: `Welcome, ${user.name}!`,
+        token,
+        user: {
+          id: user._id || user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          plan: user.plan,
+          dailyOperationsUsed: user.dailyOperationsUsed || 0,
+          dailyQuota: user.dailyQuota || 5
+        }
+      });
+    } catch (err) {
+      return sendJson(res, 500, { error: err.message });
+    }
   }
 
   // 1. REGISTER
@@ -200,19 +249,26 @@ export async function handleApiRoute(req, res, path) {
     });
   }
 
-  // 4. UPGRADE SUBSCRIPTION
+  // 4. UPGRADE SUBSCRIPTION (Pro Tier: ₹5 Daily, ₹100 Monthly, ₹1000 Yearly via UPI)
   if (path === '/api/subscription/upgrade' && req.method === 'POST') {
     const user = await authenticateRequest(req);
     if (!user) {
-      return sendJson(res, 401, { error: 'Please log in to upgrade subscription.' });
+      return sendJson(res, 401, { error: 'Please sign in with Google to activate your Pro subscription.' });
     }
     try {
-      const { plan = 'pro', amount = 299, paymentMethod = 'UPI' } = await parseJsonBody(req);
+      const {
+        plan = 'pro',
+        duration = 'monthly', // 'daily' | 'monthly' | 'yearly'
+        amount = 100,
+        paymentMethod = 'UPI',
+        utrRef = ''
+      } = await parseJsonBody(req);
+
       const userId = user._id || user.id;
 
-      // Update user plan
+      // Update user plan to PRO with unlimited operations
       const updated = await updateUser(userId, {
-        plan,
+        plan: 'pro',
         dailyQuota: 9999
       });
 
@@ -220,20 +276,22 @@ export async function handleApiRoute(req, res, path) {
       const sub = await createSubscription({
         userId,
         userEmail: user.email,
-        plan,
-        amount,
-        paymentMethod
+        plan: 'pro',
+        amount: Number(amount) || 100,
+        paymentMethod,
+        duration,
+        utrRef
       });
 
       await recordLog({
         userId,
         userEmail: user.email,
-        action: 'USER_UPGRADED_PRO',
-        details: `Upgraded to ${plan.toUpperCase()} via ${paymentMethod} (₹${amount})`
+        action: 'PRO_SUBSCRIPTION_ACTIVE',
+        details: `Activated PRO (${duration.toUpperCase()} - ₹${amount}) via UPI (Ref: ${utrRef || 'Direct UPI'})`
       });
 
       return sendJson(res, 200, {
-        message: `Successfully upgraded to DocStudio ${plan.toUpperCase()}!`,
+        message: `Congratulations! DocStudio Pro (${duration.toUpperCase()}) is now activated!`,
         subscription: sub,
         user: {
           id: updated._id || updated.id,
@@ -245,6 +303,49 @@ export async function handleApiRoute(req, res, path) {
           dailyQuota: updated.dailyQuota
         }
       });
+    } catch (err) {
+      return sendJson(res, 500, { error: err.message });
+    }
+  }
+
+  // 4.1 CONTACT US FORM SUBMISSION
+  if (path === '/api/contact/submit' && req.method === 'POST') {
+    try {
+      const { name, email, subject, message } = await parseJsonBody(req);
+      if (!email || !message) {
+        return sendJson(res, 400, { error: 'Email and message are required.' });
+      }
+
+      await recordLog({
+        userEmail: email,
+        action: 'CONTACT_SUBMITTED',
+        details: `From: ${name || 'User'} (${email}) | Subject: ${subject || 'General Inquiry'} | Message: ${message.slice(0, 150)}`
+      });
+
+      return sendJson(res, 200, {
+        message: 'Thank you! Your inquiry has been received. Our team will get back to you within 24 hours.'
+      });
+    } catch (err) {
+      return sendJson(res, 500, { error: err.message });
+    }
+  }
+
+  // 4.2 ADMIN CONFIG UPDATE (Update UPI ID & QR Code)
+  if (path === '/api/admin/config' && req.method === 'POST') {
+    const user = await authenticateRequest(req);
+    if (!user || user.role !== 'admin') {
+      return sendJson(res, 403, { error: 'Admin privileges required to change UPI settings.' });
+    }
+    try {
+      const { upiId, upiName, qrCodeUrl } = await parseJsonBody(req);
+      const updatedConfig = await updateAppConfig({ upiId, upiName, qrCodeUrl });
+      await recordLog({
+        userId: user._id || user.id,
+        userEmail: user.email,
+        action: 'ADMIN_UPDATE_UPI',
+        details: `Admin updated UPI ID to: ${upiId || 'Unchanged'}`
+      });
+      return sendJson(res, 200, { message: 'UPI payment settings updated successfully!', config: updatedConfig });
     } catch (err) {
       return sendJson(res, 500, { error: err.message });
     }

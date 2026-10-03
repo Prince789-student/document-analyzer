@@ -98,6 +98,30 @@ class AuthService {
     }
   }
 
+  async loginWithGoogle(email, name = '', avatar = '', googleId = '') {
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name, avatar, googleId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Google Sign-in failed');
+
+      this.token = data.token;
+      this.user = data.user;
+      localStorage.setItem('docstudio_jwt', this.token);
+      localStorage.setItem('docstudio_user', JSON.stringify(this.user));
+
+      this.notifyAuthChange();
+      toast.success(`Welcome ${this.user.name || this.user.email}!`);
+      return { success: true, user: this.user };
+    } catch (err) {
+      toast.error(err.message);
+      return { success: false, error: err.message };
+    }
+  }
+
   logout(showToast = true) {
     this.token = null;
     this.user = null;
@@ -107,9 +131,9 @@ class AuthService {
     if (showToast) toast.info('You have logged out.');
   }
 
-  async upgradeToPro(paymentMethod = 'UPI', amount = 299) {
+  async upgradeToPro(paymentMethod = 'UPI', amount = 100, duration = 'monthly', utrRef = '') {
     if (!this.token) {
-      toast.error('Please sign in or create an account first.');
+      toast.error('Please sign in with Google first.');
       return false;
     }
     try {
@@ -119,7 +143,7 @@ class AuthService {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.token}`
         },
-        body: JSON.stringify({ plan: 'pro', amount, paymentMethod })
+        body: JSON.stringify({ plan: 'pro', amount: Number(amount) || 100, duration, paymentMethod, utrRef })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Subscription upgrade failed');
@@ -127,6 +151,7 @@ class AuthService {
       this.user = data.user;
       localStorage.setItem('docstudio_user', JSON.stringify(this.user));
       this.notifyAuthChange();
+      toast.success(data.message || 'DocStudio Pro activated successfully!');
       return true;
     } catch (err) {
       toast.error(err.message);

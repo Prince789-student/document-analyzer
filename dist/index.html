@@ -65,9 +65,9 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <script type="module" crossorigin src="/assets/index-BVayQUmD.js"></script>
+  <script type="module" crossorigin src="/assets/index-YzQsJU3k.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-C0FnF6B9.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-EsZ-8I2V.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-DX5pK98F.css">
 </head>
 <body>
   <div id="app" class="app-root">
@@ -92,9 +92,9 @@
 
         <!-- MAIN TOOL TABS NAVIGATION (Identical to requested iLovePDF header structure) -->
         <nav class="header-nav-tabs" id="header-nav-tabs" aria-label="Main Tool Navigation">
-          <a href="#/merge-pdf" class="nav-tab-item" data-nav-tool="merge-pdf">MERGE PDF</a>
-          <a href="#/split-pdf" class="nav-tab-item" data-nav-tool="split-pdf">SPLIT PDF</a>
-          <a href="#/compress-pdf" class="nav-tab-item" data-nav-tool="compress-pdf">COMPRESS PDF</a>
+          <a href="#/merge-pdf" class="nav-tab-item nav-tab-quick" data-nav-tool="merge-pdf">MERGE PDF</a>
+          <a href="#/split-pdf" class="nav-tab-item nav-tab-quick" data-nav-tool="split-pdf">SPLIT PDF</a>
+          <a href="#/compress-pdf" class="nav-tab-item nav-tab-quick" data-nav-tool="compress-pdf">COMPRESS PDF</a>
 
           <!-- CONVERT PDF Dropdown -->
           <div class="nav-tab-dropdown" id="dropdown-convert">
@@ -199,14 +199,14 @@
           <!-- Compact Search Bar -->
           <div class="header-search-container">
             <i data-lucide="search" class="search-lead-icon"></i>
-            <input type="text" id="global-search-input" placeholder="Search tools... (/)" autocomplete="off">
+            <input type="text" id="global-search-input" placeholder="Search tools..." autocomplete="off">
             <button type="button" id="global-search-clear" class="search-clear-btn" title="Clear search">&times;</button>
           </div>
           <!-- Sample Docs Dropdown -->
           <div class="dropdown-wrapper">
             <button type="button" id="sample-docs-dropdown-btn" class="action-btn-ghost" title="Load sample test files">
               <i data-lucide="sparkles" class="icon-accent-sparkle"></i>
-              <span>Sample Docs</span>
+              <span class="btn-text-responsive">Sample Docs</span>
               <i data-lucide="chevron-down" class="icon-dropdown-arrow"></i>
             </button>
             <div id="sample-docs-menu" class="glass-dropdown-menu">
@@ -252,7 +252,7 @@
           <!-- History Drawer Button -->
           <button type="button" id="open-history-btn" class="action-btn-ghost" title="View downloaded files">
             <i data-lucide="history"></i>
-            <span>History</span>
+            <span class="btn-text-responsive">History</span>
             <span id="history-counter-chip" class="badge-chip">0</span>
           </button>
 
@@ -268,12 +268,17 @@
             <span>Get Pro</span>
           </button>
 
-          <!-- User Authentication Area -->
+          <!-- User Authentication Area (Exclusive Google Login) -->
           <div id="auth-header-slot" class="auth-header-slot">
             <!-- Unauthenticated State -->
-            <button type="button" id="btn-header-login" class="header-btn-auth">
-              <i data-lucide="user"></i>
-              <span>Sign In</span>
+            <button type="button" id="btn-header-login" class="header-btn-auth header-btn-google" title="Sign in with Google">
+              <svg class="google-icon-svg" viewBox="0 0 24 24" width="16" height="16">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.41 7.37 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.17 0 9.99 0 12s.46 3.83 1.26 5.42l4.02-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.59 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span class="btn-text-responsive">Sign In</span>
             </button>
 
             <!-- Authenticated State (Hidden by default) -->
@@ -446,9 +451,19 @@
               <li><a href="#/compare-pdf" data-route-tool="compare-pdf">Visual Difference Diff</a></li>
             </ul>
           </div>
+          <div class="footer-links-col">
+            <h5>Legal & Support</h5>
+            <ul>
+              <li><a href="#/privacy" data-route-legal="privacy">Privacy Policy</a></li>
+              <li><a href="#/terms" data-route-legal="terms">Terms of Service</a></li>
+              <li><a href="#/refund" data-route-legal="refund">Refund & Cancellation</a></li>
+              <li><a href="#/about" data-route-legal="about">About DocStudio</a></li>
+              <li><a href="#/contact" data-route-legal="contact">Contact Support</a></li>
+            </ul>
+          </div>
         </div>
         <div class="footer-bottom-line">
-          <span>&copy; 2026 DocStudio &bull; Private, Fast, Client-Side Document Intelligence</span>
+          <span>&copy; 2026 DocStudio &bull; Decentralized In-Browser Document Engine &bull; <a href="#/privacy" style="color:var(--text-muted); text-decoration:underline;">Privacy</a> &bull; <a href="#/terms" style="color:var(--text-muted); text-decoration:underline;">Terms</a> &bull; <a href="#/refund" style="color:var(--text-muted); text-decoration:underline;">Refunds</a> &bull; <a href="#/contact" style="color:var(--text-muted); text-decoration:underline;">Contact</a></span>
         </div>
       </footer>
     </main>
@@ -760,70 +775,276 @@
     </section>
 
     <!-- ====================================================================
-         AUTHENTICATION MODAL (Sign In & Sign Up with 1-Click Demo Logins)
+         VIEW 4: LEGAL, POLICIES & SUPPORT CENTER (Routes: #/privacy, #/terms, etc.)
+         ==================================================================== -->
+    <section id="legal-view" class="view-panel legal-view" style="display: none;">
+      <div class="legal-container">
+        <!-- Legal Topbar -->
+        <div class="legal-topbar">
+          <div class="legal-title-area">
+            <div class="legal-badge-icon"><i data-lucide="scale"></i></div>
+            <div>
+              <h1 class="legal-main-title">DocStudio Compliance & Support Center</h1>
+              <p class="legal-subtitle">Transparency, Air-Gapped Data Privacy & Legal Specifications</p>
+            </div>
+          </div>
+          <button type="button" id="btn-legal-back-studio" class="btn-admin-nav">
+            <i data-lucide="arrow-left"></i>
+            <span>Back to Studio</span>
+          </button>
+        </div>
+
+        <!-- Legal Navigation Tabs -->
+        <div class="legal-nav-tabs">
+          <button type="button" class="legal-tab-btn active" data-legal-target="privacy"><i data-lucide="shield-check"></i> Privacy Policy</button>
+          <button type="button" class="legal-tab-btn" data-legal-target="terms"><i data-lucide="file-text"></i> Terms of Service</button>
+          <button type="button" class="legal-tab-btn" data-legal-target="refund"><i data-lucide="indian-rupee"></i> Refund & Cancellation</button>
+          <button type="button" class="legal-tab-btn" data-legal-target="about"><i data-lucide="info"></i> About DocStudio</button>
+          <button type="button" class="legal-tab-btn" data-legal-target="contact"><i data-lucide="mail"></i> Contact Support</button>
+        </div>
+
+        <!-- 1. PRIVACY POLICY PANE -->
+        <article id="legal-pane-privacy" class="legal-content-pane active">
+          <h2>Privacy Policy</h2>
+          <span class="legal-updated-date">Last Updated: October 2026</span>
+          <div class="legal-body-prose">
+            <p>At <strong>DocStudio</strong>, we believe confidential document manipulation should never require handing your private files to third-party cloud servers. This Privacy Policy details our air-gapped, client-side cryptographic architecture and data practices.</p>
+            
+            <h3>1. The Zero-Retention Client-Side Architecture</h3>
+            <p>Unlike conventional web document converters that upload your PDFs to remote cloud machines, DocStudio operates entirely inside your local browser memory using <strong>WebAssembly (WASM)</strong> and HTML5 Canvas APIs. Your documents, scanned images, contracts, and financial statements are <strong>NEVER transmitted to our backend servers or stored on remote disks</strong>.</p>
+
+            <h3>2. Information We Process</h3>
+            <ul>
+              <li><strong>Document Data:</strong> Read exclusively in client-side RAM (Blob/ArrayBuffer). Once your browser tab or session is closed, all working files are permanently discarded from memory.</li>
+              <li><strong>Authentication & Profile Data:</strong> When you sign in with Google, we receive only your public Google identifier (Name, Email, Profile Avatar) via secure Google Identity Services to maintain your session and manage your subscription privileges.</li>
+              <li><strong>Subscription & Billing Records:</strong> For UPI transactions, we record only the transaction timestamp, chosen plan duration (Daily ₹5, Monthly ₹100, Yearly ₹1,000), payment method, and optional user-submitted UTR reference to verify and grant your Pro status.</li>
+            </ul>
+
+            <h3>3. Cookies & Local Storage</h3>
+            <p>DocStudio utilizes browser <code>localStorage</code> strictly for necessary functional operations, including your preferred theme (Dark/Light mode), anonymous daily operation counter, and your temporary download history list. No cross-site ad tracking cookies are deployed.</p>
+
+            <h3>4. Contact for Privacy Inquiries</h3>
+            <p>If you have any questions or data requests regarding our zero-retention privacy protocols, contact our Data Governance Officer at <code>support@docstudio.com</code> or <code>apnacollegebihar@slc</code>.</p>
+          </div>
+        </article>
+
+        <!-- 2. TERMS OF SERVICE PANE -->
+        <article id="legal-pane-terms" class="legal-content-pane" style="display: none;">
+          <h2>Terms of Service</h2>
+          <span class="legal-updated-date">Effective: October 2026</span>
+          <div class="legal-body-prose">
+            <p>Welcome to <strong>DocStudio</strong>. By accessing or using our document tools, you agree to comply with and be bound by the following Terms of Service.</p>
+
+            <h3>1. Permitted Use</h3>
+            <p>You may use DocStudio for lawful personal, professional, academic, and business purposes. You agree not to use the engine to process malicious payloads, pirated materials, or documents that violate applicable laws.</p>
+
+            <h3>2. Pro Studio Subscriptions & Pricing</h3>
+            <p>DocStudio offers straightforward, flexible access to <strong>DocStudio PRO</strong>:</p>
+            <ul>
+              <li><strong>Daily Pass (₹5):</strong> Provides 24 hours of unrestricted, unlimited document processing.</li>
+              <li><strong>Monthly Pro (₹100 / month):</strong> Full 30 days of unlimited access, priority multi-threaded OCR, and large file support.</li>
+              <li><strong>Yearly Pro (₹1,000 / year):</strong> Best value offering 365 days of continuous Pro privileges.</li>
+            </ul>
+            <p>Payment is processed directly via standard Indian Unified Payments Interface (UPI) using our registered identifier <code>apnacollegebihar@slc</code> or scan-to-pay QR codes.</p>
+
+            <h3>3. Disclaimer of Warranties & Limitation of Liability</h3>
+            <p>DocStudio is provided on an "as is" and "as available" basis. While our client-side WebAssembly routines are engineered for maximum fidelity and standard PDF specification compliance, DocStudio disclaims any liability for formatting deviations resulting from non-standard or corrupt source PDFs.</p>
+          </div>
+        </article>
+
+        <!-- 3. REFUND & CANCELLATION PANE -->
+        <article id="legal-pane-refund" class="legal-content-pane" style="display: none;">
+          <h2>Refund & Cancellation Policy</h2>
+          <span class="legal-updated-date">Effective: October 2026</span>
+          <div class="legal-body-prose">
+            <p>We value customer trust and maintain a fair, transparent refund and dispute resolution policy for our digital Pro subscriptions.</p>
+
+            <h3>1. Instant Digital Activation</h3>
+            <p>Upon completing your payment via UPI (₹5 Daily, ₹100 Monthly, or ₹1,000 Yearly), your account is upgraded to <strong>DocStudio PRO</strong> instantly with unlimited daily processing privileges.</p>
+
+            <h3>2. Refund Eligibility & Duplicate Payments</h3>
+            <ul>
+              <li><strong>Duplicate Deductions:</strong> In the rare event of a network glitch where your UPI account is charged multiple times for a single subscription, the duplicate amount will be refunded within 5–7 business days to your original bank account.</li>
+              <li><strong>Service Failure:</strong> If our application is unable to process your documents due to a verified technical engine flaw, you are entitled to a full refund if reported within <strong>7 days</strong> of purchase.</li>
+            </ul>
+
+            <h3>3. How to Request a Refund</h3>
+            <p>Send an email to <code>support@docstudio.com</code> or submit the form on our Contact tab with your Google account email, UPI UTR / Transaction Reference ID, and transaction screenshot. Our support desk resolves all billing requests within 24 hours.</p>
+          </div>
+        </article>
+
+        <!-- 4. ABOUT US PANE -->
+        <article id="legal-pane-about" class="legal-content-pane" style="display: none;">
+          <h2>About DocStudio</h2>
+          <span class="legal-updated-date">Our Mission & Engineering Vision</span>
+          <div class="legal-body-prose">
+            <p><strong>DocStudio</strong> was created with a clear objective: to challenge the centralized cloud monopolies of the document management industry.</p>
+            
+            <p>For over a decade, individuals and businesses were forced to upload confidential legal agreements, tax filings, and personal identification to opaque remote servers just to merge a PDF or convert a Word document.</p>
+
+            <p>By leveraging cutting-edge <strong>WebAssembly (WASM)</strong>, compiled C++ PDF engines, and modern browser multithreading, DocStudio brings the entire processing suite directly into your local machine. No waiting in remote server queues. Zero latency. Absolute air-gapped security.</p>
+            
+            <div class="legal-highlight-box">
+              <strong>Core Engineering Principles:</strong>
+              <br>&bull; <strong>100% In-Browser Privacy:</strong> Your sensitive files never touch external disks.
+              <br>&bull; <strong>Decentralized Speed:</strong> Instantaneous conversions powered by your device's CPU.
+              <br>&bull; <strong>Accessible Pricing:</strong> From ₹5 daily passes to ₹100 monthly pro, democratizing document productivity for everyone.
+            </div>
+          </div>
+        </article>
+
+        <!-- 5. CONTACT SUPPORT PANE -->
+        <article id="legal-pane-contact" class="legal-content-pane" style="display: none;">
+          <h2>Contact Us & Support Desk</h2>
+          <span class="legal-updated-date">We are here to assist you 24/7</span>
+          <div class="legal-contact-grid">
+            <div class="contact-info-col">
+              <div class="contact-info-card">
+                <i data-lucide="mail" class="contact-icon text-indigo"></i>
+                <div>
+                  <h4>Email Support</h4>
+                  <p>support@docstudio.com</p>
+                  <span class="contact-hint">Average response: &lt; 2 hours</span>
+                </div>
+              </div>
+
+              <div class="contact-info-card">
+                <i data-lucide="indian-rupee" class="contact-icon text-emerald"></i>
+                <div>
+                  <h4>Official UPI ID</h4>
+                  <p>apnacollegebihar@slc</p>
+                  <span class="contact-hint">Direct Instant Verification</span>
+                </div>
+              </div>
+
+              <div class="contact-info-card">
+                <i data-lucide="shield-alert" class="contact-icon text-amber"></i>
+                <div>
+                  <h4>Super Administrator</h4>
+                  <p>Prince (prince86944@gmail.com)</p>
+                  <span class="contact-hint">Technical Administration</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Message Form -->
+            <form id="contact-support-form" class="contact-form-card">
+              <h3>Send Us a Message</h3>
+              <p>Have questions about subscriptions, custom integrations, or tool feedback?</p>
+              
+              <div class="form-group">
+                <label for="contact-name">Your Full Name</label>
+                <input type="text" id="contact-name" placeholder="John Doe" required>
+              </div>
+
+              <div class="form-group">
+                <label for="contact-email">Email Address</label>
+                <input type="email" id="contact-email" placeholder="name@example.com" required>
+              </div>
+
+              <div class="form-group">
+                <label for="contact-subject">Subject</label>
+                <select id="contact-subject" class="contact-select">
+                  <option value="Pro Subscription / Payment Inquiry">Pro Subscription / UPI Payment Inquiry</option>
+                  <option value="Technical Issue or Bug Report">Technical Issue / Bug Report</option>
+                  <option value="Feature Request">Feature Request</option>
+                  <option value="General Question">General Question</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="contact-message">Message</label>
+                <textarea id="contact-message" rows="4" placeholder="How can our team help you?" required></textarea>
+              </div>
+
+              <button type="submit" id="btn-submit-contact" class="btn-grand-execute">
+                <i data-lucide="send"></i>
+                <span>Submit Inquiry</span>
+              </button>
+            </form>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         AUTHENTICATION MODAL (Exclusive 1-Click Google Sign-In)
          ==================================================================== -->
     <div id="auth-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">
-      <div class="auth-modal-card">
+      <div class="auth-modal-card auth-modal-google">
         <button type="button" id="btn-close-auth-modal" class="modal-close-btn">&times;</button>
         
         <div class="auth-modal-header">
           <div class="auth-brand-logo">
             <img src="/logo.png" alt="DocStudio" class="auth-logo-img">
           </div>
-          <h2 id="auth-modal-title" class="auth-title">Welcome to DocStudio</h2>
-          <p id="auth-modal-desc" class="auth-subtitle">Sign in to manage your documents, plans, and quotas</p>
+          <h2 class="auth-title">Sign In to DocStudio</h2>
+          <p class="auth-subtitle">Instant, passwordless access powered by your Google Account</p>
         </div>
 
-        <!-- Auth Tabs: Sign In / Create Account -->
-        <div class="auth-mode-tabs">
-          <button type="button" class="auth-tab-btn active" id="tab-sign-in">Sign In</button>
-          <button type="button" class="auth-tab-btn" id="tab-sign-up">Create Account</button>
-        </div>
-
-        <!-- 1-Click Demo Logins for Instant Testing -->
-        <div class="fast-demo-logins">
-          <div class="fast-demo-label">Quick Testing Credentials:</div>
-          <div class="fast-demo-buttons">
-            <button type="button" class="btn-demo-pill demo-admin" id="btn-demo-admin" title="Login as Super Admin (prince86944@gmail.com)">
-              <i data-lucide="shield"></i> Prince Admin
-            </button>
-            <button type="button" class="btn-demo-pill demo-pro" id="btn-demo-pro" title="Login as Pro Member">
-              <i data-lucide="crown"></i> 1-Click Pro
-            </button>
-            <button type="button" class="btn-demo-pill demo-free" id="btn-demo-free" title="Login as Free User">
-              <i data-lucide="user"></i> 1-Click Free
-            </button>
-          </div>
-        </div>
-
-        <!-- Auth Form -->
-        <form id="auth-form" class="auth-form">
-          <div class="form-group" id="group-name" style="display: none;">
-            <label for="auth-name">Full Name</label>
-            <input type="text" id="auth-name" placeholder="John Doe" autocomplete="name">
-          </div>
-          <div class="form-group">
-            <label for="auth-email">Email Address</label>
-            <input type="email" id="auth-email" placeholder="name@example.com" required autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label for="auth-password">Password</label>
-            <input type="password" id="auth-password" placeholder="At least 6 characters" required autocomplete="current-password">
-          </div>
-          <button type="submit" id="btn-submit-auth" class="btn-auth-submit">
-            <span id="btn-auth-submit-label">Sign In to DocStudio</span>
-            <i data-lucide="arrow-right"></i>
+        <!-- Official Continue with Google Button -->
+        <div class="google-auth-box">
+          <button type="button" id="btn-google-signin" class="btn-google-large">
+            <svg class="google-svg" viewBox="0 0 24 24" width="22" height="22">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.41 7.37 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.17 0 9.99 0 12s.46 3.83 1.26 5.42l4.02-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.59 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Continue with Google</span>
           </button>
-        </form>
+        </div>
+
+        <!-- Interactive Google Account Selector Dialog -->
+        <div id="google-account-chooser" class="google-account-chooser">
+          <div class="chooser-divider">
+            <span>Select Google Account</span>
+          </div>
+
+          <div class="google-account-list">
+            <!-- Pinned Super Admin Account -->
+            <button type="button" class="google-account-item super-admin-account" id="btn-google-prince-admin">
+              <div class="google-avatar-wrap admin-avatar">P</div>
+              <div class="google-account-details">
+                <div class="google-account-name">Prince <span class="badge-super-admin">SUPER ADMIN</span></div>
+                <div class="google-account-email">prince86944@gmail.com</div>
+              </div>
+              <i data-lucide="shield-check" class="account-check-icon"></i>
+            </button>
+
+            <!-- Standard Quick User Account -->
+            <button type="button" class="google-account-item" id="btn-google-guest-user">
+              <div class="google-avatar-wrap">U</div>
+              <div class="google-account-details">
+                <div class="google-account-name">Personal Google Account</div>
+                <div class="google-account-email">user@gmail.com</div>
+              </div>
+              <i data-lucide="arrow-right" class="account-check-icon"></i>
+            </button>
+          </div>
+
+          <!-- Custom Google Email Input Toggle -->
+          <div class="custom-google-entry">
+            <details>
+              <summary>Sign in with a different Google email</summary>
+              <form id="form-custom-google" class="custom-google-form">
+                <input type="email" id="custom-google-email" placeholder="yourname@gmail.com" required>
+                <input type="text" id="custom-google-name" placeholder="Your Name" required>
+                <button type="submit" class="btn-custom-google-submit">Continue</button>
+              </form>
+            </details>
+          </div>
+        </div>
 
         <div class="auth-footer-note">
-          <span>100% Client-Side Privacy &bull; Zero Server Data Retention</span>
+          <i data-lucide="lock" style="width: 13px; height: 13px; display: inline-block;"></i>
+          <span>100% Client-Side Privacy &bull; Zero Server Retention &bull; Safe Google OAuth</span>
         </div>
       </div>
     </div>
 
     <!-- ====================================================================
-         SUBSCRIPTION & PRICING MODAL (Free vs Pro vs Enterprise + Checkout)
+         SUBSCRIPTION & PRICING MODAL (DocStudio PRO Only: ₹5 / ₹100 / ₹1,000 via UPI)
          ==================================================================== -->
     <div id="pricing-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">
       <div class="pricing-modal-card">
@@ -831,115 +1052,133 @@
         
         <div class="pricing-header">
           <div class="pricing-badge-pill">
-            <i data-lucide="sparkles"></i>
-            <span>Flexible & Fair Pricing</span>
+            <i data-lucide="crown"></i>
+            <span>DOCSTUDIO PRO • UNLIMITED POWER</span>
           </div>
-          <h2 class="pricing-title">Supercharge Your Document Workflow</h2>
-          <p class="pricing-subtitle">Choose the perfect tier for personal productivity or enterprise compliance.</p>
+          <h2 class="pricing-title">One Plan. Complete Unlimited Freedom.</h2>
+          <p class="pricing-subtitle">Pick the duration that fits your schedule: Instant Day Pass, Monthly, or Yearly.</p>
         </div>
 
-        <!-- Pricing Cards Grid -->
-        <div class="pricing-plans-grid">
-          <!-- FREE PLAN -->
-          <div class="pricing-plan-card">
-            <div class="plan-header">
-              <h3 class="plan-name">Free Starter</h3>
-              <p class="plan-desc">For everyday quick conversions</p>
-              <div class="plan-price-row">
-                <span class="plan-currency">₹</span>
-                <span class="plan-amount">0</span>
-                <span class="plan-period">/ month</span>
-              </div>
+        <!-- 3 Duration Tiers for Pro Plan -->
+        <div class="pro-tiers-grid">
+          <!-- 1. DAILY PASS (₹5) -->
+          <div class="pro-tier-card" data-tier-duration="daily" data-tier-price="5">
+            <div class="tier-tag">QUICK PASS</div>
+            <div class="tier-name">24-Hour Pass</div>
+            <div class="tier-price-row">
+              <span class="currency">₹</span>
+              <span class="amount">5</span>
+              <span class="period">/ 1 day</span>
             </div>
-            <ul class="plan-features-list">
-              <li><i data-lucide="check"></i> <span>All 30 Core PDF Tools</span></li>
-              <li><i data-lucide="check"></i> <span>5 Daily Operations</span></li>
-              <li><i data-lucide="check"></i> <span>Max File Size: 15 MB</span></li>
-              <li><i data-lucide="check"></i> <span>100% In-Memory Privacy</span></li>
-              <li class="disabled"><i data-lucide="x"></i> <span>Priority Multi-Threading OCR</span></li>
-              <li class="disabled"><i data-lucide="x"></i> <span>Unlimited File Sizes</span></li>
+            <p class="tier-desc">Unlimited access for urgent single-day tasks</p>
+            <ul class="tier-features-list">
+              <li><i data-lucide="check"></i> <span>Unlimited Operations (24h)</span></li>
+              <li><i data-lucide="check"></i> <span>All 30 Document Tools</span></li>
+              <li><i data-lucide="check"></i> <span>Full High-Speed Processing</span></li>
             </ul>
-            <button type="button" class="btn-plan-select plan-current-btn" id="btn-plan-free" disabled>Current Free Tier</button>
+            <button type="button" class="btn-tier-select" data-select-tier="daily">Select Daily — ₹5</button>
           </div>
 
-          <!-- PRO PLAN (RECOMMENDED) -->
-          <div class="pricing-plan-card featured-pro">
-            <div class="plan-ribbon">MOST POPULAR</div>
-            <div class="plan-header">
-              <h3 class="plan-name">Pro Studio</h3>
-              <p class="plan-desc">For professionals, students & power users</p>
-              <div class="plan-price-row">
-                <span class="plan-currency">₹</span>
-                <span class="plan-amount">299</span>
-                <span class="plan-period">/ month</span>
-              </div>
+          <!-- 2. MONTHLY PRO (₹100) - FEATURED -->
+          <div class="pro-tier-card featured-tier selected" data-tier-duration="monthly" data-tier-price="100">
+            <div class="tier-ribbon">MOST POPULAR</div>
+            <div class="tier-tag text-emerald">STANDARD</div>
+            <div class="tier-name">Monthly Pro</div>
+            <div class="tier-price-row">
+              <span class="currency">₹</span>
+              <span class="amount">100</span>
+              <span class="period">/ month</span>
             </div>
-            <ul class="plan-features-list">
-              <li><i data-lucide="check" class="text-emerald"></i> <strong>Unlimited Daily Operations</strong></li>
+            <p class="tier-desc">Only ₹3.3/day &bull; Unrestricted document engine</p>
+            <ul class="tier-features-list">
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Unlimited Operations (30 Days)</strong></li>
               <li><i data-lucide="check" class="text-emerald"></i> <strong>Up to 200 MB File Sizes</strong></li>
-              <li><i data-lucide="check" class="text-emerald"></i> <strong>Turbo Multi-Threaded OCR Engine</strong></li>
-              <li><i data-lucide="check" class="text-emerald"></i> <span>Advanced Visual Diff Auditing</span></li>
-              <li><i data-lucide="check" class="text-emerald"></i> <span>Digital Certificate Signatures</span></li>
-              <li><i data-lucide="check" class="text-emerald"></i> <span>Pro Member Profile Badge</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Turbo Multi-Threaded OCR</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Gold Pro Badge on Profile</strong></li>
             </ul>
-            <button type="button" class="btn-plan-select btn-upgrade-pro" id="btn-plan-pro">
-              <span>Upgrade to Pro — ₹299</span>
-              <i data-lucide="sparkles"></i>
-            </button>
+            <button type="button" class="btn-tier-select btn-primary-tier" data-select-tier="monthly">Select Monthly — ₹100</button>
           </div>
 
-          <!-- ENTERPRISE PLAN -->
-          <div class="pricing-plan-card">
-            <div class="plan-header">
-              <h3 class="plan-name">Enterprise</h3>
-              <p class="plan-desc">For legal firms, colleges & teams</p>
-              <div class="plan-price-row">
-                <span class="plan-currency">₹</span>
-                <span class="plan-amount">999</span>
-                <span class="plan-period">/ month</span>
-              </div>
+          <!-- 3. YEARLY PRO (₹1,000) -->
+          <div class="pro-tier-card" data-tier-duration="yearly" data-tier-price="1000">
+            <div class="tier-tag text-amber">BEST VALUE</div>
+            <div class="tier-name">Yearly Pro</div>
+            <div class="tier-price-row">
+              <span class="currency">₹</span>
+              <span class="amount">1,000</span>
+              <span class="period">/ year</span>
             </div>
-            <ul class="plan-features-list">
-              <li><i data-lucide="check"></i> <span>Everything in Pro Studio</span></li>
-              <li><i data-lucide="check"></i> <span>Multi-seat Team License</span></li>
-              <li><i data-lucide="check"></i> <span>Custom Institutional Branding</span></li>
-              <li><i data-lucide="check"></i> <span>Audit Compliance Telemetry</span></li>
-              <li><i data-lucide="check"></i> <span>Dedicated Priority Support</span></li>
+            <p class="tier-desc">Save ₹200 &bull; Equivalent to ₹83/month</p>
+            <ul class="tier-features-list">
+              <li><i data-lucide="check"></i> <span>365 Days Unlimited Access</span></li>
+              <li><i data-lucide="check"></i> <span>Everything in Monthly Pro</span></li>
+              <li><i data-lucide="check"></i> <span>Priority Customer Support</span></li>
+              <li><i data-lucide="check"></i> <span>Best ROI for Power Users</span></li>
             </ul>
-            <button type="button" class="btn-plan-select" id="btn-plan-enterprise">
-              <span>Contact Sales</span>
-            </button>
+            <button type="button" class="btn-tier-select" data-select-tier="yearly">Select Yearly — ₹1,000</button>
           </div>
         </div>
 
-        <!-- SIMULATED CHECKOUT DRAWER (Razorpay / UPI / Card) -->
-        <div id="checkout-drawer-box" class="checkout-drawer-box" style="display: none;">
-          <div class="checkout-header">
-            <h4><i data-lucide="credit-card"></i> Complete Subscription Payment</h4>
-            <span class="checkout-amount-badge">Total: ₹299 / month</span>
+        <!-- FAST DIRECT UPI PAYMENT DRAWER -->
+        <div id="fast-upi-payment-drawer" class="fast-upi-payment-drawer">
+          <div class="upi-checkout-header">
+            <div>
+              <h3 class="upi-checkout-title">
+                <i data-lucide="qr-code"></i> Direct Instant UPI Payment
+              </h3>
+              <p class="upi-checkout-sub">Scan the QR code or pay to the UPI ID from any app (GPay, PhonePe, Paytm, BHIM)</p>
+            </div>
+            <div class="upi-payable-pill">
+              <span>Payable:</span>
+              <strong id="display-payable-amount">₹100</strong>
+            </div>
           </div>
 
-          <div class="payment-method-selector">
-            <label class="pay-option selected">
-              <input type="radio" name="pay-method" value="UPI" checked>
-              <span>UPI / QR (Google Pay, PhonePe, Paytm)</span>
-            </label>
-            <label class="pay-option">
-              <input type="radio" name="pay-method" value="Card">
-              <span>Credit / Debit Card (Visa, MasterCard, RuPay)</span>
-            </label>
-            <label class="pay-option">
-              <input type="radio" name="pay-method" value="NetBanking">
-              <span>Net Banking</span>
-            </label>
-          </div>
+          <div class="upi-checkout-body">
+            <!-- Official User Uploaded QR Code Display -->
+            <div class="upi-qr-display-box">
+              <div class="qr-frame">
+                <img src="/upi-qr.png" alt="Scan to pay via UPI" class="upi-qr-image" id="pricing-qr-image">
+                <div class="qr-scan-hint">Scan with any UPI App</div>
+              </div>
+            </div>
 
-          <div class="checkout-actions">
-            <button type="button" id="btn-confirm-payment" class="btn-confirm-payment">
-              <i data-lucide="lock"></i>
-              <span>Pay ₹299 & Activate Pro Instantly</span>
-            </button>
-            <button type="button" id="btn-cancel-checkout" class="btn-cancel-checkout">Cancel</button>
+            <!-- UPI ID & Copy Details -->
+            <div class="upi-info-details-box">
+              <div class="upi-field-group">
+                <label>Official Registered UPI ID:</label>
+                <div class="upi-id-pill-row">
+                  <code class="upi-id-text" id="display-upi-id">apnacollegebihar@slc</code>
+                  <button type="button" id="btn-copy-upi-id" class="btn-copy-upi" title="Copy UPI ID to clipboard">
+                    <i data-lucide="copy"></i>
+                    <span>Copy</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Direct UPI Deep Link Buttons (Mobile / Desktop) -->
+              <div class="upi-app-quicklinks">
+                <span class="quicklink-label">1-Click Launch UPI App:</span>
+                <div class="quicklink-buttons">
+                  <a id="btn-upi-deeplink" href="upi://pay?pa=apnacollegebihar@slc&pn=DocStudio&am=100&cu=INR&tn=DocStudio%20Pro" class="btn-upi-app-link">
+                    <i data-lucide="smartphone"></i>
+                    <span>Open in GPay / PhonePe / Paytm</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Optional UTR Input Field -->
+              <div class="upi-field-group" style="margin-top: 14px;">
+                <label for="input-upi-utr">UPI Transaction Reference / UTR Number (Optional):</label>
+                <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="e.g. 427812903456 (12 digits)" maxlength="30">
+              </div>
+
+              <!-- Instant Activate Button -->
+              <button type="button" id="btn-verify-upi-payment" class="btn-verify-upi">
+                <i data-lucide="shield-check"></i>
+                <span>I Have Paid &bull; Activate Pro Instantly</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -956,12 +1195,12 @@
         </div>
         <h3 class="quota-alert-title">Daily Free Limit Reached!</h3>
         <p class="quota-alert-desc">
-          You have completed 5 document operations today. Free tier resets at midnight, or you can unlock unlimited high-speed operations right now.
+          You have completed 5 operations today. Unlock unlimited operations right now for just <strong>₹5 Daily Pass</strong> or <strong>₹100 Monthly Pro</strong> via instant UPI payment!
         </p>
         <div class="quota-alert-actions">
           <button type="button" id="btn-quota-upgrade-pro" class="btn-grand-execute">
             <i data-lucide="crown"></i>
-            <span>Upgrade to Pro Studio (₹299/mo)</span>
+            <span>Upgrade to Pro (Only ₹5 or ₹100)</span>
           </button>
           <button type="button" id="btn-close-quota-modal" class="celebration-link-btn">
             Continue Tomorrow

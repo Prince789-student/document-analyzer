@@ -42,9 +42,32 @@ const MIME_TYPES = {
   '.txt': 'text/plain; charset=utf-8'
 };
 
-const server = http.createServer((req, res) => {
+import { initDatabase } from './server/db.js';
+import { handleApiRoute } from './server/api.js';
+
+// Boot database & seed defaults
+initDatabase().catch(err => console.error('Database initialization error:', err));
+
+const server = http.createServer(async (req, res) => {
   // Normalize URL and remove query strings
   let reqPath = decodeURI(req.url.split('?')[0]);
+
+  // Handle REST API Routes (/api/auth, /api/subscription, /api/admin)
+  if (reqPath.startsWith('/api/')) {
+    try {
+      await handleApiRoute(req, res, reqPath);
+    } catch (apiErr) {
+      console.error('API execution error:', apiErr);
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+      }
+    }
+    return;
+  }
+
+  if (res.headersSent) return;
+
   if (reqPath === '/') {
     reqPath = '/index.html';
   }
@@ -53,17 +76,22 @@ const server = http.createServer((req, res) => {
 
   // Security: prevent directory traversal
   if (!filePath.startsWith(DIST_DIR)) {
-    res.writeHead(403);
-    res.end('Forbidden');
+    if (!res.headersSent) {
+      res.writeHead(403);
+      res.end('Forbidden');
+    }
     return;
   }
 
   // Check if requested file exists
   fs.stat(filePath, (err, stats) => {
+    if (res.headersSent) return;
+
     if (err || !stats.isFile()) {
       // Fallback to index.html for SPA client-side routing
       const indexPath = path.join(DIST_DIR, 'index.html');
       fs.readFile(indexPath, (err2, content) => {
+        if (res.headersSent) return;
         if (err2) {
           res.writeHead(500, { 'Content-Type': 'text/plain' });
           res.end('Error loading DocuMatrix Studio: dist/index.html not found. Please build the project first.');

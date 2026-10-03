@@ -65,9 +65,9 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <script type="module" crossorigin src="/assets/index-C2MKyq3X.js"></script>
+  <script type="module" crossorigin src="/assets/index-BVayQUmD.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-C0FnF6B9.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-Bmn-zmFf.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-EsZ-8I2V.css">
 </head>
 <body>
   <div id="app" class="app-root">
@@ -261,6 +261,57 @@
             <i data-lucide="moon" id="icon-moon"></i>
             <i data-lucide="sun" id="icon-sun" style="display: none;"></i>
           </button>
+
+          <!-- Pricing & Pro Upgrade CTA -->
+          <button type="button" id="open-pricing-btn" class="header-btn-pricing" title="View Pro Plans & Pricing">
+            <i data-lucide="crown" class="crown-icon"></i>
+            <span>Get Pro</span>
+          </button>
+
+          <!-- User Authentication Area -->
+          <div id="auth-header-slot" class="auth-header-slot">
+            <!-- Unauthenticated State -->
+            <button type="button" id="btn-header-login" class="header-btn-auth">
+              <i data-lucide="user"></i>
+              <span>Sign In</span>
+            </button>
+
+            <!-- Authenticated State (Hidden by default) -->
+            <div id="user-header-widget" class="user-header-widget" style="display: none;">
+              <button type="button" id="btn-user-avatar" class="user-avatar-btn">
+                <span id="user-avatar-initial" class="avatar-initial">U</span>
+                <span id="user-plan-badge" class="user-plan-badge">FREE</span>
+              </button>
+              <div id="user-dropdown-menu" class="glass-dropdown-menu user-dropdown-menu">
+                <div class="user-info-box">
+                  <div id="dropdown-user-name" class="user-name">User Name</div>
+                  <div id="dropdown-user-email" class="user-email">user@example.com</div>
+                </div>
+                <div class="quota-mini-meter">
+                  <div class="quota-meter-label">
+                    <span>Daily Quota</span>
+                    <span id="user-quota-count">0 / 5 Used</span>
+                  </div>
+                  <div class="quota-meter-bar">
+                    <div id="user-quota-fill" class="quota-meter-fill" style="width: 0%;"></div>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <button type="button" id="dropdown-upgrade-btn" class="glass-dropdown-item highlight-item">
+                  <i data-lucide="zap" style="color: #f59e0b;"></i>
+                  <span>Upgrade to Pro</span>
+                </button>
+                <button type="button" id="dropdown-admin-btn" class="glass-dropdown-item admin-item" style="display: none;">
+                  <i data-lucide="shield" style="color: #6366f1;"></i>
+                  <span>Admin Dashboard</span>
+                </button>
+                <button type="button" id="dropdown-logout-btn" class="glass-dropdown-item">
+                  <i data-lucide="log-out" style="color: #ef4444;"></i>
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
           <!-- Privacy Security Pill -->
           <div class="privacy-status-pill" title="100% In-Memory Processing. Files never touch any remote server.">
@@ -579,8 +630,345 @@
     </section>
 
     <!-- ====================================================================
-         RECENT DOWNLOADS HISTORY DRAWER
+         VIEW 3: ADMIN COMMAND CENTER & USER MANAGEMENT (Route: #/admin)
          ==================================================================== -->
+    <section id="admin-view" class="view-panel admin-view" style="display: none;">
+      <div class="admin-container">
+        <!-- Admin Top Navigation Bar -->
+        <div class="admin-topbar">
+          <div class="admin-title-area">
+            <div class="admin-shield-icon">
+              <i data-lucide="shield-alert"></i>
+            </div>
+            <div>
+              <div class="admin-header-title">DocStudio <span class="badge-admin-tag">ADMIN PORTAL</span></div>
+              <p class="admin-header-sub">User Database, Subscription Revenue & MongoDB Atlas Telemetry</p>
+            </div>
+          </div>
+          <div class="admin-topbar-actions">
+            <div id="mongo-status-pill" class="mongo-status-pill connected">
+              <span class="status-indicator-dot"></span>
+              <span id="mongo-status-text">MongoDB Atlas Active</span>
+            </div>
+            <button type="button" id="btn-admin-return-studio" class="btn-admin-nav">
+              <i data-lucide="arrow-left"></i>
+              <span>Back to Studio</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Metrics Grid (4 Cards) -->
+        <div class="admin-kpi-grid">
+          <div class="admin-kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">
+              <i data-lucide="users"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Total Users</span>
+              <div id="kpi-total-users" class="kpi-value">0</div>
+              <span id="kpi-users-sub" class="kpi-trend">Active in Database</span>
+            </div>
+          </div>
+
+          <div class="admin-kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+              <i data-lucide="crown"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Pro Subscribers</span>
+              <div id="kpi-pro-users" class="kpi-value">0</div>
+              <span id="kpi-pro-ratio" class="kpi-trend text-amber">0% conversion</span>
+            </div>
+          </div>
+
+          <div class="admin-kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+              <i data-lucide="indian-rupee"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Total Revenue</span>
+              <div id="kpi-total-revenue" class="kpi-value">₹0</div>
+              <span class="kpi-trend text-emerald">Subscriptions & Upgrades</span>
+            </div>
+          </div>
+
+          <div class="admin-kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">
+              <i data-lucide="cpu"></i>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-label">Documents Processed</span>
+              <div id="kpi-total-ops" class="kpi-value">0</div>
+              <span class="kpi-trend">WebAssembly Engine Calls</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Management Table Section -->
+        <div class="admin-section-card">
+          <div class="section-card-header">
+            <div>
+              <h3 class="section-card-title">User Accounts & Subscription Controls</h3>
+              <p class="section-card-sub">Manage tiers, toggle pro privileges, and inspect member quotas</p>
+            </div>
+            <div class="table-filter-group">
+              <input type="text" id="admin-user-search" class="admin-search-input" placeholder="Search name or email...">
+              <select id="admin-plan-filter" class="admin-select-filter">
+                <option value="all">All Plans</option>
+                <option value="free">Free Starter</option>
+                <option value="pro">Pro Studio</option>
+                <option value="admin">Administrators</option>
+              </select>
+              <button type="button" id="btn-admin-refresh-users" class="btn-admin-refresh" title="Reload User Table">
+                <i data-lucide="refresh-cw"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User Profile</th>
+                  <th>Role</th>
+                  <th>Subscription Plan</th>
+                  <th>Daily Quota</th>
+                  <th>Registered</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-tbody">
+                <!-- Dynamically rendered by adminService.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Audit & System Logs -->
+        <div class="admin-section-card">
+          <div class="section-card-header">
+            <div>
+              <h3 class="section-card-title">Real-time Telemetry & Audit Logs</h3>
+              <p class="section-card-sub">Live events from authentication, subscription payments, and engine executions</p>
+            </div>
+          </div>
+          <div class="admin-logs-list" id="admin-logs-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         AUTHENTICATION MODAL (Sign In & Sign Up with 1-Click Demo Logins)
+         ==================================================================== -->
+    <div id="auth-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">
+      <div class="auth-modal-card">
+        <button type="button" id="btn-close-auth-modal" class="modal-close-btn">&times;</button>
+        
+        <div class="auth-modal-header">
+          <div class="auth-brand-logo">
+            <img src="/logo.png" alt="DocStudio" class="auth-logo-img">
+          </div>
+          <h2 id="auth-modal-title" class="auth-title">Welcome to DocStudio</h2>
+          <p id="auth-modal-desc" class="auth-subtitle">Sign in to manage your documents, plans, and quotas</p>
+        </div>
+
+        <!-- Auth Tabs: Sign In / Create Account -->
+        <div class="auth-mode-tabs">
+          <button type="button" class="auth-tab-btn active" id="tab-sign-in">Sign In</button>
+          <button type="button" class="auth-tab-btn" id="tab-sign-up">Create Account</button>
+        </div>
+
+        <!-- 1-Click Demo Logins for Instant Testing -->
+        <div class="fast-demo-logins">
+          <div class="fast-demo-label">Quick Testing Credentials:</div>
+          <div class="fast-demo-buttons">
+            <button type="button" class="btn-demo-pill demo-admin" id="btn-demo-admin" title="Login as Super Admin (prince86944@gmail.com)">
+              <i data-lucide="shield"></i> Prince Admin
+            </button>
+            <button type="button" class="btn-demo-pill demo-pro" id="btn-demo-pro" title="Login as Pro Member">
+              <i data-lucide="crown"></i> 1-Click Pro
+            </button>
+            <button type="button" class="btn-demo-pill demo-free" id="btn-demo-free" title="Login as Free User">
+              <i data-lucide="user"></i> 1-Click Free
+            </button>
+          </div>
+        </div>
+
+        <!-- Auth Form -->
+        <form id="auth-form" class="auth-form">
+          <div class="form-group" id="group-name" style="display: none;">
+            <label for="auth-name">Full Name</label>
+            <input type="text" id="auth-name" placeholder="John Doe" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="auth-email">Email Address</label>
+            <input type="email" id="auth-email" placeholder="name@example.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="auth-password">Password</label>
+            <input type="password" id="auth-password" placeholder="At least 6 characters" required autocomplete="current-password">
+          </div>
+          <button type="submit" id="btn-submit-auth" class="btn-auth-submit">
+            <span id="btn-auth-submit-label">Sign In to DocStudio</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </form>
+
+        <div class="auth-footer-note">
+          <span>100% Client-Side Privacy &bull; Zero Server Data Retention</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SUBSCRIPTION & PRICING MODAL (Free vs Pro vs Enterprise + Checkout)
+         ==================================================================== -->
+    <div id="pricing-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">
+      <div class="pricing-modal-card">
+        <button type="button" id="btn-close-pricing-modal" class="modal-close-btn">&times;</button>
+        
+        <div class="pricing-header">
+          <div class="pricing-badge-pill">
+            <i data-lucide="sparkles"></i>
+            <span>Flexible & Fair Pricing</span>
+          </div>
+          <h2 class="pricing-title">Supercharge Your Document Workflow</h2>
+          <p class="pricing-subtitle">Choose the perfect tier for personal productivity or enterprise compliance.</p>
+        </div>
+
+        <!-- Pricing Cards Grid -->
+        <div class="pricing-plans-grid">
+          <!-- FREE PLAN -->
+          <div class="pricing-plan-card">
+            <div class="plan-header">
+              <h3 class="plan-name">Free Starter</h3>
+              <p class="plan-desc">For everyday quick conversions</p>
+              <div class="plan-price-row">
+                <span class="plan-currency">₹</span>
+                <span class="plan-amount">0</span>
+                <span class="plan-period">/ month</span>
+              </div>
+            </div>
+            <ul class="plan-features-list">
+              <li><i data-lucide="check"></i> <span>All 30 Core PDF Tools</span></li>
+              <li><i data-lucide="check"></i> <span>5 Daily Operations</span></li>
+              <li><i data-lucide="check"></i> <span>Max File Size: 15 MB</span></li>
+              <li><i data-lucide="check"></i> <span>100% In-Memory Privacy</span></li>
+              <li class="disabled"><i data-lucide="x"></i> <span>Priority Multi-Threading OCR</span></li>
+              <li class="disabled"><i data-lucide="x"></i> <span>Unlimited File Sizes</span></li>
+            </ul>
+            <button type="button" class="btn-plan-select plan-current-btn" id="btn-plan-free" disabled>Current Free Tier</button>
+          </div>
+
+          <!-- PRO PLAN (RECOMMENDED) -->
+          <div class="pricing-plan-card featured-pro">
+            <div class="plan-ribbon">MOST POPULAR</div>
+            <div class="plan-header">
+              <h3 class="plan-name">Pro Studio</h3>
+              <p class="plan-desc">For professionals, students & power users</p>
+              <div class="plan-price-row">
+                <span class="plan-currency">₹</span>
+                <span class="plan-amount">299</span>
+                <span class="plan-period">/ month</span>
+              </div>
+            </div>
+            <ul class="plan-features-list">
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Unlimited Daily Operations</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Up to 200 MB File Sizes</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <strong>Turbo Multi-Threaded OCR Engine</strong></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Advanced Visual Diff Auditing</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Digital Certificate Signatures</span></li>
+              <li><i data-lucide="check" class="text-emerald"></i> <span>Pro Member Profile Badge</span></li>
+            </ul>
+            <button type="button" class="btn-plan-select btn-upgrade-pro" id="btn-plan-pro">
+              <span>Upgrade to Pro — ₹299</span>
+              <i data-lucide="sparkles"></i>
+            </button>
+          </div>
+
+          <!-- ENTERPRISE PLAN -->
+          <div class="pricing-plan-card">
+            <div class="plan-header">
+              <h3 class="plan-name">Enterprise</h3>
+              <p class="plan-desc">For legal firms, colleges & teams</p>
+              <div class="plan-price-row">
+                <span class="plan-currency">₹</span>
+                <span class="plan-amount">999</span>
+                <span class="plan-period">/ month</span>
+              </div>
+            </div>
+            <ul class="plan-features-list">
+              <li><i data-lucide="check"></i> <span>Everything in Pro Studio</span></li>
+              <li><i data-lucide="check"></i> <span>Multi-seat Team License</span></li>
+              <li><i data-lucide="check"></i> <span>Custom Institutional Branding</span></li>
+              <li><i data-lucide="check"></i> <span>Audit Compliance Telemetry</span></li>
+              <li><i data-lucide="check"></i> <span>Dedicated Priority Support</span></li>
+            </ul>
+            <button type="button" class="btn-plan-select" id="btn-plan-enterprise">
+              <span>Contact Sales</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SIMULATED CHECKOUT DRAWER (Razorpay / UPI / Card) -->
+        <div id="checkout-drawer-box" class="checkout-drawer-box" style="display: none;">
+          <div class="checkout-header">
+            <h4><i data-lucide="credit-card"></i> Complete Subscription Payment</h4>
+            <span class="checkout-amount-badge">Total: ₹299 / month</span>
+          </div>
+
+          <div class="payment-method-selector">
+            <label class="pay-option selected">
+              <input type="radio" name="pay-method" value="UPI" checked>
+              <span>UPI / QR (Google Pay, PhonePe, Paytm)</span>
+            </label>
+            <label class="pay-option">
+              <input type="radio" name="pay-method" value="Card">
+              <span>Credit / Debit Card (Visa, MasterCard, RuPay)</span>
+            </label>
+            <label class="pay-option">
+              <input type="radio" name="pay-method" value="NetBanking">
+              <span>Net Banking</span>
+            </label>
+          </div>
+
+          <div class="checkout-actions">
+            <button type="button" id="btn-confirm-payment" class="btn-confirm-payment">
+              <i data-lucide="lock"></i>
+              <span>Pay ₹299 & Activate Pro Instantly</span>
+            </button>
+            <button type="button" id="btn-cancel-checkout" class="btn-cancel-checkout">Cancel</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         QUOTA REACHED PROMPT MODAL
+         ==================================================================== -->
+    <div id="quota-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">
+      <div class="quota-modal-card">
+        <div class="quota-alert-icon">
+          <i data-lucide="alert-triangle"></i>
+        </div>
+        <h3 class="quota-alert-title">Daily Free Limit Reached!</h3>
+        <p class="quota-alert-desc">
+          You have completed 5 document operations today. Free tier resets at midnight, or you can unlock unlimited high-speed operations right now.
+        </p>
+        <div class="quota-alert-actions">
+          <button type="button" id="btn-quota-upgrade-pro" class="btn-grand-execute">
+            <i data-lucide="crown"></i>
+            <span>Upgrade to Pro Studio (₹299/mo)</span>
+          </button>
+          <button type="button" id="btn-close-quota-modal" class="celebration-link-btn">
+            Continue Tomorrow
+          </button>
+        </div>
+      </div>
+    </div>
     <div id="history-drawer-overlay" class="drawer-backdrop" aria-hidden="true">
       <aside class="history-drawer-pane">
         <div class="drawer-header-bar">

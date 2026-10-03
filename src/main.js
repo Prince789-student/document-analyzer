@@ -10,13 +10,17 @@ import {
   createSampleWordFile,
   createSampleHtmlFile
 } from './utils/sampleDocs.js';
+import { authService } from './utils/authService.js';
+import { adminService } from './utils/adminService.js';
 
 class DocuMatrixStudioApp {
   constructor() {
-    this.currentView = 'home'; // 'home' | 'tool'
+    this.currentView = 'home'; // 'home' | 'tool' | 'admin'
     this.currentStage = 1;      // 1: Upload, 2: Workbench, 3: Download
     this.currentFilter = 'all';
     this.searchQuery = '';
+    this.adminUsersList = [];
+    this.authMode = 'signin';
 
     this.selectedToolMeta = null;
     this.activeToolInstance = null;
@@ -29,6 +33,7 @@ class DocuMatrixStudioApp {
     this.initTheme();
     this.renderCategoryPills();
     this.renderToolsGrid();
+    this.initAuthAndAdmin();
     this.bindEvents();
     this.initRouter();
     this.updateHistoryBadge();
@@ -42,9 +47,68 @@ class DocuMatrixStudioApp {
     // Views
     this.homeView = document.getElementById('home-view');
     this.studioToolView = document.getElementById('studio-tool-view');
+    this.adminView = document.getElementById('admin-view');
 
     // Header & Navigation
     this.brandHomeLink = document.getElementById('brand-home-link');
+    this.openPricingBtn = document.getElementById('open-pricing-btn');
+    this.btnHeaderLogin = document.getElementById('btn-header-login');
+    this.userHeaderWidget = document.getElementById('user-header-widget');
+    this.btnUserAvatar = document.getElementById('btn-user-avatar');
+    this.userAvatarInitial = document.getElementById('user-avatar-initial');
+    this.userPlanBadge = document.getElementById('user-plan-badge');
+    this.userDropdownMenu = document.getElementById('user-dropdown-menu');
+    this.dropdownUserName = document.getElementById('dropdown-user-name');
+    this.dropdownUserEmail = document.getElementById('dropdown-user-email');
+    this.userQuotaCount = document.getElementById('user-quota-count');
+    this.userQuotaFill = document.getElementById('user-quota-fill');
+    this.dropdownUpgradeBtn = document.getElementById('dropdown-upgrade-btn');
+    this.dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
+    this.dropdownLogoutBtn = document.getElementById('dropdown-logout-btn');
+
+    // Auth Modal Elements
+    this.authModalOverlay = document.getElementById('auth-modal-overlay');
+    this.btnCloseAuthModal = document.getElementById('btn-close-auth-modal');
+    this.tabSignIn = document.getElementById('tab-sign-in');
+    this.tabSignUp = document.getElementById('tab-sign-up');
+    this.authForm = document.getElementById('auth-form');
+    this.groupName = document.getElementById('group-name');
+    this.authName = document.getElementById('auth-name');
+    this.authEmail = document.getElementById('auth-email');
+    this.authPassword = document.getElementById('auth-password');
+    this.btnSubmitAuth = document.getElementById('btn-submit-auth');
+    this.btnAuthSubmitLabel = document.getElementById('btn-auth-submit-label');
+    this.btnDemoAdmin = document.getElementById('btn-demo-admin');
+    this.btnDemoPro = document.getElementById('btn-demo-pro');
+    this.btnDemoFree = document.getElementById('btn-demo-free');
+
+    // Pricing & Checkout Elements
+    this.pricingModalOverlay = document.getElementById('pricing-modal-overlay');
+    this.btnClosePricingModal = document.getElementById('btn-close-pricing-modal');
+    this.btnPlanPro = document.getElementById('btn-plan-pro');
+    this.checkoutDrawerBox = document.getElementById('checkout-drawer-box');
+    this.btnConfirmPayment = document.getElementById('btn-confirm-payment');
+    this.btnCancelCheckout = document.getElementById('btn-cancel-checkout');
+
+    // Quota Modal Elements
+    this.quotaModalOverlay = document.getElementById('quota-modal-overlay');
+    this.btnQuotaUpgradePro = document.getElementById('btn-quota-upgrade-pro');
+    this.btnCloseQuotaModal = document.getElementById('btn-close-quota-modal');
+
+    // Admin Dashboard Elements
+    this.btnAdminReturnStudio = document.getElementById('btn-admin-return-studio');
+    this.btnAdminRefreshUsers = document.getElementById('btn-admin-refresh-users');
+    this.adminUserSearch = document.getElementById('admin-user-search');
+    this.adminPlanFilter = document.getElementById('admin-plan-filter');
+    this.adminUsersTbody = document.getElementById('admin-users-tbody');
+    this.adminLogsContainer = document.getElementById('admin-logs-container');
+    this.kpiTotalUsers = document.getElementById('kpi-total-users');
+    this.kpiProUsers = document.getElementById('kpi-pro-users');
+    this.kpiProRatio = document.getElementById('kpi-pro-ratio');
+    this.kpiTotalRevenue = document.getElementById('kpi-total-revenue');
+    this.kpiTotalOps = document.getElementById('kpi-total-ops');
+    this.mongoStatusPill = document.getElementById('mongo-status-pill');
+    this.mongoStatusText = document.getElementById('mongo-status-text');
     this.globalSearchInput = document.getElementById('global-search-input');
     this.globalSearchClear = document.getElementById('global-search-clear');
     this.sampleDocsDropdownBtn = document.getElementById('sample-docs-dropdown-btn');
@@ -347,6 +411,18 @@ class DocuMatrixStudioApp {
       return;
     }
 
+    // Admin portal route: #/admin or /admin
+    if (clean === 'admin') {
+      if (!authService.isAdmin()) {
+        toast.info('Please sign in as Super Admin (prince86944@gmail.com) to access the Admin Portal.');
+        this.openAuthModal('signin');
+        this.showHomeView(false);
+        return;
+      }
+      this.showAdminView(false);
+      return;
+    }
+
     // Category filter route: #/category/:catId
     if (clean.startsWith('category/')) {
       const catId = clean.replace('category/', '').trim();
@@ -377,7 +453,7 @@ class DocuMatrixStudioApp {
   }
 
   /* --------------------------------------------------------------------------
-     Navigation Views (Home Directory vs Studio Tool View)
+     Navigation Views (Home Directory vs Studio Tool View vs Admin Portal)
      -------------------------------------------------------------------------- */
   showHomeView(updateHash = true) {
     if (updateHash && window.location.hash !== '#/' && window.location.hash !== '') {
@@ -386,8 +462,9 @@ class DocuMatrixStudioApp {
     }
 
     this.currentView = 'home';
-    this.homeView.style.display = 'block';
-    this.studioToolView.style.display = 'none';
+    if (this.homeView) this.homeView.style.display = 'block';
+    if (this.studioToolView) this.studioToolView.style.display = 'none';
+    if (this.adminView) this.adminView.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     this.selectedToolMeta = null;
@@ -396,6 +473,24 @@ class DocuMatrixStudioApp {
     this.lastProcessedResult = null;
     this.updateNavTabsActiveState(null);
     document.title = 'DocStudio — Next-Gen Client-Side PDF Engine';
+  }
+
+  showAdminView(updateHash = true) {
+    if (updateHash && window.location.hash !== '#/admin') {
+      this.navigateTo('#/admin');
+      return;
+    }
+
+    this.currentView = 'admin';
+    if (this.homeView) this.homeView.style.display = 'none';
+    if (this.studioToolView) this.studioToolView.style.display = 'none';
+    if (this.adminView) this.adminView.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    document.title = 'Admin Command Center — DocStudio';
+    this.updateNavTabsActiveState(null);
+    this.loadAdminDashboard();
+    this.refreshIcons();
   }
 
   updateNavTabsActiveState(activeId) {
@@ -453,8 +548,9 @@ class DocuMatrixStudioApp {
     this.updateNavTabsActiveState(toolId);
 
     // Switch Views
-    this.homeView.style.display = 'none';
-    this.studioToolView.style.display = 'flex';
+    if (this.homeView) this.homeView.style.display = 'none';
+    if (this.adminView) this.adminView.style.display = 'none';
+    if (this.studioToolView) this.studioToolView.style.display = 'flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Workspace Top Bar Details
@@ -863,6 +959,17 @@ class DocuMatrixStudioApp {
      -------------------------------------------------------------------------- */
   async executeTool() {
     if (!this.activeToolInstance || this.activeFiles.length === 0 || this.isProcessing) return;
+
+    // Check quota before execution
+    const usageCheck = await authService.checkAndRecordUsage(
+      this.selectedToolMeta?.id || 'tool',
+      this.activeFiles[0]?.name || 'document.pdf'
+    );
+
+    if (!usageCheck.allowed) {
+      this.openQuotaModal();
+      return;
+    }
 
     this.isProcessing = true;
     if (this.sidebarActionExecuteBtn) this.sidebarActionExecuteBtn.disabled = true;
@@ -1285,6 +1392,533 @@ class DocuMatrixStudioApp {
         }
       }
     });
+  }
+
+  /* --------------------------------------------------------------------------
+     Authentication, Subscription & Admin Command Center Management
+     -------------------------------------------------------------------------- */
+  initAuthAndAdmin() {
+    // 1. Initial Auth Header Rendering
+    this.updateAuthHeader(authService.getUser());
+
+    // 2. Auth state change listener
+    window.addEventListener('docstudio:auth-change', (e) => {
+      this.updateAuthHeader(e.detail.user);
+      if (this.currentView === 'admin' && !authService.isAdmin()) {
+        this.navigateTo('#/');
+      }
+    });
+
+    // 3. User Avatar dropdown toggle
+    this.btnUserAvatar?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.userDropdownMenu?.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (this.userDropdownMenu && !this.userDropdownMenu.contains(e.target) && !this.btnUserAvatar?.contains(e.target)) {
+        this.userDropdownMenu.classList.remove('show');
+      }
+    });
+
+    // 4. Header buttons
+    this.btnHeaderLogin?.addEventListener('click', () => {
+      this.openAuthModal('signin');
+    });
+
+    this.openPricingBtn?.addEventListener('click', () => {
+      this.openPricingModal();
+    });
+
+    this.dropdownUpgradeBtn?.addEventListener('click', () => {
+      this.userDropdownMenu?.classList.remove('show');
+      this.openPricingModal();
+    });
+
+    this.dropdownAdminBtn?.addEventListener('click', () => {
+      this.userDropdownMenu?.classList.remove('show');
+      this.navigateTo('#/admin');
+    });
+
+    this.dropdownLogoutBtn?.addEventListener('click', () => {
+      this.userDropdownMenu?.classList.remove('show');
+      authService.logout();
+      this.navigateTo('#/');
+    });
+
+    // 5. Auth Modal interactions
+    this.btnCloseAuthModal?.addEventListener('click', () => this.closeAuthModal());
+    this.authModalOverlay?.addEventListener('click', (e) => {
+      if (e.target === this.authModalOverlay) this.closeAuthModal();
+    });
+
+    this.tabSignIn?.addEventListener('click', () => this.setAuthMode('signin'));
+    this.tabSignUp?.addEventListener('click', () => this.setAuthMode('signup'));
+
+    // Fast Demo Logins (Specifically Prince Super Admin!)
+    this.btnDemoAdmin?.addEventListener('click', async () => {
+      if (this.authEmail) this.authEmail.value = 'prince86944@gmail.com';
+      if (this.authPassword) this.authPassword.value = 'admin123';
+      const res = await authService.login('prince86944@gmail.com', 'admin123');
+      if (res.success) {
+        this.closeAuthModal();
+        this.navigateTo('#/admin');
+      }
+    });
+
+    this.btnDemoPro?.addEventListener('click', async () => {
+      if (this.authEmail) this.authEmail.value = 'pro@docstudio.com';
+      if (this.authPassword) this.authPassword.value = 'pro123';
+      const res = await authService.login('pro@docstudio.com', 'pro123');
+      if (res.success) {
+        this.closeAuthModal();
+      }
+    });
+
+    this.btnDemoFree?.addEventListener('click', async () => {
+      if (this.authEmail) this.authEmail.value = 'demo@docstudio.com';
+      if (this.authPassword) this.authPassword.value = 'demo123';
+      const res = await authService.login('demo@docstudio.com', 'demo123');
+      if (res.success) {
+        this.closeAuthModal();
+      }
+    });
+
+    // Auth Form Submit
+    this.authForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = this.authEmail?.value.trim();
+      const password = this.authPassword?.value;
+      const name = this.authName?.value.trim();
+
+      if (!email || !password) {
+        toast.error('Please enter both email and password.');
+        return;
+      }
+
+      if (this.btnSubmitAuth) this.btnSubmitAuth.disabled = true;
+
+      try {
+        if (this.authMode === 'signup') {
+          if (!name) {
+            toast.error('Please enter your full name.');
+            if (this.btnSubmitAuth) this.btnSubmitAuth.disabled = false;
+            return;
+          }
+          const res = await authService.register(name, email, password);
+          if (res.success) {
+            this.closeAuthModal();
+            if (email.toLowerCase() === 'prince86944@gmail.com') {
+              this.navigateTo('#/admin');
+            }
+          }
+        } else {
+          const res = await authService.login(email, password);
+          if (res.success) {
+            this.closeAuthModal();
+            if (email.toLowerCase() === 'prince86944@gmail.com') {
+              this.navigateTo('#/admin');
+            }
+          }
+        }
+      } finally {
+        if (this.btnSubmitAuth) this.btnSubmitAuth.disabled = false;
+      }
+    });
+
+    // 6. Pricing & Checkout Drawer
+    this.btnClosePricingModal?.addEventListener('click', () => this.closePricingModal());
+    this.pricingModalOverlay?.addEventListener('click', (e) => {
+      if (e.target === this.pricingModalOverlay) this.closePricingModal();
+    });
+
+    this.btnPlanPro?.addEventListener('click', () => {
+      if (!authService.isLoggedIn()) {
+        toast.info('Please sign in or create an account first.');
+        this.closePricingModal();
+        this.openAuthModal('signup');
+        return;
+      }
+      if (this.checkoutDrawerBox) {
+        this.checkoutDrawerBox.style.display = 'block';
+        this.checkoutDrawerBox.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+    this.btnCancelCheckout?.addEventListener('click', () => {
+      if (this.checkoutDrawerBox) this.checkoutDrawerBox.style.display = 'none';
+    });
+
+    this.btnConfirmPayment?.addEventListener('click', async () => {
+      const selectedPay = document.querySelector('input[name="pay-method"]:checked')?.value || 'UPI';
+      if (this.btnConfirmPayment) this.btnConfirmPayment.disabled = true;
+
+      toast.info(`Processing ${selectedPay} payment for ₹299...`);
+      const ok = await authService.upgradeToPro(selectedPay, 299);
+      if (this.btnConfirmPayment) this.btnConfirmPayment.disabled = false;
+
+      if (ok) {
+        triggerConfetti();
+        toast.success('Congratulations! Pro Studio is now activated on your account.');
+        this.closePricingModal();
+      }
+    });
+
+    // 7. Quota Modal
+    this.btnCloseQuotaModal?.addEventListener('click', () => this.closeQuotaModal());
+    this.quotaModalOverlay?.addEventListener('click', (e) => {
+      if (e.target === this.quotaModalOverlay) this.closeQuotaModal();
+    });
+
+    this.btnQuotaUpgradePro?.addEventListener('click', () => {
+      this.closeQuotaModal();
+      this.openPricingModal();
+    });
+
+    // 8. Admin Panel Topbar & Actions
+    this.btnAdminReturnStudio?.addEventListener('click', () => {
+      this.navigateTo('#/');
+    });
+
+    this.btnAdminRefreshUsers?.addEventListener('click', () => {
+      this.loadAdminDashboard();
+      toast.info('Admin dashboard metrics and users refreshed.');
+    });
+
+    this.adminUserSearch?.addEventListener('input', () => {
+      this.filterAdminUsers();
+    });
+
+    this.adminPlanFilter?.addEventListener('change', () => {
+      this.filterAdminUsers();
+    });
+  }
+
+  updateAuthHeader(user) {
+    if (user) {
+      if (this.btnHeaderLogin) this.btnHeaderLogin.style.display = 'none';
+      if (this.userHeaderWidget) this.userHeaderWidget.style.display = 'flex';
+
+      const initial = (user.name || user.email || 'U').charAt(0).toUpperCase();
+      if (this.userAvatarInitial) this.userAvatarInitial.textContent = initial;
+
+      if (this.userPlanBadge) {
+        if (user.role === 'admin') {
+          this.userPlanBadge.textContent = 'ADMIN';
+          this.userPlanBadge.className = 'user-plan-badge admin';
+        } else if (user.plan === 'pro') {
+          this.userPlanBadge.textContent = 'PRO';
+          this.userPlanBadge.className = 'user-plan-badge pro';
+        } else {
+          this.userPlanBadge.textContent = 'FREE';
+          this.userPlanBadge.className = 'user-plan-badge free';
+        }
+      }
+
+      if (this.dropdownUserName) this.dropdownUserName.textContent = user.name || 'DocStudio User';
+      if (this.dropdownUserEmail) this.dropdownUserEmail.textContent = user.email;
+
+      const isUnlimited = user.role === 'admin' || user.plan === 'pro' || user.plan === 'enterprise';
+      if (this.userQuotaCount) {
+        this.userQuotaCount.textContent = isUnlimited ? 'Unlimited' : `${Math.max(0, 5 - (user.dailyOperationsUsed || 0))} / 5 left today`;
+      }
+      if (this.userQuotaFill) {
+        const pct = isUnlimited ? 100 : Math.min(100, ((user.dailyOperationsUsed || 0) / 5) * 100);
+        this.userQuotaFill.style.width = `${pct}%`;
+      }
+
+      if (this.dropdownAdminBtn) {
+        this.dropdownAdminBtn.style.display = user.role === 'admin' ? 'flex' : 'none';
+      }
+      if (this.dropdownUpgradeBtn) {
+        this.dropdownUpgradeBtn.style.display = (user.plan === 'pro' || user.role === 'admin') ? 'none' : 'flex';
+      }
+    } else {
+      if (this.btnHeaderLogin) this.btnHeaderLogin.style.display = 'flex';
+      if (this.userHeaderWidget) this.userHeaderWidget.style.display = 'none';
+      if (this.userDropdownMenu) this.userDropdownMenu.classList.remove('show');
+    }
+  }
+
+  setAuthMode(mode) {
+    this.authMode = mode;
+    if (mode === 'signup') {
+      this.tabSignUp?.classList.add('active');
+      this.tabSignIn?.classList.remove('active');
+      if (this.groupName) this.groupName.style.display = 'block';
+      if (this.btnAuthSubmitLabel) this.btnAuthSubmitLabel.textContent = 'Create DocStudio Account';
+      const title = document.getElementById('auth-modal-title');
+      if (title) title.textContent = 'Create Free Account';
+      const desc = document.getElementById('auth-modal-desc');
+      if (desc) desc.textContent = 'Get 5 free operations daily, save history, and manage preferences.';
+    } else {
+      this.tabSignIn?.classList.add('active');
+      this.tabSignUp?.classList.remove('active');
+      if (this.groupName) this.groupName.style.display = 'none';
+      if (this.btnAuthSubmitLabel) this.btnAuthSubmitLabel.textContent = 'Sign In to DocStudio';
+      const title = document.getElementById('auth-modal-title');
+      if (title) title.textContent = 'Welcome to DocStudio';
+      const desc = document.getElementById('auth-modal-desc');
+      if (desc) desc.textContent = 'Sign in to manage your documents, plans, and quotas';
+    }
+  }
+
+  openAuthModal(mode = 'signin') {
+    this.setAuthMode(mode);
+    if (this.authModalOverlay) {
+      this.authModalOverlay.style.display = 'flex';
+      this.authModalOverlay.setAttribute('aria-hidden', 'false');
+    }
+    this.refreshIcons();
+  }
+
+  closeAuthModal() {
+    if (this.authModalOverlay) {
+      this.authModalOverlay.style.display = 'none';
+      this.authModalOverlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  openPricingModal() {
+    if (this.pricingModalOverlay) {
+      this.pricingModalOverlay.style.display = 'flex';
+      this.pricingModalOverlay.setAttribute('aria-hidden', 'false');
+      if (this.checkoutDrawerBox) this.checkoutDrawerBox.style.display = 'none';
+    }
+    this.refreshIcons();
+  }
+
+  closePricingModal() {
+    if (this.pricingModalOverlay) {
+      this.pricingModalOverlay.style.display = 'none';
+      this.pricingModalOverlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  openQuotaModal(limit = 5, plan = 'free') {
+    if (this.quotaModalOverlay) {
+      this.quotaModalOverlay.style.display = 'flex';
+      this.quotaModalOverlay.setAttribute('aria-hidden', 'false');
+    }
+    this.refreshIcons();
+  }
+
+  closeQuotaModal() {
+    if (this.quotaModalOverlay) {
+      this.quotaModalOverlay.style.display = 'none';
+      this.quotaModalOverlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  async loadAdminDashboard() {
+    // 1. Fetch Metrics
+    const metrics = await adminService.getMetrics();
+    if (metrics) {
+      if (this.kpiTotalUsers) this.kpiTotalUsers.textContent = metrics.totalUsers || 0;
+      if (this.kpiProUsers) this.kpiProUsers.textContent = metrics.proSubscribers || 0;
+      if (this.kpiProRatio) {
+        const ratio = metrics.totalUsers ? Math.round((metrics.proSubscribers / metrics.totalUsers) * 100) : 0;
+        this.kpiProRatio.textContent = `${ratio}% Pro Conversion`;
+      }
+      if (this.kpiTotalRevenue) this.kpiTotalRevenue.textContent = `₹${(metrics.totalRevenue || 0).toLocaleString('en-IN')}`;
+      if (this.kpiTotalOps) this.kpiTotalOps.textContent = metrics.totalOperations || 0;
+
+      if (this.mongoStatusText) {
+        this.mongoStatusText.textContent = metrics.isMongoConnected ? 'MongoDB Atlas Cluster Connected' : 'Persistent Storage Fallback Active';
+      }
+      if (this.mongoStatusPill) {
+        this.mongoStatusPill.className = metrics.isMongoConnected ? 'mongo-status-pill connected' : 'mongo-status-pill local';
+      }
+
+      if (metrics.recentLogs) {
+        this.renderAdminLogs(metrics.recentLogs);
+      }
+    }
+
+    // 2. Fetch Users
+    const users = await adminService.getUsers();
+    this.adminUsersList = users;
+    this.filterAdminUsers();
+  }
+
+  filterAdminUsers() {
+    if (!this.adminUsersList) return;
+    const query = (this.adminUserSearch?.value || '').toLowerCase().trim();
+    const planFilter = this.adminPlanFilter?.value || 'all';
+
+    const filtered = this.adminUsersList.filter(u => {
+      const matchQuery = !query ||
+        (u.name && u.name.toLowerCase().includes(query)) ||
+        (u.email && u.email.toLowerCase().includes(query));
+
+      let matchPlan = true;
+      if (planFilter === 'free') matchPlan = u.plan === 'free';
+      else if (planFilter === 'pro') matchPlan = u.plan === 'pro';
+      else if (planFilter === 'admin') matchPlan = u.role === 'admin';
+
+      return matchQuery && matchPlan;
+    });
+
+    this.renderAdminUsers(filtered);
+  }
+
+  renderAdminUsers(users) {
+    if (!this.adminUsersTbody) return;
+
+    if (users.length === 0) {
+      this.adminUsersTbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-dim);">
+            <i data-lucide="users" style="width: 24px; height: 24px; margin-bottom: 8px; display: inline-block;"></i>
+            <div>No matching user accounts found.</div>
+          </td>
+        </tr>
+      `;
+      this.refreshIcons();
+      return;
+    }
+
+    this.adminUsersTbody.innerHTML = users.map(u => {
+      const isSuperAdmin = u.email.toLowerCase() === 'prince86944@gmail.com';
+      const initial = (u.name || u.email || 'U').charAt(0).toUpperCase();
+      const planClass = u.plan === 'pro' ? 'pro' : (u.plan === 'enterprise' ? 'enterprise' : 'free');
+      const roleClass = u.role === 'admin' ? 'admin' : 'user';
+      const regDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+
+      return `
+        <tr data-user-id="${u.id || u._id}">
+          <td>
+            <div class="user-row-profile">
+              <div class="user-row-avatar ${isSuperAdmin ? 'super-admin' : ''}">${initial}</div>
+              <div>
+                <div class="user-row-name">
+                  ${u.name || 'DocStudio User'}
+                  ${isSuperAdmin ? '<span class="badge-super-admin">SUPER ADMIN</span>' : ''}
+                </div>
+                <div class="user-row-email">${u.email}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="user-tag ${roleClass}">${u.role.toUpperCase()}</span>
+          </td>
+          <td>
+            <span class="user-tag ${planClass}">${(u.plan || 'free').toUpperCase()}</span>
+          </td>
+          <td>
+            <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-heading);">
+              ${u.dailyQuota >= 9000 ? 'Unlimited' : `${u.dailyOperationsUsed || 0} / ${u.dailyQuota || 5}`}
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-dim);">Operations / day</div>
+          </td>
+          <td style="font-size: 0.82rem; color: var(--text-dim);">
+            ${regDate}
+          </td>
+          <td style="text-align: right;">
+            <div class="user-actions-group">
+              <select class="admin-action-select" data-action="change-plan" data-user-id="${u.id || u._id}" title="Change Subscription Plan">
+                <option value="free" ${u.plan === 'free' ? 'selected' : ''}>Plan: Free</option>
+                <option value="pro" ${u.plan === 'pro' ? 'selected' : ''}>Plan: Pro</option>
+                <option value="enterprise" ${u.plan === 'enterprise' ? 'selected' : ''}>Plan: Enterprise</option>
+              </select>
+
+              ${!isSuperAdmin ? `
+                <button type="button" class="btn-user-action toggle-role" data-action="toggle-role" data-user-id="${u.id || u._id}" data-role="${u.role}" title="Toggle Admin / User Role">
+                  <i data-lucide="${u.role === 'admin' ? 'shield-minus' : 'shield-check'}"></i>
+                </button>
+                <button type="button" class="btn-user-action delete-user" data-action="delete" data-user-id="${u.id || u._id}" data-email="${u.email}" title="Delete User">
+                  <i data-lucide="trash-2"></i>
+                </button>
+              ` : `
+                <span class="protected-badge" title="Super Admin is protected"><i data-lucide="lock"></i></span>
+              `}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Bind event handlers for action buttons in user table
+    this.adminUsersTbody.querySelectorAll('[data-action="change-plan"]').forEach(select => {
+      select.addEventListener('change', async (e) => {
+        const userId = e.target.dataset.userId;
+        const newPlan = e.target.value;
+        const newQuota = newPlan === 'pro' || newPlan === 'enterprise' ? 9999 : 5;
+        await adminService.updateUser(userId, { plan: newPlan, dailyQuota: newQuota });
+        this.loadAdminDashboard();
+      });
+    });
+
+    this.adminUsersTbody.querySelectorAll('[data-action="toggle-role"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const userId = btn.dataset.userId;
+        const curRole = btn.dataset.role;
+        const newRole = curRole === 'admin' ? 'user' : 'admin';
+        if (confirm(`Change this user's role to ${newRole.toUpperCase()}?`)) {
+          await adminService.updateUser(userId, { role: newRole });
+          this.loadAdminDashboard();
+        }
+      });
+    });
+
+    this.adminUsersTbody.querySelectorAll('[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const userId = btn.dataset.userId;
+        const email = btn.dataset.email;
+        if (confirm(`Are you sure you want to permanently delete user "${email}"?`)) {
+          await adminService.deleteUser(userId);
+          this.loadAdminDashboard();
+        }
+      });
+    });
+
+    this.refreshIcons();
+  }
+
+  renderAdminLogs(logs) {
+    if (!this.adminLogsContainer) return;
+
+    if (!logs || logs.length === 0) {
+      this.adminLogsContainer.innerHTML = `
+        <div style="padding: 24px; text-align: center; color: var(--text-dim);">No audit logs recorded yet.</div>
+      `;
+      return;
+    }
+
+    this.adminLogsContainer.innerHTML = logs.map(l => {
+      const timeStr = l.createdAt ? new Date(l.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Now';
+      let icon = 'activity';
+      let color = 'var(--accent-color)';
+
+      if (l.action.includes('REGISTER')) {
+        icon = 'user-plus';
+        color = '#10b981';
+      } else if (l.action.includes('LOGIN')) {
+        icon = 'log-in';
+        color = '#6366f1';
+      } else if (l.action.includes('UPGRADED')) {
+        icon = 'crown';
+        color = '#f59e0b';
+      } else if (l.action.includes('TOOL')) {
+        icon = 'cpu';
+        color = '#ec4899';
+      }
+
+      return `
+        <div class="log-item-row">
+          <div class="log-icon-pill" style="color: ${color};">
+            <i data-lucide="${icon}"></i>
+          </div>
+          <div class="log-content">
+            <div class="log-action-text">${l.action} &bull; <span class="log-user">${l.userEmail || 'Guest'}</span></div>
+            <div class="log-detail-text">${l.details || ''}</div>
+          </div>
+          <div class="log-time-chip">${timeStr}</div>
+        </div>
+      `;
+    }).join('');
+
+    this.refreshIcons();
   }
 }
 

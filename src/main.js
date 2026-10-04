@@ -1587,16 +1587,7 @@ class DocuMatrixStudioApp {
     // Initialize Google Identity Services
     this.initGoogleIdentityServices();
 
-    // 5.1 Account Security & Verification Modal (+91 Phone & Area PIN)
-    this.btnCloseSecurityModal?.addEventListener('click', () => this.closeSecurityModal());
-    this.btnSkipSecurityProfile?.addEventListener('click', () => {
-      this.closeSecurityModal();
-      toast.info('Security profile verification postponed.');
-    });
-    this.securityModalOverlay?.addEventListener('click', (e) => {
-      if (e.target === this.securityModalOverlay) this.closeSecurityModal();
-    });
-
+    // 5.1 Mandatory Account Security & Verification Modal (+91 Phone & Area PIN)
     this.formSecurityProfile?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const phone = this.securityPhone?.value.trim().replace(/[^0-9]/g, '');

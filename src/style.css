@@ -3872,6 +3872,8 @@ button {
   background: #1f2022;
   border-color: #8ab4f8;
   color: #8ab4f8;
+}
+
 .manual-auth-box {
   margin-top: 14px;
   padding: 14px;
@@ -4642,7 +4644,7 @@ button {
   max-height: 90vh;
   overflow-y: auto;
   overflow-x: hidden;
-  background: var(--bg-surface);
+  background-color: var(--bg-surface, #ffffff);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-elevated), 0 0 50px rgba(99, 102, 241, 0.15);
@@ -4650,7 +4652,28 @@ button {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  z-index: 2100;
   animation: modalFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] .pricing-modal-card,
+[data-theme="light"] .security-modal-card {
+  background-color: #ffffff !important;
+  color: #0f172a;
+}
+[data-theme="dark"] .pricing-modal-card,
+[data-theme="dark"] .security-modal-card {
+  background-color: #0e1424 !important;
+  color: #f8fafc;
+}
+
+[data-theme="light"] .pro-tier-card {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+[data-theme="dark"] .pro-tier-card {
+  background-color: #161f36;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .pricing-modal-card::-webkit-scrollbar {

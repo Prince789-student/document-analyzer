@@ -424,6 +424,8 @@ class DocuMatrixStudioApp {
      Single Page Application (SPA) Router
      -------------------------------------------------------------------------- */
   initRouter() {
+    this.checkGoogleOAuthRedirect();
+
     window.addEventListener('hashchange', () => {
       this.handleRouting();
     });
@@ -1641,38 +1643,6 @@ class DocuMatrixStudioApp {
       this.triggerGoogleOAuth();
     });
 
-    // Trouble signing in toggle (reveals fallback email form)
-    this.btnToggleManualBox?.addEventListener('click', () => {
-      if (this.manualAuthBox) {
-        const isHidden = this.manualAuthBox.style.display === 'none';
-        this.manualAuthBox.style.display = isHidden ? 'block' : 'none';
-        if (isHidden) {
-          this.googleSigninEmail?.focus();
-        }
-      }
-    });
-
-    // Manual email fallback form
-    this.formGoogleSignin?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = this.googleSigninEmail?.value.trim();
-      if (!email) {
-        toast.error('Please enter your Google account email.');
-        return;
-      }
-      if (!email.includes('@')) {
-        toast.error('Please enter a valid Google email address.');
-        return;
-      }
-
-      const isPrince = email.toLowerCase() === 'prince86944@gmail.com' || email.toLowerCase() === 'prince869442@gmail.com' || email.toLowerCase().startsWith('prince86944');
-      const displayName = isPrince ? 'Prince Super Admin' : email.split('@')[0];
-      const res = await authService.loginWithGoogle(email, displayName);
-      if (res.success) {
-        this.handlePostLoginSuccess(isPrince, res.user?.name || email);
-      }
-    });
-
     // Initialize Google Identity Services
     this.initGoogleIdentityServices();
 
@@ -2127,9 +2097,6 @@ class DocuMatrixStudioApp {
 
   openAuthModal(mode = 'signin') {
     this.setAuthMode(mode);
-    if (this.manualAuthBox) {
-      this.manualAuthBox.style.display = 'block';
-    }
     if (this.authModalOverlay) {
       this.authModalOverlay.style.display = 'flex';
       this.authModalOverlay.setAttribute('aria-hidden', 'false');
@@ -2151,14 +2118,15 @@ class DocuMatrixStudioApp {
   }
 
   triggerGoogleOAuth() {
-    toast.info('Connecting to Google Account Chooser...');
+    toast.info('Opening Google Account Chooser...');
 
+    // 1. Try Google Identity Services popup if available
     if (this.googleTokenClient) {
       try {
         this.googleTokenClient.requestAccessToken({ prompt: 'select_account' });
         return;
       } catch (err) {
-        console.warn('OAuth request error, re-initializing', err);
+        console.warn('OAuth popup request error, falling back to direct redirect:', err);
       }
     }
 
@@ -2169,33 +2137,71 @@ class DocuMatrixStudioApp {
           this.googleTokenClient.requestAccessToken({ prompt: 'select_account' });
           return;
         } catch (err) {
-          console.warn('OAuth request failed after setup', err);
+          console.warn('OAuth popup request error after setup, falling back to redirect:', err);
         }
       }
     }
 
     if (window.google?.accounts?.id) {
       try {
-        window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            console.warn('Google One Tap notice:', notification.getNotDisplayedReason());
-            if (this.manualAuthBox) {
-              this.manualAuthBox.style.display = 'block';
-              this.googleSigninEmail?.focus();
-            }
-            toast.info('Enter your Gmail below to sign in instantly.');
-          }
-        });
-        return;
-      } catch (e) {
-        console.warn('One Tap prompt error', e);
-      }
+        window.google.accounts.id.prompt();
+      } catch (e) {}
     }
 
-    if (this.manualAuthBox) {
-      this.manualAuthBox.style.display = 'block';
-      this.googleSigninEmail?.focus();
-      toast.info('Please enter your Google account email below to sign in.');
+    // 2. Guaranteed fallback: Smooth Google OAuth redirect (bypasses all popup blockers & works on every phone/desktop)
+    this.redirectGoogleOAuth();
+  }
+
+  redirectGoogleOAuth() {
+    const clientId = this.googleClientId || '818059891079-kh6vpef04bkov0ic1ajk7a5g100oaejt.apps.googleusercontent.com';
+    const redirectUri = window.location.origin + window.location.pathname;
+    const scope = encodeURIComponent('email profile openid');
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}&prompt=select_account`;
+    window.location.href = authUrl;
+  }
+
+  checkGoogleOAuthRedirect() {
+    const hash = window.location.hash || '';
+    if (hash.includes('access_token=')) {
+      try {
+        const cleanHash = hash.replace(/^#\/?/, '').replace(/^\?/, '');
+        const params = new URLSearchParams(cleanHash);
+        const accessToken = params.get('access_token');
+        if (accessToken) {
+          toast.info('Authenticating with Google Account...');
+          this.fetchGoogleProfileAndLogin(accessToken);
+          window.history.replaceState(null, '', window.location.pathname + '#/');
+        }
+      } catch (e) {
+        console.warn('OAuth redirect token parse error:', e);
+      }
+    }
+  }
+
+  async fetchGoogleProfileAndLogin(accessToken) {
+    try {
+      const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      if (!userInfoRes.ok) throw new Error('Could not fetch Google profile');
+      const profile = await userInfoRes.json();
+
+      const isPrince = (profile.email || '').toLowerCase() === 'prince86944@gmail.com' ||
+                       (profile.email || '').toLowerCase() === 'prince869442@gmail.com' ||
+                       (profile.email || '').toLowerCase().startsWith('prince86944');
+      const res = await authService.loginWithGoogle({
+        email: profile.email,
+        name: profile.name || profile.email.split('@')[0],
+        avatar: profile.picture || '',
+        googleId: profile.sub || ''
+      });
+
+      if (res.success) {
+        this.handlePostLoginSuccess(isPrince, profile.name || profile.email);
+      }
+    } catch (err) {
+      console.error('Google profile fetch failed:', err);
+      toast.error('Google authentication failed. Please try again.');
     }
   }
 
@@ -2206,54 +2212,22 @@ class DocuMatrixStudioApp {
         client_id: clientId,
         scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid',
         error_callback: (err) => {
-          console.warn('Google OAuth popup error:', err);
-          toast.info('Google popup not available on this domain yet. Please enter your Gmail below.');
-          if (this.manualAuthBox) {
-            this.manualAuthBox.style.display = 'block';
-            this.googleSigninEmail?.focus();
-          }
+          console.warn('Google OAuth popup blocked or rejected, redirecting directly:', err);
+          this.redirectGoogleOAuth();
         },
         callback: async (tokenResponse) => {
           if (tokenResponse.error) {
-            console.error('Google OAuth error:', tokenResponse);
-            toast.info('Google popup closed or unauthorized. Enter your Gmail below to sign in instantly.');
-            if (this.manualAuthBox) {
-              this.manualAuthBox.style.display = 'block';
-              this.googleSigninEmail?.focus();
-            }
+            console.warn('Google OAuth token error, falling back to redirect:', tokenResponse);
+            this.redirectGoogleOAuth();
             return;
           }
-          try {
-            toast.info('Authenticating with Google...');
-            const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-              headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-            });
-            if (!userInfoRes.ok) throw new Error('Could not fetch Google profile');
-            const profile = await userInfoRes.json();
-
-            const isPrince = profile.email?.toLowerCase() === 'prince86944@gmail.com';
-            const res = await authService.loginWithGoogle({
-              email: profile.email,
-              name: profile.name || profile.email.split('@')[0],
-              avatar: profile.picture || '',
-              googleId: profile.sub || ''
-            });
-
-            if (res.success) {
-              this.handlePostLoginSuccess(isPrince, profile.name || profile.email);
-            }
-          } catch (err) {
-            console.error('Google profile fetch failed', err);
-            toast.error('Google authentication error. Enter your Gmail below.');
-            if (this.manualAuthBox) {
-              this.manualAuthBox.style.display = 'block';
-              this.googleSigninEmail?.focus();
-            }
+          if (tokenResponse.access_token) {
+            await this.fetchGoogleProfileAndLogin(tokenResponse.access_token);
           }
         }
       });
     } catch (e) {
-      console.warn('setupGoogleTokenClient error', e);
+      console.warn('setupGoogleTokenClient error:', e);
     }
   }
 
@@ -2321,7 +2295,8 @@ class DocuMatrixStudioApp {
                 size: 'large',
                 width: 320,
                 text: 'continue_with',
-                shape: 'rectangular'
+                shape: 'rectangular',
+                logo_alignment: 'left'
               });
             }
           } catch (e) {

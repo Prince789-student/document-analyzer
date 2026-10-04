@@ -1217,14 +1217,14 @@
           </div>
         </div>
 
-        <!-- FAST DIRECT UPI PAYMENT DRAWER -->
+        <!-- FAST DIRECT 1-TO-1 UPI PAYMENT DRAWER -->
         <div id="fast-upi-payment-drawer" class="fast-upi-payment-drawer">
           <div class="upi-checkout-header">
             <div>
               <h3 class="upi-checkout-title">
-                <i data-lucide="qr-code"></i> Direct Instant UPI Payment
+                <i data-lucide="qr-code"></i> Direct 1-to-1 UPI Payment
               </h3>
-              <p class="upi-checkout-sub">Scan the QR code or pay to the UPI ID from any app (GPay, PhonePe, Paytm, BHIM)</p>
+              <p class="upi-checkout-sub">Pay directly to our official UPI ID or scan the QR code from any UPI app</p>
             </div>
             <div class="upi-payable-pill">
               <span id="label-selected-plan-name">Selected: Monthly Pro (30 Days)</span>
@@ -1237,70 +1237,63 @@
             <div class="upi-qr-display-box">
               <div class="qr-frame">
                 <img src="/upi-qr.png" alt="Scan to pay via UPI" class="upi-qr-image" id="pricing-qr-image">
-                <div class="qr-scan-hint">Scan with any UPI App</div>
+                <div class="qr-scan-hint">Scan with GPay / PhonePe / Paytm</div>
               </div>
             </div>
 
-            <!-- UPI ID & Copy Details -->
+            <!-- UPI ID & Direct Pay Actions -->
             <div class="upi-info-details-box">
+              <!-- Official UPI ID & Copy Row -->
               <div class="upi-field-group">
                 <label>Official Registered UPI ID:</label>
                 <div class="upi-id-pill-row">
                   <code class="upi-id-text" id="display-upi-id">apnacollegebihar@slc</code>
                   <button type="button" id="btn-copy-upi-id" class="btn-copy-upi" title="Copy UPI ID to clipboard">
                     <i data-lucide="copy"></i>
-                    <span>Copy</span>
+                    <span>Copy UPI ID</span>
                   </button>
                 </div>
               </div>
 
-              <!-- Direct UPI Deep Link Buttons (Mobile / Desktop) -->
-              <div class="upi-app-quicklinks">
-                <span class="quicklink-label">1-Click Direct UPI Payment:</span>
-                <div class="quicklink-buttons">
-                  <a id="btn-upi-deeplink" href="upi://pay?pa=apnacollegebihar@slc&pn=DocStudio&am=100&cu=INR&tn=DocStudio%20Pro" class="btn-upi-app-link">
-                    <i data-lucide="smartphone"></i>
-                    <span>Open in GPay / PhonePe / Paytm</span>
-                  </a>
-                </div>
-                <!-- Live Status Detection Indicator -->
-                <div id="upi-live-status-badge" class="upi-live-detect-badge" style="display: none;">
-                  <span class="live-detect-dot"></span>
-                  <span id="upi-live-status-text">⚡ Auto-verifying your UPI transaction with bank network...</span>
-                </div>
+              <!-- 💳 PROMINENT DIRECT "PAY WITH UPI" BUTTON -->
+              <div class="upi-pay-primary-action">
+                <a id="btn-upi-deeplink" href="upi://pay?pa=apnacollegebihar@slc&pn=Prince%20Kumar&am=100.00&cu=INR&tn=DocStudioPro" class="btn-pay-with-upi">
+                  <i data-lucide="smartphone"></i>
+                  <span>Pay with UPI (GPay / PhonePe / Paytm / BHIM)</span>
+                </a>
               </div>
 
-              <!-- Google Account Email for Pro Subscription -->
-              <div class="upi-field-group" style="margin-top: 14px;">
-                <label for="input-payer-email">Google Account Email for Pro Activation:</label>
-                <input type="email" id="input-payer-email" class="upi-utr-input" placeholder="e.g. prince86944@gmail.com" required>
+              <!-- Status notification on launching UPI -->
+              <div id="upi-live-status-badge" class="upi-live-detect-badge" style="display: none;">
+                <span class="live-detect-dot"></span>
+                <span id="upi-live-status-text">Payment initiated! After sending payment, enter your 12-digit UTR below.</span>
               </div>
-
-              <!-- ⚡ Instant Auto-Verify Button for QR Scanner Payment -->
-              <button type="button" id="btn-auto-verify-upi" class="btn-auto-verify-upi">
-                <i data-lucide="zap"></i>
-                <span>⚡ Auto-Verify Scanner Payment (Instant)</span>
-              </button>
 
               <div class="upi-or-divider">
-                <span>OR ENTER TRANSACTION ID / UTR MANUALLY</span>
+                <span>AFTER PAYMENT: SUBMIT DETAILS TO ACTIVATE PRO</span>
+              </div>
+
+              <!-- Email for Pro Subscription -->
+              <div class="upi-field-group">
+                <label for="input-payer-email">Your Email Address (For Pro Activation):</label>
+                <input type="email" id="input-payer-email" class="upi-utr-input" placeholder="Enter your email (e.g. name@gmail.com)" required>
               </div>
 
               <!-- Transaction Reference / UTR Input Field -->
-              <div class="upi-field-group" style="margin-top: 6px;">
+              <div class="upi-field-group">
                 <label for="input-upi-utr">
-                  <span>UPI Transaction ID / UTR Number:</span>
+                  <span>UPI Transaction ID / 12-digit UTR Number:</span>
                   <span style="font-size: 0.76rem; color: #10b981; display: block; font-weight: 500; margin-top: 2px;">
-                    Supports 12-digit UTR, PhonePe Txn ID (T...), Google Pay Ref, or Bank UTR
+                    Enter the 12-digit UTR / Ref No. from your payment receipt
                   </span>
                 </label>
-                <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="e.g. 427812903456 or T241004123..." maxlength="35">
+                <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="e.g. 427812903456 or PhonePe Txn Ref..." maxlength="35" required>
               </div>
 
-              <!-- Manual Verification Button -->
+              <!-- Submit UTR Button -->
               <button type="button" id="btn-verify-upi-payment" class="btn-verify-upi">
-                <i data-lucide="shield-check"></i>
-                <span id="btn-verify-label">Verify Reference & Activate Pro</span>
+                <i data-lucide="check-circle-2"></i>
+                <span id="btn-verify-label">Submit UTR & Activate Pro</span>
               </button>
             </div>
           </div>

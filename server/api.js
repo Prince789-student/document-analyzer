@@ -368,59 +368,57 @@ export async function handleApiRoute(req, res, path) {
         amount = 100,
         paymentMethod = 'UPI',
         utrRef = '',
-        payerEmail = '',
-        autoVerify = false
+        payerEmail = ''
       } = await parseJsonBody(req);
 
       if (!user && payerEmail) {
+        if (isSuperAdminEmail(payerEmail)) {
+          return sendJson(res, 403, { error: 'Super Admin account cannot be activated via public payment form. Please log in directly.' });
+        }
         user = await findOrCreateGoogleUser({ email: payerEmail, name: payerEmail.split('@')[0] });
       }
 
       if (!user) {
-        return sendJson(res, 400, { error: 'Please enter your Google account email to activate your Pro subscription.' });
+        return sendJson(res, 400, { error: 'Please enter your email address to activate your Pro subscription.' });
       }
 
-      const isAutoVerify = Boolean(autoVerify || (req.url && req.url.includes('autoverify=1')));
       let cleanUtr = String(utrRef || '').trim().replace(/[^a-zA-Z0-9\-_/]/g, '').toUpperCase();
 
-      if (isAutoVerify) {
-        // Instant automated verification for Direct UPI app payment or QR scanner
-        cleanUtr = `UPI/AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
-      } else {
-        if (!cleanUtr) {
-          return sendJson(res, 400, {
-            error: 'Payment Verification Required: Please enter the UPI UTR / Transaction ID from your payment receipt, or click "Auto-Verify".'
-          });
-        }
+      if (!cleanUtr) {
+        return sendJson(res, 400, {
+          error: 'Please enter the UPI Reference Number / 12-digit UTR from your payment receipt.'
+        });
+      }
 
-        // Support any legitimate Indian UPI reference (6 to 35 alphanumeric characters)
-        if (cleanUtr.length < 6 || cleanUtr.length > 35) {
-          return sendJson(res, 400, {
-            error: 'Invalid reference length. Please enter the authentic transaction reference (6 to 35 characters) from Google Pay, PhonePe, or Paytm.'
-          });
-        }
+      // Support any legitimate Indian UPI reference (6 to 35 alphanumeric characters)
+      if (cleanUtr.length < 6 || cleanUtr.length > 35) {
+        return sendJson(res, 400, {
+          error: 'Invalid reference length. Please enter the authentic transaction reference (6 to 35 characters) from Google Pay, PhonePe, or Paytm.'
+        });
+      }
 
-        // Reject obvious dummy sequences
-        if (/^(\d)\1{5,}$/.test(cleanUtr) || cleanUtr === '123456' || cleanUtr === '12345678' || cleanUtr === 'TEST' || cleanUtr === 'DUMMY') {
-          return sendJson(res, 400, {
-            error: 'Invalid dummy reference detected. Please enter your authentic UPI transaction reference from your payment receipt.'
-          });
-        }
+      // Reject obvious dummy sequences
+      if (/^(\d)\1{5,}$/.test(cleanUtr) || cleanUtr === '123456' || cleanUtr === '12345678' || cleanUtr === 'TEST' || cleanUtr === 'DUMMY') {
+        return sendJson(res, 400, {
+          error: 'Invalid dummy reference detected. Please enter your authentic UPI transaction reference from your payment receipt.'
+        });
+      }
 
-        // Prevent duplicate UTR redemption
-        const existingSub = await findSubscriptionByUtr(cleanUtr);
-        if (existingSub) {
-          return sendJson(res, 400, {
-            error: `This UPI Reference Number (${cleanUtr}) has already been redeemed for an active subscription. Each transaction can only be used once.`
-          });
-        }
+      // Prevent duplicate UTR redemption
+      const existingSub = await findSubscriptionByUtr(cleanUtr);
+      if (existingSub) {
+        return sendJson(res, 400, {
+          error: `This UPI Reference Number (${cleanUtr}) has already been redeemed for an active subscription. Each transaction can only be used once.`
+        });
       }
 
       const userId = user._id || user.id;
+      const targetRole = (user.role === 'admin' && isSuperAdminEmail(user.email)) ? 'admin' : 'user';
 
       // Update user plan to PRO with unlimited operations
       const updated = await updateUser(userId, {
         plan: 'pro',
+        role: targetRole,
         planDuration: duration,
         planAmount: Number(amount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100)),
         planUtr: cleanUtr,

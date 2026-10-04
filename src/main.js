@@ -1668,7 +1668,7 @@ class DocuMatrixStudioApp {
         this.labelSelectedPlanName.textContent = `Selected: ${nameMap[duration] || 'Monthly Pro (₹100)'}`;
       }
       if (this.btnVerifyLabel) {
-        this.btnVerifyLabel.textContent = `I Have Paid ₹${this.selectedPlanAmount} • Activate Pro Instantly`;
+        this.btnVerifyLabel.textContent = `Submit UTR & Activate Pro (₹${this.selectedPlanAmount})`;
       }
       const upiId = this.activeUpiId || 'apnacollegebihar@slc';
       const cleanAmt = Number(this.selectedPlanAmount).toFixed(2);
@@ -1718,65 +1718,33 @@ class DocuMatrixStudioApp {
       }
     });
 
-    // Direct UPI Deep Link Click (Launch UPI App & show live detection indicator)
+    // Direct 1-Click Pay With UPI (Launch UPI App on device)
     this.btnUpiDeeplink?.addEventListener('click', () => {
+      const amt = this.selectedPlanAmount || 100;
       if (this.upiLiveStatusBadge) {
         this.upiLiveStatusBadge.style.display = 'flex';
       }
       if (this.upiLiveStatusText) {
-        this.upiLiveStatusText.textContent = '⚡ UPI App Launched! Click "Auto-Verify Scanner Payment" once completed.';
+        this.upiLiveStatusText.textContent = `⚡ UPI payment initiated! Complete ₹${amt} payment to apnacollegebihar@slc, then enter the 12-digit UTR below.`;
       }
-      toast.info('⚡ Direct UPI Payment initiated! Complete payment in your banking app.');
+      toast.info(`⚡ Launching UPI App to pay ₹${amt} to apnacollegebihar@slc...`);
+      setTimeout(() => {
+        this.inputUpiUtr?.focus();
+      }, 1000);
     });
 
-    // Instant Auto-Verification Function for Scanner & Direct UPI Payment
-    const executeAutoVerification = async () => {
-      let payerEmail = this.inputPayerEmail?.value?.trim() || authService.getUser()?.email || '';
-
-      if (!payerEmail) {
-        toast.error('Please enter your Google account email to activate Pro.');
-        this.inputPayerEmail?.focus();
-        return;
-      }
-
-      const duration = this.selectedPlanDuration || 'monthly';
-      const amount = Number(this.selectedPlanAmount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
-
-      if (this.btnAutoVerifyUpi) this.btnAutoVerifyUpi.disabled = true;
-      if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = true;
-
-      if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'flex';
-      if (this.upiLiveStatusText) this.upiLiveStatusText.textContent = '🔍 Connecting to NPCI & bank node for apnacollegebihar@slc...';
-
-      toast.info(`⚡ Verifying payment settlement for ₹${amount}...`);
-      await new Promise(r => setTimeout(r, 1200));
-
-      if (this.upiLiveStatusText) this.upiLiveStatusText.textContent = '✅ Payment settlement confirmed! Activating Pro...';
-
-      const ok = await authService.upgradeToPro('UPI', amount, duration, '', payerEmail, true);
-
-      if (this.btnAutoVerifyUpi) this.btnAutoVerifyUpi.disabled = false;
-      if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = false;
-
-      if (ok) {
-        triggerConfetti();
-        this.closePricingModal();
-        toast.success(`🎉 DocStudio Pro (${duration.toUpperCase()}) activated! Enjoy unlimited operations.`);
-        const u = authService.getUser();
-        if (u && (!u.phone || !u.pincode)) {
-          setTimeout(() => this.openSecurityModal(), 1000);
-        }
-      }
-    };
-
-    this.btnAutoVerifyUpi?.addEventListener('click', executeAutoVerification);
-
-    // Verify UPI Payment via Manual Reference / UTR Input (Supports PhonePe T..., GPay, Paytm, Bank UTRs)
+    // Submit UTR & Activate Pro Plan
     this.btnVerifyUpiPayment?.addEventListener('click', async () => {
       let payerEmail = this.inputPayerEmail?.value?.trim() || authService.getUser()?.email || '';
 
       if (!payerEmail) {
-        toast.error('Please enter your Google account email to activate Pro.');
+        toast.error('Please enter your email address to activate your Pro account.');
+        this.inputPayerEmail?.focus();
+        return;
+      }
+
+      if (payerEmail.toLowerCase() === 'prince86944@gmail.com' && !authService.isAdmin()) {
+        toast.error('This email is reserved for Super Admin. Please enter your personal email address.');
         this.inputPayerEmail?.focus();
         return;
       }
@@ -1784,13 +1752,19 @@ class DocuMatrixStudioApp {
       const cleanUtr = (this.inputUpiUtr?.value || '').trim().replace(/[^a-zA-Z0-9\-_/]/g, '').toUpperCase();
 
       if (!cleanUtr) {
-        toast.info('No Transaction ID typed. Initiating Auto-Verification...');
-        await executeAutoVerification();
+        toast.error('Please enter the 12-digit UPI Reference / UTR Number from your payment receipt.');
+        this.inputUpiUtr?.focus();
         return;
       }
 
       if (cleanUtr.length < 6 || cleanUtr.length > 35) {
-        toast.error('Please enter a valid UPI Transaction ID / Reference (6 to 35 characters from GPay, PhonePe, or Paytm).');
+        toast.error('Please enter a valid UPI Transaction ID / UTR Number (from GPay, PhonePe, or Paytm receipt).');
+        this.inputUpiUtr?.focus();
+        return;
+      }
+
+      if (/^(\d)\1{5,}$/.test(cleanUtr) || cleanUtr === '123456' || cleanUtr === '12345678') {
+        toast.error('Invalid test UTR. Please enter your authentic transaction reference.');
         this.inputUpiUtr?.focus();
         return;
       }
@@ -1799,13 +1773,11 @@ class DocuMatrixStudioApp {
       const amount = Number(this.selectedPlanAmount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
 
       if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = true;
-      if (this.btnAutoVerifyUpi) this.btnAutoVerifyUpi.disabled = true;
 
-      toast.info(`Verifying reference & activating DocStudio Pro (${duration.toUpperCase()} - ₹${amount})...`);
+      toast.info(`Verifying UTR "${cleanUtr}" & activating DocStudio Pro (${duration.toUpperCase()} - ₹${amount})...`);
       const ok = await authService.upgradeToPro('UPI', amount, duration, cleanUtr, payerEmail, false);
 
       if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = false;
-      if (this.btnAutoVerifyUpi) this.btnAutoVerifyUpi.disabled = false;
 
       if (ok) {
         triggerConfetti();
@@ -2206,11 +2178,7 @@ class DocuMatrixStudioApp {
       }
       if (this.inputPayerEmail) {
         const u = authService.getUser();
-        if (u && u.email) {
-          this.inputPayerEmail.value = u.email;
-        } else if (!this.inputPayerEmail.value) {
-          this.inputPayerEmail.value = 'prince86944@gmail.com';
-        }
+        this.inputPayerEmail.value = (u && u.email) ? u.email : '';
       }
     }
     this.refreshIcons();

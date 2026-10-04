@@ -51,9 +51,9 @@
       "lastQuotaReset": "2026-10-03T16:23:22.872Z",
       "createdAt": "2026-10-03T16:23:22.873Z",
       "_id": "usr_1791044602872r8eb",
-      "planDuration": "daily",
-      "planAmount": 5,
-      "planUtr": "627757858181",
+      "planDuration": "monthly",
+      "planAmount": 100,
+      "planUtr": "UPI/AUTO-MUTP79EA-283195",
       "phone": "9508621631",
       "pincode": "803120",
       "profileVerified": true
@@ -151,9 +151,30 @@
       "status": "active",
       "paymentMethod": "UPI",
       "createdAt": "2026-10-04T07:21:23.432Z"
+    },
+    {
+      "id": "sub_1791110928469",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "plan": "pro",
+      "amount": 100,
+      "duration": "monthly",
+      "utrRef": "UPI/AUTO-MUTP79EA-283195",
+      "currency": "INR",
+      "status": "active",
+      "paymentMethod": "UPI",
+      "createdAt": "2026-10-04T10:48:48.469Z"
     }
   ],
   "logs": [
+    {
+      "id": "log_1791110928481",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "PRO_SUBSCRIPTION_ACTIVE",
+      "details": "Activated PRO (MONTHLY - ₹100) via UPI (Ref: Direct UPI)",
+      "createdAt": "2026-10-04T10:48:48.481Z"
+    },
     {
       "id": "log_1791098483437",
       "userId": "usr_1791044602872r8eb",

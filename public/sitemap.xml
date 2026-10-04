@@ -3,230 +3,230 @@
 
   <!-- Homepage / Primary Hub -->
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Popular Document Tools (High Priority 0.9) -->
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/merge-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/merge-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/split-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/split-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/compress-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/compress-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/word-to-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/word-to-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/pdf-to-word</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/pdf-to-word</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/jpg-to-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/jpg-to-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/sign-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/sign-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Essential Conversion Tools (Priority 0.8) -->
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/powerpoint-to-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/powerpoint-to-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/excel-to-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/excel-to-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/html-to-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/html-to-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/pdf-to-jpg</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/pdf-to-jpg</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/pdf-to-powerpoint</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/pdf-to-powerpoint</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/pdf-to-excel</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/pdf-to-excel</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/pdf-to-pdfa</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/pdf-to-pdfa</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Document Organization & Optimization Tools (Priority 0.8) -->
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/remove-pages</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/remove-pages</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/extract-pages</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/extract-pages</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/organize-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/organize-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/scan-to-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/scan-to-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/repair-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/repair-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/ocr-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/ocr-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Editing & Annotation Tools (Priority 0.8) -->
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/rotate-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/rotate-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/add-page-numbers</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/add-page-numbers</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/add-watermark</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/add-watermark</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/crop-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/crop-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/edit-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/edit-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/pdf-forms</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/pdf-forms</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Security & Audit Tools (Priority 0.8) -->
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/unlock-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/unlock-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/protect-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/protect-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/redact-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/redact-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/compare-pdf</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/compare-pdf</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Legal, Compliance & Support Pages (Priority 0.7) -->
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/privacy</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/privacy</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/terms</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/terms</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/refund</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/refund</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/about</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/about</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://document-analyzer-y7as.onrender.com/contact</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://document-analyzer-one.vercel.app/contact</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

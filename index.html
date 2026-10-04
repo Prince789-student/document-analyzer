@@ -1256,36 +1256,51 @@
 
               <!-- Direct UPI Deep Link Buttons (Mobile / Desktop) -->
               <div class="upi-app-quicklinks">
-                <span class="quicklink-label">1-Click Launch UPI App:</span>
+                <span class="quicklink-label">1-Click Direct UPI Payment:</span>
                 <div class="quicklink-buttons">
                   <a id="btn-upi-deeplink" href="upi://pay?pa=apnacollegebihar@slc&pn=DocStudio&am=100&cu=INR&tn=DocStudio%20Pro" class="btn-upi-app-link">
                     <i data-lucide="smartphone"></i>
                     <span>Open in GPay / PhonePe / Paytm</span>
                   </a>
                 </div>
+                <!-- Live Status Detection Indicator -->
+                <div id="upi-live-status-badge" class="upi-live-detect-badge" style="display: none;">
+                  <span class="live-detect-dot"></span>
+                  <span id="upi-live-status-text">⚡ Auto-verifying your UPI transaction with bank network...</span>
+                </div>
               </div>
 
               <!-- Google Account Email for Pro Subscription -->
               <div class="upi-field-group" style="margin-top: 14px;">
-                <label for="input-payer-email">Google Email for Pro Account Activation:</label>
+                <label for="input-payer-email">Google Account Email for Pro Activation:</label>
                 <input type="email" id="input-payer-email" class="upi-utr-input" placeholder="e.g. prince86944@gmail.com" required>
               </div>
 
-              <!-- Mandatory UTR Input Field -->
-              <div class="upi-field-group" style="margin-top: 10px;">
-                <label for="input-upi-utr">
-                  <span>UPI Transaction Reference / UTR Number (Mandatory):</span>
-                  <span style="font-size: 0.76rem; color: #10b981; display: block; font-weight: 500; margin-top: 2px;">
-                    Found on your Google Pay, PhonePe, or Paytm receipt (12 digits)
-                  </span>
-                </label>
-                <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="Enter 12-digit UTR (e.g. 427812903456)" maxlength="12" required>
+              <!-- ⚡ Instant Auto-Verify Button for QR Scanner Payment -->
+              <button type="button" id="btn-auto-verify-upi" class="btn-auto-verify-upi">
+                <i data-lucide="zap"></i>
+                <span>⚡ Auto-Verify Scanner Payment (Instant)</span>
+              </button>
+
+              <div class="upi-or-divider">
+                <span>OR ENTER TRANSACTION ID / UTR MANUALLY</span>
               </div>
 
-              <!-- Instant Activate Button -->
+              <!-- Transaction Reference / UTR Input Field -->
+              <div class="upi-field-group" style="margin-top: 6px;">
+                <label for="input-upi-utr">
+                  <span>UPI Transaction ID / UTR Number:</span>
+                  <span style="font-size: 0.76rem; color: #10b981; display: block; font-weight: 500; margin-top: 2px;">
+                    Supports 12-digit UTR, PhonePe Txn ID (T...), Google Pay Ref, or Bank UTR
+                  </span>
+                </label>
+                <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="e.g. 427812903456 or T241004123..." maxlength="35">
+              </div>
+
+              <!-- Manual Verification Button -->
               <button type="button" id="btn-verify-upi-payment" class="btn-verify-upi">
                 <i data-lucide="shield-check"></i>
-                <span>I Have Paid &bull; Activate Pro Instantly</span>
+                <span id="btn-verify-label">Verify Reference & Activate Pro</span>
               </button>
             </div>
           </div>

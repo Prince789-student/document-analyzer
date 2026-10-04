@@ -151,7 +151,7 @@ class AuthService {
     if (showToast) toast.info('You have logged out.');
   }
 
-  async upgradeToPro(paymentMethod = 'UPI', amount = 100, duration = 'monthly', utrRef = '', payerEmail = '') {
+  async upgradeToPro(paymentMethod = 'UPI', amount = 100, duration = 'monthly', utrRef = '', payerEmail = '', autoVerify = false) {
     try {
       const emailToUse = payerEmail || (this.user?.email || '');
       const headers = { 'Content-Type': 'application/json' };
@@ -168,7 +168,8 @@ class AuthService {
           duration,
           paymentMethod,
           utrRef,
-          payerEmail: emailToUse
+          payerEmail: emailToUse,
+          autoVerify
         })
       });
       const data = await res.json();

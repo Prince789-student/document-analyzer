@@ -53,7 +53,10 @@
       "_id": "usr_1791044602872r8eb",
       "planDuration": "daily",
       "planAmount": 5,
-      "planUtr": ""
+      "planUtr": "627757858181",
+      "phone": "9508621631",
+      "pincode": "803120",
+      "profileVerified": true
     },
     {
       "id": "usr_1791046230389n9hd",
@@ -135,9 +138,38 @@
       "status": "active",
       "paymentMethod": "UPI",
       "createdAt": "2026-10-03T17:29:21.075Z"
+    },
+    {
+      "id": "sub_1791098483432",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "plan": "pro",
+      "amount": 5,
+      "duration": "daily",
+      "utrRef": "627757858181",
+      "currency": "INR",
+      "status": "active",
+      "paymentMethod": "UPI",
+      "createdAt": "2026-10-04T07:21:23.432Z"
     }
   ],
   "logs": [
+    {
+      "id": "log_1791098483437",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "PRO_SUBSCRIPTION_ACTIVE",
+      "details": "Activated PRO (DAILY - ₹5) via UPI (Ref: 627757858181)",
+      "createdAt": "2026-10-04T07:21:23.437Z"
+    },
+    {
+      "id": "log_1791098205480",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "PROFILE_VERIFIED",
+      "details": "Linked Phone: +91-9508621631, PIN: 803120",
+      "createdAt": "2026-10-04T07:16:45.481Z"
+    },
     {
       "id": "log_1791098006874",
       "userId": "usr_1791044602872r8eb",

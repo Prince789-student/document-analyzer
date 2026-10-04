@@ -5154,6 +5154,97 @@ button {
   transform: none;
 }
 
+.btn-auto-verify-upi {
+  margin-top: 10px;
+  min-height: 48px;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #7c3aed 100%);
+  color: #ffffff;
+  font-size: 0.96rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.btn-auto-verify-upi:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 50%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
+}
+
+.btn-auto-verify-upi:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.upi-or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 14px 0 8px 0;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.upi-or-divider::before,
+.upi-or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.upi-or-divider span {
+  padding: 0 10px;
+}
+
+.upi-live-detect-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: var(--radius-md);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #10b981;
+  animation: pulseLiveBadge 2s infinite ease-in-out;
+}
+
+@keyframes pulseLiveBadge {
+  0%, 100% { border-color: rgba(16, 185, 129, 0.35); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.2); }
+  50% { border-color: rgba(16, 185, 129, 0.7); box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); }
+}
+
+.live-detect-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  flex-shrink: 0;
+  animation: pingDot 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes pingDot {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
 /* ==========================================================================
    ACCOUNT SECURITY & VERIFICATION MODAL (+91 Phone & Area PIN)
    ========================================================================== */

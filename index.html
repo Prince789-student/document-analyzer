@@ -796,6 +796,7 @@
                   <th>UTR / Reference ID</th>
                   <th>Purchase Date</th>
                   <th>Status</th>
+                  <th style="text-align: right;">Action</th>
                 </tr>
               </thead>
               <tbody id="admin-subscriptions-tbody">
@@ -1270,10 +1271,15 @@
                 <input type="email" id="input-payer-email" class="upi-utr-input" placeholder="e.g. prince86944@gmail.com" required>
               </div>
 
-              <!-- Optional UTR Input Field -->
+              <!-- Mandatory UTR Input Field -->
               <div class="upi-field-group" style="margin-top: 10px;">
-                <label for="input-upi-utr">UPI Transaction Reference / UTR Number (Optional):</label>
-                <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="e.g. 427812903456 (12 digits)" maxlength="30">
+                <label for="input-upi-utr">
+                  <span>UPI Transaction Reference / UTR Number (Mandatory):</span>
+                  <span style="font-size: 0.76rem; color: #10b981; display: block; font-weight: 500; margin-top: 2px;">
+                    Found on your Google Pay, PhonePe, or Paytm receipt (12 digits)
+                  </span>
+                </label>
+                <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="Enter 12-digit UTR (e.g. 427812903456)" maxlength="12" required>
               </div>
 
               <!-- Instant Activate Button -->

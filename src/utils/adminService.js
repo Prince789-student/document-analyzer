@@ -65,6 +65,23 @@ class AdminService {
       return false;
     }
   }
+
+  async revokeSubscription(subId) {
+    try {
+      const res = await fetch('/api/admin/revoke-subscription', {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ subId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to revoke subscription');
+      toast.info(data.message || 'Subscription revoked.');
+      return true;
+    } catch (err) {
+      toast.error(err.message);
+      return false;
+    }
+  }
 }
 
 export const adminService = new AdminService();

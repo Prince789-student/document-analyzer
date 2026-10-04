@@ -342,6 +342,42 @@ export async function createSubscription({ userId, userEmail, plan = 'pro', amou
   return newSub;
 }
 
+export async function findSubscriptionByUtr(utrRef) {
+  if (!utrRef) return null;
+  const cleanUtr = String(utrRef).trim();
+  if (isMongoConnected) {
+    return await MongoSubscription.findOne({ utrRef: cleanUtr, status: 'active' });
+  }
+  const db = readLocalDb();
+  return (db.subscriptions || []).find(s => s.utrRef && s.utrRef === cleanUtr && s.status === 'active') || null;
+}
+
+export async function revokeSubscription(subId) {
+  if (isMongoConnected) {
+    const sub = await MongoSubscription.findById(subId);
+    if (!sub) return null;
+    sub.status = 'revoked';
+    await sub.save();
+    await MongoUser.findByIdAndUpdate(sub.userId, {
+      plan: 'free',
+      dailyQuota: 5
+    });
+    return sub;
+  }
+  const db = readLocalDb();
+  const subIdx = (db.subscriptions || []).findIndex(s => s.id === subId || s._id === subId);
+  if (subIdx === -1) return null;
+  db.subscriptions[subIdx].status = 'revoked';
+  const userId = db.subscriptions[subIdx].userId;
+  const userIdx = (db.users || []).findIndex(u => u.id === userId || u._id === userId);
+  if (userIdx !== -1) {
+    db.users[userIdx].plan = 'free';
+    db.users[userIdx].dailyQuota = 5;
+  }
+  writeLocalDb(db);
+  return db.subscriptions[subIdx];
+}
+
 export async function recordLog({ userId, userEmail, action, toolId, details }) {
   if (isMongoConnected) {
     const log = new MongoLog({ userId, userEmail, action, toolId, details });

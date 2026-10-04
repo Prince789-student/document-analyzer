@@ -1639,9 +1639,20 @@ class DocuMatrixStudioApp {
       if (this.btnVerifyLabel) {
         this.btnVerifyLabel.textContent = `I Have Paid ₹${this.selectedPlanAmount} • Activate Pro Instantly`;
       }
+      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const cleanAmt = Number(this.selectedPlanAmount).toFixed(2);
+      const upiPayload = `upi://pay?pa=${upiId}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+
       if (this.btnUpiDeeplink) {
-        const upiId = this.activeUpiId || 'apnacollegebihar@slc';
-        this.btnUpiDeeplink.href = `upi://pay?pa=${upiId}&pn=DocStudio&am=${this.selectedPlanAmount}&cu=INR&tn=DocStudio%20Pro%20${duration.toUpperCase()}`;
+        this.btnUpiDeeplink.href = upiPayload;
+      }
+
+      if (this.pricingQrImage) {
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=2&data=${encodeURIComponent(upiPayload)}`;
+        this.pricingQrImage.src = qrUrl;
+        this.pricingQrImage.onerror = () => {
+          this.pricingQrImage.src = '/upi-qr.png';
+        };
       }
     };
     this.updateSelectedTier = updateSelectedTier;
@@ -1686,14 +1697,25 @@ class DocuMatrixStudioApp {
         return;
       }
 
+      const isSuper = authService.isAdmin() || payerEmail.toLowerCase().startsWith('prince86944');
+      const cleanUtr = (this.inputUpiUtr?.value || '').trim().replace(/[^0-9]/g, '');
+
+      // Strict Anti-Fraud Guard: non-admins MUST provide 12-digit UTR from payment receipt
+      if (!isSuper) {
+        if (!cleanUtr || cleanUtr.length !== 12) {
+          toast.error('Payment Verification Required: Please enter the 12-digit UPI UTR / Reference Number from your payment receipt (Google Pay, PhonePe, or Paytm).');
+          this.inputUpiUtr?.focus();
+          return;
+        }
+      }
+
       const duration = this.selectedPlanDuration || 'monthly';
       const amount = Number(this.selectedPlanAmount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
-      const utr = this.inputUpiUtr?.value.trim() || '';
 
       if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = true;
 
-      toast.info(`Activating DocStudio Pro (${duration.toUpperCase()} - ₹${amount}) for ${payerEmail}...`);
-      const ok = await authService.upgradeToPro('UPI', amount, duration, utr, payerEmail);
+      toast.info(`Verifying payment & activating DocStudio Pro (${duration.toUpperCase()} - ₹${amount})...`);
+      const ok = await authService.upgradeToPro('UPI', amount, duration, cleanUtr, payerEmail);
       if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = false;
 
       if (ok) {
@@ -2365,13 +2387,33 @@ class DocuMatrixStudioApp {
             ${dateStr}
           </td>
           <td>
-            <span class="sub-status-pill active">
-              <i data-lucide="check-circle-2"></i> ${s.status || 'Active'}
+            <span class="sub-status-pill ${s.status === 'revoked' ? 'revoked' : 'active'}">
+              <i data-lucide="${s.status === 'revoked' ? 'x-circle' : 'check-circle-2'}"></i> ${s.status === 'revoked' ? 'Revoked' : 'Active'}
             </span>
+          </td>
+          <td style="text-align: right;">
+            ${s.status !== 'revoked' ? `
+              <button type="button" class="btn-revoke-sub" data-sub-id="${s.id || s._id}" style="padding: 4px 10px; font-size: 0.74rem; font-weight: 600; border-radius: 6px; background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); cursor: pointer;" title="Revoke fake payment and downgrade user to Free">
+                Revoke Pro
+              </button>
+            ` : `
+              <span style="font-size: 0.72rem; color: #ef4444; font-weight: 600;">Cancelled</span>
+            `}
           </td>
         </tr>
       `;
     }).join('');
+
+    this.adminSubscriptionsTbody.querySelectorAll('.btn-revoke-sub').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const subId = e.currentTarget.dataset.subId;
+        if (!confirm('Are you sure you want to revoke this subscription? The user will be reverted to Free plan (5 ops/day).')) return;
+        const ok = await adminService.revokeSubscription(subId);
+        if (ok) {
+          this.loadAdminDashboard();
+        }
+      });
+    });
 
     this.refreshIcons();
   }

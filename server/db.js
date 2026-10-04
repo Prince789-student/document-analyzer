@@ -368,9 +368,9 @@ export async function getAdminMetrics() {
   const totalUsers = users.length;
   const proSubscribers = users.filter(u => u.plan === 'pro' || u.plan === 'enterprise').length;
   const freeUsers = Math.max(0, totalUsers - proSubscribers);
-  const dailyPasses = subscriptions.filter(s => s.duration === 'daily').length;
-  const monthlySubs = subscriptions.filter(s => s.duration === 'monthly').length;
-  const yearlySubs = subscriptions.filter(s => s.duration === 'yearly').length;
+  const dailyPasses = subscriptions.filter(s => s.duration === 'daily' || s.amount === 5).length;
+  const monthlySubs = subscriptions.filter(s => s.duration === 'monthly' || s.amount === 100 || (!s.duration && s.amount !== 5 && s.amount !== 1000)).length;
+  const yearlySubs = subscriptions.filter(s => s.duration === 'yearly' || s.amount === 1000).length;
   const totalRevenue = subscriptions.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
   const totalOperations = logs.filter(l => l.action.startsWith('TOOL_EXECUTE') || l.action.startsWith('TOOL_OPERATION')).length;
 

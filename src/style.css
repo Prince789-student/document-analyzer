@@ -173,14 +173,14 @@ button {
 }
 
 .studio-header__inner {
-  max-width: 1440px;
+  max-width: 1600px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   box-sizing: border-box;
 }
 
@@ -708,33 +708,7 @@ button {
   color: var(--primary);
 }
 
-.privacy-status-pill {
-  display: none !important;
-}
 
-@media (min-width: 1560px) {
-  .privacy-status-pill {
-    display: flex !important;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.25);
-    border-radius: var(--radius-pill);
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--accent-emerald);
-    flex-shrink: 0;
-  }
-}
-
-.status-indicator-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent-emerald);
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
-}
 
 /* Glass Dropdown Menu */
 .dropdown-wrapper {
@@ -823,37 +797,38 @@ button {
 
 .studio-hero {
   text-align: center;
-  padding: 50px 24px 24px 24px;
-  max-width: 1040px;
+  padding: 24px 20px 10px 20px;
+  max-width: 980px;
   margin: 0 auto;
 }
 
 .hero-chip-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
+  gap: 7px;
+  padding: 4px 14px;
   background: var(--badge-pill-bg);
   border: 1px solid var(--badge-pill-border);
   border-radius: var(--radius-pill);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: var(--badge-pill-color);
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .chip-icon {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   color: #a855f7;
 }
 
 .hero-main-title {
   font-family: var(--font-heading);
-  font-size: 3.1rem;
+  font-size: clamp(1.75rem, 2.9vw, 2.35rem);
   font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 16px;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+  line-height: 1.2;
   color: var(--text-heading);
 }
 
@@ -864,16 +839,17 @@ button {
 }
 
 .hero-main-subtitle {
-  font-size: 1.1rem;
+  font-size: clamp(0.86rem, 1.15vw, 0.95rem);
   color: var(--text-muted);
-  line-height: 1.65;
-  max-width: 780px;
-  margin: 0 auto 32px auto;
+  line-height: 1.5;
+  max-width: 660px;
+  margin: 0 auto 16px auto;
 }
 
 /* Category Filter Nav */
 .category-filter-nav {
-  margin-top: 10px;
+  margin-top: 4px;
+  width: 100%;
 }
 
 .category-pills-bar {
@@ -881,23 +857,24 @@ button {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .category-filter-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
+  gap: 6px;
+  padding: 6px 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-pill);
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
   user-select: none;
+  white-space: nowrap;
 }
 
 .category-filter-pill:hover {
@@ -924,9 +901,9 @@ button {
 
 /* Meta Bar */
 .directory-meta-bar {
-  max-width: 1400px;
-  margin: 16px auto 10px auto;
-  padding: 0 24px;
+  max-width: 1380px;
+  margin: 8px auto 6px auto;
+  padding: 0 clamp(14px, 2.5vw, 24px);
   display: flex;
   align-items: center;
   justify-content: space-between;

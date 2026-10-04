@@ -88,12 +88,8 @@
           </div>
         </div>
 
-        <!-- MAIN TOOL TABS NAVIGATION (Identical to requested iLovePDF header structure) -->
+        <!-- MAIN TOOL TABS NAVIGATION -->
         <nav class="header-nav-tabs" id="header-nav-tabs" aria-label="Main Tool Navigation">
-          <a href="#/merge-pdf" class="nav-tab-item nav-tab-quick" data-nav-tool="merge-pdf">MERGE PDF</a>
-          <a href="#/split-pdf" class="nav-tab-item nav-tab-quick" data-nav-tool="split-pdf">SPLIT PDF</a>
-          <a href="#/compress-pdf" class="nav-tab-item nav-tab-quick" data-nav-tool="compress-pdf">COMPRESS PDF</a>
-
           <!-- CONVERT PDF Dropdown -->
           <div class="nav-tab-dropdown" id="dropdown-convert">
             <button type="button" class="nav-tab-dropdown-btn" id="btn-convert-dropdown">
@@ -324,12 +320,6 @@
                 </button>
               </div>
             </div>
-          </div>
-
-          <!-- Privacy Security Pill -->
-          <div class="privacy-status-pill" title="100% In-Memory Processing. Files never touch any remote server.">
-            <span class="status-indicator-dot"></span>
-            <span class="status-text">Zero-Upload Privacy</span>
           </div>
         </div>
 
@@ -1224,8 +1214,14 @@
                 </div>
               </div>
 
-              <!-- Optional UTR Input Field -->
+              <!-- Google Account Email for Pro Subscription -->
               <div class="upi-field-group" style="margin-top: 14px;">
+                <label for="input-payer-email">Google Email for Pro Account Activation:</label>
+                <input type="email" id="input-payer-email" class="upi-utr-input" placeholder="e.g. prince86944@gmail.com" required>
+              </div>
+
+              <!-- Optional UTR Input Field -->
+              <div class="upi-field-group" style="margin-top: 10px;">
                 <label for="input-upi-utr">UPI Transaction Reference / UTR Number (Optional):</label>
                 <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="e.g. 427812903456 (12 digits)" maxlength="30">
               </div>

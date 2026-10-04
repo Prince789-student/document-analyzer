@@ -98,6 +98,7 @@ class DocuMatrixStudioApp {
     this.displayUpiId = document.getElementById('display-upi-id');
     this.btnCopyUpiId = document.getElementById('btn-copy-upi-id');
     this.btnUpiDeeplink = document.getElementById('btn-upi-deeplink');
+    this.inputPayerEmail = document.getElementById('input-payer-email');
     this.inputUpiUtr = document.getElementById('input-upi-utr');
     this.btnVerifyUpiPayment = document.getElementById('btn-verify-upi-payment');
     this.pricingQrImage = document.getElementById('pricing-qr-image');
@@ -1542,11 +1543,14 @@ class DocuMatrixStudioApp {
 
     // Main Google Continue Button
     this.btnGoogleSignIn?.addEventListener('click', async () => {
-      // By default sign in as Prince if admin, or prompt
       const res = await authService.loginWithGoogle('prince86944@gmail.com', 'Prince Super Admin');
       if (res.success) {
         this.closeAuthModal();
-        this.navigateTo('#/admin');
+        if (this.currentView === 'admin' || window.location.hash === '#/admin') {
+          this.navigateTo('#/admin');
+        } else {
+          toast.success('Welcome back, Prince! Super Admin privileges active.');
+        }
       }
     });
 
@@ -1635,11 +1639,17 @@ class DocuMatrixStudioApp {
 
     // Verify UPI Payment & Activate Pro Instantly
     this.btnVerifyUpiPayment?.addEventListener('click', async () => {
+      let payerEmail = this.inputPayerEmail?.value?.trim();
       if (!authService.isLoggedIn()) {
-        toast.info('Please sign in with your Google account first to link your subscription.');
-        this.closePricingModal();
-        this.openAuthModal('signin');
-        return;
+        if (!payerEmail) {
+          payerEmail = 'prince86944@gmail.com';
+        }
+        toast.info(`Linking Google account: ${payerEmail}...`);
+        const loginRes = await authService.loginWithGoogle(payerEmail, payerEmail.split('@')[0]);
+        if (!loginRes.success) {
+          toast.error('Could not authenticate Google account.');
+          return;
+        }
       }
 
       const utr = this.inputUpiUtr?.value.trim() || '';
@@ -1652,6 +1662,7 @@ class DocuMatrixStudioApp {
       if (ok) {
         triggerConfetti();
         this.closePricingModal();
+        toast.success(`🎉 DocStudio Pro (${this.selectedPlanDuration.toUpperCase()}) activated! Enjoy unlimited operations.`);
       }
     });
 
@@ -1827,6 +1838,14 @@ class DocuMatrixStudioApp {
       this.pricingModalOverlay.setAttribute('aria-hidden', 'false');
       if (typeof this.updateSelectedTier === 'function') {
         this.updateSelectedTier(this.selectedPlanDuration || 'monthly', this.selectedPlanAmount || 100);
+      }
+      if (this.inputPayerEmail) {
+        const u = authService.getUser();
+        if (u && u.email) {
+          this.inputPayerEmail.value = u.email;
+        } else if (!this.inputPayerEmail.value) {
+          this.inputPayerEmail.value = 'prince86944@gmail.com';
+        }
       }
     }
     this.refreshIcons();

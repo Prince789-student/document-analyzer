@@ -84,16 +84,38 @@ export async function handleApiRoute(req, res, path) {
     return true;
   }
 
-  // 0. GET APP CONFIG (Active UPI ID & QR Code)
+  // 0. GET APP CONFIG (Active UPI ID & QR Code & Google Client ID)
   if (path === '/api/config' && req.method === 'GET') {
     const config = await getAppConfig();
-    return sendJson(res, 200, config);
+    return sendJson(res, 200, {
+      ...config,
+      googleClientId: process.env.GOOGLE_CLIENT_ID || ''
+    });
   }
 
   // 0.1 GOOGLE OAUTH AUTHENTICATION (Exclusive Google Sign-in)
   if (path === '/api/auth/google' && req.method === 'POST') {
     try {
-      const { email, name, avatar = '', googleId = '' } = await parseJsonBody(req);
+      let { email, name, avatar = '', googleId = '', credential } = await parseJsonBody(req);
+
+      // If official Google Identity Services credential token is passed, decode it
+      if (credential) {
+        try {
+          const parts = credential.split('.');
+          if (parts.length === 3) {
+            const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+            if (payload && payload.email) {
+              email = payload.email;
+              name = payload.name || payload.email.split('@')[0];
+              avatar = payload.picture || '';
+              googleId = payload.sub || '';
+            }
+          }
+        } catch (e) {
+          console.error('Failed to parse Google credential token:', e);
+        }
+      }
+
       if (!email) {
         return sendJson(res, 400, { error: 'Valid Google email is required.' });
       }

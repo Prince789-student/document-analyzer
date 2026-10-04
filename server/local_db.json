@@ -67,6 +67,32 @@
       "lastQuotaReset": "2026-10-03T16:50:30.389Z",
       "createdAt": "2026-10-03T16:50:30.389Z",
       "_id": "usr_1791046230389n9hd"
+    },
+    {
+      "id": "usr_17910942879972idp",
+      "name": "biharibaba654",
+      "email": "biharibaba654@gmail.com",
+      "password": "$2b$10$EivdVULAZUHld/xLrIAzj.TkkQ5YKG/I2fVSgAx72FxB5Xw9tGBxa",
+      "role": "user",
+      "plan": "free",
+      "dailyOperationsUsed": 0,
+      "dailyQuota": 5,
+      "lastQuotaReset": "2026-10-04T06:11:27.997Z",
+      "createdAt": "2026-10-04T06:11:28.004Z",
+      "_id": "usr_17910942879972idp"
+    },
+    {
+      "id": "usr_1791094367418gw0t",
+      "name": "Rahul Test",
+      "email": "rahul.test@gmail.com",
+      "password": "$2b$10$5pILK6iuofepuuWMwnVeAeVjEJaFe8LhbskCpIa7vYF5XD.GFWham",
+      "role": "user",
+      "plan": "free",
+      "dailyOperationsUsed": 0,
+      "dailyQuota": 5,
+      "lastQuotaReset": "2026-10-04T06:12:47.418Z",
+      "createdAt": "2026-10-04T06:12:47.418Z",
+      "_id": "usr_1791094367418gw0t"
     }
   ],
   "subscriptions": [
@@ -96,6 +122,78 @@
     }
   ],
   "logs": [
+    {
+      "id": "log_1791094367439",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T06:12:47.439Z"
+    },
+    {
+      "id": "log_1791094367420",
+      "userId": "usr_1791094367418gw0t",
+      "userEmail": "rahul.test@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Rahul Test (rahul.test@gmail.com) - user",
+      "createdAt": "2026-10-04T06:12:47.420Z"
+    },
+    {
+      "id": "log_1791094288020",
+      "userId": "usr_17910942879972idp",
+      "userEmail": "biharibaba654@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: biharibaba654 (biharibaba654@gmail.com) - user",
+      "createdAt": "2026-10-04T06:11:28.020Z"
+    },
+    {
+      "id": "log_1791094213854",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T06:10:13.854Z"
+    },
+    {
+      "id": "log_1791094130945",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T06:08:50.945Z"
+    },
+    {
+      "id": "log_1791094008850",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T06:06:48.850Z"
+    },
+    {
+      "id": "log_1791094000870",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T06:06:40.870Z"
+    },
+    {
+      "id": "log_1791093774124",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T06:02:54.124Z"
+    },
+    {
+      "id": "log_1791093739583",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T06:02:19.583Z"
+    },
     {
       "id": "log_1791093529967",
       "userId": "usr_1791044602872r8eb",

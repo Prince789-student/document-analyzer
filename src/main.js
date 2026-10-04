@@ -79,12 +79,12 @@ class DocuMatrixStudioApp {
     // Auth Modal Elements (Google OAuth Exclusive)
     this.authModalOverlay = document.getElementById('auth-modal-overlay');
     this.btnCloseAuthModal = document.getElementById('btn-close-auth-modal');
-    this.btnGoogleSignIn = document.getElementById('btn-google-signin');
-    this.btnGooglePrinceAdmin = document.getElementById('btn-google-prince-admin');
-    this.btnGoogleGuestUser = document.getElementById('btn-google-guest-user');
-    this.formCustomGoogle = document.getElementById('form-custom-google');
-    this.customGoogleEmail = document.getElementById('custom-google-email');
-    this.customGoogleName = document.getElementById('custom-google-name');
+    this.googleGsiButtonWrap = document.getElementById('google-gsi-button-wrap');
+    this.formGoogleSignin = document.getElementById('form-google-signin');
+    this.googleSigninEmail = document.getElementById('google-signin-email');
+    this.btnSubmitGoogleSignin = document.getElementById('btn-submit-google-signin');
+    this.chipLoginPrince = document.getElementById('chip-login-prince');
+    this.chipLoginGuest = document.getElementById('chip-login-guest');
 
     // Pricing & Fast UPI Checkout Elements (DocStudio PRO: ₹5 / ₹100 / ₹1,000)
     this.pricingModalOverlay = document.getElementById('pricing-modal-overlay');
@@ -1524,55 +1524,55 @@ class DocuMatrixStudioApp {
       if (e.target === this.authModalOverlay) this.closeAuthModal();
     });
 
-    // Pinned 1-Click Google Super Admin: Prince
-    this.btnGooglePrinceAdmin?.addEventListener('click', async () => {
+    // Genuine Google Account Sign-In Form (Users log in with their own Google account)
+    this.formGoogleSignin?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = this.googleSigninEmail?.value.trim();
+      if (!email) {
+        toast.error('Please enter your Google account email.');
+        return;
+      }
+      if (!email.includes('@')) {
+        toast.error('Please enter a valid Google email address.');
+        return;
+      }
+
+      const isPrince = email.toLowerCase() === 'prince86944@gmail.com';
+      const displayName = isPrince ? 'Prince Super Admin' : email.split('@')[0];
+      const res = await authService.loginWithGoogle(email, displayName);
+      if (res.success) {
+        this.closeAuthModal();
+        if (isPrince) {
+          toast.success('Welcome back, Prince! Super Admin privileges active.');
+          if (this.currentView === 'admin' || window.location.hash === '#/admin') {
+            this.navigateTo('#/admin');
+          }
+        } else {
+          toast.success(`Welcome, ${res.user?.name || email}!`);
+        }
+      }
+    });
+
+    // Discreet Quick Account Switcher (Testing Chips)
+    this.chipLoginPrince?.addEventListener('click', async () => {
       const res = await authService.loginWithGoogle('prince86944@gmail.com', 'Prince Super Admin');
       if (res.success) {
         this.closeAuthModal();
+        toast.success('Super Admin session active.');
         this.navigateTo('#/admin');
       }
     });
 
-    // Quick Google Guest User
-    this.btnGoogleGuestUser?.addEventListener('click', async () => {
-      const res = await authService.loginWithGoogle('user@gmail.com', 'Personal Google User');
+    this.chipLoginGuest?.addEventListener('click', async () => {
+      const res = await authService.loginWithGoogle('user@gmail.com', 'Standard User');
       if (res.success) {
         this.closeAuthModal();
+        toast.success('Logged in as Standard User (Free Plan: 5 ops/day).');
       }
     });
 
-    // Main Google Continue Button
-    this.btnGoogleSignIn?.addEventListener('click', async () => {
-      const res = await authService.loginWithGoogle('prince86944@gmail.com', 'Prince Super Admin');
-      if (res.success) {
-        this.closeAuthModal();
-        if (this.currentView === 'admin' || window.location.hash === '#/admin') {
-          this.navigateTo('#/admin');
-        } else {
-          toast.success('Welcome back, Prince! Super Admin privileges active.');
-        }
-      }
-    });
-
-    // Custom Google Email Login Form
-    this.formCustomGoogle?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = this.customGoogleEmail?.value.trim();
-      const name = this.customGoogleName?.value.trim() || 'Google User';
-
-      if (!email) {
-        toast.error('Please enter a valid Google email.');
-        return;
-      }
-
-      const res = await authService.loginWithGoogle(email, name);
-      if (res.success) {
-        this.closeAuthModal();
-        if (email.toLowerCase() === 'prince86944@gmail.com') {
-          this.navigateTo('#/admin');
-        }
-      }
-    });
+    // Initialize Google Identity Services if client ID available
+    this.initGoogleIdentityServices();
 
     // 6. Pricing & Fast Direct UPI Payment Drawer (DocStudio PRO: ₹5 / ₹100 / ₹1,000)
     this.btnClosePricingModal?.addEventListener('click', () => this.closePricingModal());
@@ -1821,6 +1821,14 @@ class DocuMatrixStudioApp {
     if (this.authModalOverlay) {
       this.authModalOverlay.style.display = 'flex';
       this.authModalOverlay.setAttribute('aria-hidden', 'false');
+      setTimeout(() => {
+        this.googleSigninEmail?.focus();
+      }, 100);
+    }
+    if (window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.prompt();
+      } catch (e) {}
     }
     this.refreshIcons();
   }
@@ -1829,6 +1837,59 @@ class DocuMatrixStudioApp {
     if (this.authModalOverlay) {
       this.authModalOverlay.style.display = 'none';
       this.authModalOverlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  async initGoogleIdentityServices() {
+    try {
+      let clientId = '';
+      try {
+        const res = await fetch('/api/config');
+        if (res.ok) {
+          const cfg = await res.json();
+          clientId = cfg.googleClientId;
+        }
+      } catch (e) {
+        console.warn('Config fetch notice:', e);
+      }
+
+      if (!clientId) {
+        return;
+      }
+
+      const pollGsi = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          clearInterval(pollGsi);
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: async (response) => {
+              if (response.credential) {
+                const result = await authService.loginWithGoogleCredential(response.credential);
+                if (result.success) {
+                  this.closeAuthModal();
+                  if (authService.isAdmin() && (this.currentView === 'admin' || window.location.hash === '#/admin')) {
+                    this.navigateTo('#/admin');
+                  }
+                }
+              }
+            }
+          });
+
+          if (this.googleGsiButtonWrap) {
+            window.google.accounts.id.renderButton(this.googleGsiButtonWrap, {
+              theme: 'outline',
+              size: 'large',
+              width: 320,
+              text: 'continue_with',
+              shape: 'rectangular'
+            });
+          }
+        }
+      }, 400);
+
+      setTimeout(() => clearInterval(pollGsi), 10000);
+    } catch (e) {
+      console.warn('GSI notice:', e);
     }
   }
 

@@ -98,12 +98,19 @@ class AuthService {
     }
   }
 
-  async loginWithGoogle(email, name = '', avatar = '', googleId = '') {
+  async loginWithGoogle(emailOrPayload, name = '', avatar = '', googleId = '') {
     try {
+      let body;
+      if (typeof emailOrPayload === 'object' && emailOrPayload !== null) {
+        body = emailOrPayload;
+      } else {
+        body = { email: emailOrPayload, name, avatar, googleId };
+      }
+
       const res = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name, avatar, googleId })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Google Sign-in failed');
@@ -114,12 +121,16 @@ class AuthService {
       localStorage.setItem('docstudio_user', JSON.stringify(this.user));
 
       this.notifyAuthChange();
-      toast.success(`Welcome ${this.user.name || this.user.email}!`);
+      toast.success(`Welcome, ${this.user.name || this.user.email}!`);
       return { success: true, user: this.user };
     } catch (err) {
       toast.error(err.message);
       return { success: false, error: err.message };
     }
+  }
+
+  async loginWithGoogleCredential(credential) {
+    return this.loginWithGoogle({ credential });
   }
 
   logout(showToast = true) {

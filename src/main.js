@@ -601,6 +601,13 @@ class DocuMatrixStudioApp {
   }
 
   async showToolView(toolId, preloadedFiles = null, updateHash = true) {
+    if (authService.isLoggedIn() && !authService.isProfileVerified()) {
+      this.checkMandatorySecurityProfile();
+      toast.error('Account Security Verification Required: Please verify your 10-digit mobile number and 6-digit area PIN code to proceed.');
+      this.navigateTo('#/');
+      return;
+    }
+
     if (updateHash && window.location.hash !== `#/${toolId}`) {
       if (preloadedFiles) {
         this.pendingFilesForRoute = preloadedFiles;
@@ -1041,6 +1048,11 @@ class DocuMatrixStudioApp {
      Execution Pipeline & Stage 3 (Download Celebration)
      -------------------------------------------------------------------------- */
   async executeTool() {
+    if (authService.isLoggedIn() && !authService.isProfileVerified()) {
+      this.checkMandatorySecurityProfile();
+      toast.error('Account Security Verification Required: Please verify your 10-digit mobile number and 6-digit area PIN code before processing files.');
+      return;
+    }
     if (!this.activeToolInstance || this.activeFiles.length === 0 || this.isProcessing) return;
 
     // Check quota before execution
@@ -1114,6 +1126,11 @@ class DocuMatrixStudioApp {
      File Handling & Sample Generation
      -------------------------------------------------------------------------- */
   handleFileSelection(filesList) {
+    if (authService.isLoggedIn() && !authService.isProfileVerified()) {
+      this.checkMandatorySecurityProfile();
+      toast.error('Account Security Verification Required: Please verify your 10-digit mobile number and 6-digit area PIN code before uploading files.');
+      return;
+    }
     if (!filesList || filesList.length === 0) return;
     const incoming = Array.from(filesList);
 
@@ -1127,6 +1144,11 @@ class DocuMatrixStudioApp {
   }
 
   async loadSampleDocForCurrentTool() {
+    if (authService.isLoggedIn() && !authService.isProfileVerified()) {
+      this.checkMandatorySecurityProfile();
+      toast.error('Account Security Verification Required: Please verify your mobile number and area PIN code.');
+      return;
+    }
     if (!this.selectedToolMeta) return;
     const id = this.selectedToolMeta.id;
     const accept = (this.selectedToolMeta.accept || '').toLowerCase();
@@ -1468,6 +1490,10 @@ class DocuMatrixStudioApp {
         e.preventDefault();
         this.globalSearchInput?.focus();
       } else if (e.key === 'Escape') {
+        if (this.securityModalOverlay && this.securityModalOverlay.style.display !== 'none') {
+          // Mandatory security modal cannot be dismissed with Escape
+          return;
+        }
         if (this.historyDrawerOverlay?.classList.contains('active')) {
           this.closeHistoryDrawer();
         } else if (this.currentView === 'tool') {
@@ -1481,12 +1507,14 @@ class DocuMatrixStudioApp {
      Authentication, Subscription & Admin Command Center Management
      -------------------------------------------------------------------------- */
   initAuthAndAdmin() {
-    // 1. Initial Auth Header Rendering
+    // 1. Initial Auth Header Rendering & Strict Security Verification Check
     this.updateAuthHeader(authService.getUser());
+    this.checkMandatorySecurityProfile();
 
     // 2. Auth state change listener
     window.addEventListener('docstudio:auth-change', (e) => {
       this.updateAuthHeader(e.detail.user);
+      this.checkMandatorySecurityProfile();
       if (this.currentView === 'admin' && !authService.isAdmin()) {
         this.navigateTo('#/');
       }
@@ -2066,6 +2094,15 @@ class DocuMatrixStudioApp {
     }
   }
 
+  checkMandatorySecurityProfile() {
+    const user = authService.getUser();
+    if (user && !authService.isProfileVerified()) {
+      this.openSecurityModal();
+      return true;
+    }
+    return false;
+  }
+
   openSecurityModal() {
     if (!this.securityModalOverlay) return;
     const user = authService.getUser();
@@ -2079,7 +2116,12 @@ class DocuMatrixStudioApp {
     this.refreshIcons();
   }
 
-  closeSecurityModal() {
+  closeSecurityModal(force = false) {
+    const user = authService.getUser();
+    // STRICT SECURITY: Logged in user CANNOT close modal without completing verification
+    if (!force && user && !authService.isProfileVerified()) {
+      return;
+    }
     if (this.securityModalOverlay) {
       this.securityModalOverlay.style.display = 'none';
       this.securityModalOverlay.setAttribute('aria-hidden', 'true');

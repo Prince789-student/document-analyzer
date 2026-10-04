@@ -51,8 +51,8 @@
       "lastQuotaReset": "2026-10-03T16:23:22.872Z",
       "createdAt": "2026-10-03T16:23:22.873Z",
       "_id": "usr_1791044602872r8eb",
-      "planDuration": "monthly",
-      "planAmount": 100,
+      "planDuration": "daily",
+      "planAmount": 5,
       "planUtr": ""
     },
     {
@@ -135,74 +135,17 @@
       "status": "active",
       "paymentMethod": "UPI",
       "createdAt": "2026-10-03T17:29:21.075Z"
-    },
-    {
-      "id": "sub_1791097513331",
-      "userId": "usr_1791044602872r8eb",
-      "userEmail": "prince86944@gmail.com",
-      "plan": "pro",
-      "amount": 100,
-      "duration": "monthly",
-      "utrRef": "",
-      "currency": "INR",
-      "status": "active",
-      "paymentMethod": "UPI",
-      "createdAt": "2026-10-04T07:05:13.333Z"
-    },
-    {
-      "id": "sub_1791097529444",
-      "userId": "usr_1791044602872r8eb",
-      "userEmail": "prince86944@gmail.com",
-      "plan": "pro",
-      "amount": 100,
-      "duration": "monthly",
-      "utrRef": "",
-      "currency": "INR",
-      "status": "active",
-      "paymentMethod": "UPI",
-      "createdAt": "2026-10-04T07:05:29.444Z"
-    },
-    {
-      "id": "sub_1791097616528",
-      "userId": "usr_1791044602872r8eb",
-      "userEmail": "prince86944@gmail.com",
-      "plan": "pro",
-      "amount": 5,
-      "duration": "daily",
-      "utrRef": "",
-      "currency": "INR",
-      "status": "active",
-      "paymentMethod": "UPI",
-      "createdAt": "2026-10-04T07:06:56.528Z"
-    },
-    {
-      "id": "sub_1791097665645",
-      "userId": "usr_1791044602872r8eb",
-      "userEmail": "prince86944@gmail.com",
-      "plan": "pro",
-      "amount": 100,
-      "duration": "monthly",
-      "utrRef": "",
-      "currency": "INR",
-      "status": "active",
-      "paymentMethod": "UPI",
-      "createdAt": "2026-10-04T07:07:45.645Z"
-    },
-    {
-      "id": "sub_1791097675958",
-      "userId": "usr_1791044602872r8eb",
-      "userEmail": "prince86944@gmail.com",
-      "plan": "pro",
-      "amount": 100,
-      "duration": "monthly",
-      "utrRef": "",
-      "currency": "INR",
-      "status": "active",
-      "paymentMethod": "UPI",
-      "createdAt": "2026-10-04T07:07:55.958Z"
     }
   ],
   "logs": [
+    {
+      "id": "log_1791098006874",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "PRO_SUBSCRIPTION_ACTIVE",
+      "details": "Activated PRO (DAILY - ₹5) via UPI (Ref: Direct UPI)",
+      "createdAt": "2026-10-04T07:13:26.874Z"
+    },
     {
       "id": "log_1791097675959",
       "userId": "usr_1791044602872r8eb",

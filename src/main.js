@@ -1725,16 +1725,13 @@ class DocuMatrixStudioApp {
         return;
       }
 
-      const isSuper = authService.isAdmin() || payerEmail.toLowerCase().startsWith('prince86944');
       const cleanUtr = (this.inputUpiUtr?.value || '').trim().replace(/[^0-9]/g, '');
 
-      // Strict Anti-Fraud Guard: non-admins MUST provide 12-digit UTR from payment receipt
-      if (!isSuper) {
-        if (!cleanUtr || cleanUtr.length !== 12) {
-          toast.error('Payment Verification Required: Please enter the 12-digit UPI UTR / Reference Number from your payment receipt (Google Pay, PhonePe, or Paytm).');
-          this.inputUpiUtr?.focus();
-          return;
-        }
+      // Strict Anti-Fraud Guard: EVERYONE MUST provide authentic 12-digit UTR from payment receipt
+      if (!cleanUtr || cleanUtr.length !== 12) {
+        toast.error('Payment Verification Required: Please enter the 12-digit UPI UTR / Reference Number from your payment receipt (Google Pay, PhonePe, or Paytm).');
+        this.inputUpiUtr?.focus();
+        return;
       }
 
       const duration = this.selectedPlanDuration || 'monthly';
@@ -1881,12 +1878,16 @@ class DocuMatrixStudioApp {
         this.dropdownAdminBtn.style.display = isAdmin ? 'flex' : 'none';
       }
       if (this.dropdownUpgradeBtn) {
-        this.dropdownUpgradeBtn.style.display = (user.plan === 'pro' || isAdmin) ? 'none' : 'flex';
+        this.dropdownUpgradeBtn.style.display = isUnlimited ? 'none' : 'flex';
+      }
+      if (this.openPricingBtn) {
+        this.openPricingBtn.style.display = isUnlimited ? 'none' : 'inline-flex';
       }
     } else {
       if (this.btnHeaderLogin) this.btnHeaderLogin.style.display = 'flex';
       if (this.userHeaderWidget) this.userHeaderWidget.style.display = 'none';
       if (this.userDropdownMenu) this.userDropdownMenu.classList.remove('show');
+      if (this.openPricingBtn) this.openPricingBtn.style.display = 'inline-flex';
     }
   }
 
@@ -2129,6 +2130,10 @@ class DocuMatrixStudioApp {
   }
 
   openPricingModal() {
+    if (authService.isPro()) {
+      toast.success('Your account already has DocStudio Pro active with unlimited operations!');
+      return;
+    }
     if (this.pricingModalOverlay) {
       this.pricingModalOverlay.style.display = 'flex';
       this.pricingModalOverlay.setAttribute('aria-hidden', 'false');

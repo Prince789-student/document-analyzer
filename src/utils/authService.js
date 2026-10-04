@@ -151,7 +151,72 @@ class AuthService {
     if (showToast) toast.info('You have logged out.');
   }
 
-  async upgradeToPro(paymentMethod = 'UPI', amount = 100, duration = 'monthly', utrRef = '', payerEmail = '', autoVerify = false) {
+  async createRazorpayOrder(amount = 100, duration = 'monthly', plan = 'pro', payerEmail = '') {
+    try {
+      const emailToUse = payerEmail || (this.user?.email || '');
+      const headers = { 'Content-Type': 'application/json' };
+      if (this.token) {
+        headers['Authorization'] = `Bearer ${this.token}`;
+      }
+
+      const res = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          plan,
+          amount,
+          duration,
+          payerEmail: emailToUse
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to initiate payment');
+      return data;
+    } catch (err) {
+      toast.error(err.message);
+      return null;
+    }
+  }
+
+  async verifyRazorpayPayment(paymentResponse, amount, duration, payerEmail = '') {
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (this.token) {
+        headers['Authorization'] = `Bearer ${this.token}`;
+      }
+
+      const res = await fetch('/api/payment/verify', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          razorpay_order_id: paymentResponse.razorpay_order_id,
+          razorpay_payment_id: paymentResponse.razorpay_payment_id,
+          razorpay_signature: paymentResponse.razorpay_signature,
+          amount,
+          duration,
+          plan: 'pro',
+          payerEmail
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Payment verification failed');
+
+      if (data.token) {
+        this.token = data.token;
+        localStorage.setItem('docstudio_jwt', this.token);
+      }
+      this.user = data.user;
+      localStorage.setItem('docstudio_user', JSON.stringify(this.user));
+      this.notifyAuthChange();
+      toast.success(data.message || '🎉 DocStudio Pro activated successfully!');
+      return true;
+    } catch (err) {
+      toast.error(err.message);
+      return false;
+    }
+  }
+
+  async upgradeToPro(paymentMethod = 'UPI', amount = 100, duration = 'monthly', utrRef = '', payerEmail = '') {
     try {
       const emailToUse = payerEmail || (this.user?.email || '');
       const headers = { 'Content-Type': 'application/json' };
@@ -168,8 +233,7 @@ class AuthService {
           duration,
           paymentMethod,
           utrRef,
-          payerEmail: emailToUse,
-          autoVerify
+          payerEmail: emailToUse
         })
       });
       const data = await res.json();

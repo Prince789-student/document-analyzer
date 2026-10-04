@@ -9,6 +9,13 @@ const __dirname = path.dirname(__filename);
 const DIST_DIR = path.join(__dirname, 'dist');
 const PORT = process.env.PORT || 10000;
 
+process.on('uncaughtException', err => {
+  console.error('Server Uncaught Exception:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Server Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // Ensure build exists
 if (!fs.existsSync(path.join(DIST_DIR, 'index.html'))) {
   console.log('dist/index.html not found, running npm run build...');

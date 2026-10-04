@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import {
   findUserByEmail,
   findUserById,
@@ -19,6 +20,8 @@ import {
 } from './db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'docstudio-super-secret-jwt-key-2026-production';
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_live_TjoyXMTB0zh4Wp';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'iROJagCyhpdOhR0FzmohCQ7T';
 
 // Helper to extract JSON body from incoming HTTP request
 export async function parseJsonBody(req) {
@@ -87,11 +90,12 @@ export async function handleApiRoute(req, res, path) {
     return true;
   }
 
-  // 0. GET APP CONFIG (Active UPI ID & QR Code & Google Client ID)
+  // 0. GET APP CONFIG (Active UPI ID & QR Code & Google Client ID & Razorpay Key)
   if (path === '/api/config' && req.method === 'GET') {
     const config = await getAppConfig();
     return sendJson(res, 200, {
       ...config,
+      razorpayKeyId: RAZORPAY_KEY_ID,
       googleClientId: process.env.GOOGLE_CLIENT_ID || '818059891079-kh6vpef04bkov0ic1ajk7a5g100oaejt.apps.googleusercontent.com'
     });
   }
@@ -358,6 +362,166 @@ export async function handleApiRoute(req, res, path) {
     }
   }
 
+  // 3.1 CREATE RAZORPAY ORDER (₹5 Daily, ₹100 Monthly, ₹1,000 Yearly)
+  if (path === '/api/payment/create-order' && req.method === 'POST') {
+    let user = await authenticateRequest(req);
+    try {
+      const {
+        plan = 'pro',
+        duration = 'monthly',
+        amount = 100,
+        payerEmail = ''
+      } = await parseJsonBody(req);
+
+      const targetEmail = user?.email || payerEmail;
+      if (!targetEmail) {
+        return sendJson(res, 400, { error: 'Please sign in or enter your email address to initiate payment.' });
+      }
+
+      const numAmount = Number(amount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
+      const amountInPaise = Math.round(numAmount * 100);
+
+      const authHeader = 'Basic ' + Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
+      const rzpRes = await fetch('https://api.razorpay.com/v1/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
+        body: JSON.stringify({
+          amount: amountInPaise,
+          currency: 'INR',
+          receipt: `rcpt_${Date.now()}`,
+          notes: {
+            userEmail: targetEmail,
+            plan,
+            duration
+          }
+        })
+      });
+
+      const order = await rzpRes.json();
+      if (!rzpRes.ok) {
+        throw new Error(order.error?.description || 'Failed to create Razorpay order');
+      }
+
+      return sendJson(res, 200, {
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        keyId: RAZORPAY_KEY_ID,
+        userEmail: targetEmail
+      });
+    } catch (err) {
+      console.error('Razorpay order creation error:', err);
+      return sendJson(res, 500, { error: err.message || 'Payment initiation failed' });
+    }
+  }
+
+  // 3.2 VERIFY RAZORPAY PAYMENT & INSTANT ACTIVATE PRO (Zero-Effort Cryptographic Verification)
+  if (path === '/api/payment/verify' && req.method === 'POST') {
+    let user = await authenticateRequest(req);
+    try {
+      const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        plan = 'pro',
+        duration = 'monthly',
+        amount = 100,
+        payerEmail = ''
+      } = await parseJsonBody(req);
+
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return sendJson(res, 400, { error: 'Missing payment confirmation parameters.' });
+      }
+
+      // Verify HMAC-SHA256 signature using Secret Key
+      const expectedSignature = crypto
+        .createHmac('sha256', RAZORPAY_KEY_SECRET)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest('hex');
+
+      if (expectedSignature !== razorpay_signature) {
+        console.error('Razorpay signature mismatch:', { expectedSignature, razorpay_signature });
+        return sendJson(res, 400, { error: 'Payment signature verification failed. Untrusted payment.' });
+      }
+
+      const emailToUse = user?.email || payerEmail;
+      if (!user && emailToUse) {
+        user = await findOrCreateGoogleUser({ email: emailToUse, name: emailToUse.split('@')[0] });
+      }
+
+      if (!user) {
+        return sendJson(res, 400, { error: 'User account not found for payment activation.' });
+      }
+
+      const userId = user._id || user.id;
+      const numAmount = Number(amount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
+      const targetRole = (user.role === 'admin' && isSuperAdminEmail(user.email)) ? 'admin' : 'user';
+
+      // Upgrade User to Pro
+      const updated = await updateUser(userId, {
+        plan: 'pro',
+        role: targetRole,
+        planDuration: duration,
+        planAmount: numAmount,
+        planUtr: razorpay_payment_id,
+        dailyQuota: 9999
+      });
+
+      // Save Subscription in DB
+      const sub = await createSubscription({
+        userId,
+        userEmail: user.email,
+        plan: 'pro',
+        amount: numAmount,
+        paymentMethod: 'Razorpay / UPI',
+        duration,
+        utrRef: razorpay_payment_id
+      });
+
+      const token = jwt.sign(
+        { id: updated._id || updated.id, email: updated.email, role: updated.role },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+
+      await recordLog({
+        userId,
+        userEmail: user.email,
+        action: 'PRO_SUBSCRIPTION_ACTIVE',
+        details: `Activated PRO (${duration.toUpperCase()} - ₹${numAmount}) via Razorpay (Payment ID: ${razorpay_payment_id})`
+      });
+
+      return sendJson(res, 200, {
+        success: true,
+        message: `🎉 Payment Confirmed! DocStudio Pro (${duration.toUpperCase()}) activated successfully!`,
+        token,
+        user: {
+          id: updated._id || updated.id,
+          _id: updated._id || updated.id,
+          name: updated.name,
+          email: updated.email,
+          role: updated.role,
+          plan: updated.plan,
+          planDuration: updated.planDuration,
+          planAmount: updated.planAmount,
+          planUtr: updated.planUtr,
+          phone: updated.phone || '',
+          pincode: updated.pincode || '',
+          profileVerified: !!updated.profileVerified,
+          dailyOperationsUsed: updated.dailyOperationsUsed || 0,
+          dailyQuota: updated.dailyQuota || 9999
+        },
+        subscription: sub
+      });
+    } catch (err) {
+      console.error('Payment verification error:', err);
+      return sendJson(res, 500, { error: err.message || 'Payment verification failed' });
+    }
+  }
+
   // 4. UPGRADE SUBSCRIPTION (Pro Tier: ₹5 Daily, ₹100 Monthly, ₹1000 Yearly via UPI)
   if (path === '/api/subscription/upgrade' && req.method === 'POST') {
     let user = await authenticateRequest(req);
@@ -382,33 +546,36 @@ export async function handleApiRoute(req, res, path) {
         return sendJson(res, 400, { error: 'Please enter your email address to activate your Pro subscription.' });
       }
 
-      let cleanUtr = String(utrRef || '').trim().replace(/[^a-zA-Z0-9\-_/]/g, '').toUpperCase();
+      const rawUtr = String(utrRef || '').trim();
+      const cleanUtr = rawUtr.replace(/[^a-zA-Z0-9\-_/]/g, '').toUpperCase();
 
+      // MANDATORY UTR VERIFICATION: Never activate without an authentic UTR
       if (!cleanUtr) {
         return sendJson(res, 400, {
-          error: 'Please enter the UPI Reference Number / 12-digit UTR from your payment receipt.'
+          error: 'UPI Reference Number (UTR) is required! Please complete the UPI payment in your app (GPay / PhonePe / Paytm) and enter the 12-digit UTR from your payment receipt.'
         });
       }
 
-      // Support any legitimate Indian UPI reference (6 to 35 alphanumeric characters)
-      if (cleanUtr.length < 6 || cleanUtr.length > 35) {
+      if (cleanUtr.length < 10 || cleanUtr.length > 30) {
         return sendJson(res, 400, {
-          error: 'Invalid reference length. Please enter the authentic transaction reference (6 to 35 characters) from Google Pay, PhonePe, or Paytm.'
+          error: 'Invalid UTR format. Authentic UPI Reference IDs are usually 12 digits (e.g., 427812345678). Please check your payment receipt.'
         });
       }
 
-      // Reject obvious dummy sequences
-      if (/^(\d)\1{5,}$/.test(cleanUtr) || cleanUtr === '123456' || cleanUtr === '12345678' || cleanUtr === 'TEST' || cleanUtr === 'DUMMY') {
+      // Check dummy/fake patterns
+      const isRepeated = /^([0-9a-zA-Z])\1+$/.test(cleanUtr);
+      const isDummy = ['123456789012', '1234567890', '012345678901', 'TESTUTR12345', '987654321098'].includes(cleanUtr);
+      if (isRepeated || isDummy) {
         return sendJson(res, 400, {
-          error: 'Invalid dummy reference detected. Please enter your authentic UPI transaction reference from your payment receipt.'
+          error: 'Invalid / Dummy UTR rejected. Please enter the authentic 12-digit UTR generated after successful payment in your UPI app.'
         });
       }
 
-      // Prevent duplicate UTR redemption
+      // Check duplicate UTR redemption
       const existingSub = await findSubscriptionByUtr(cleanUtr);
       if (existingSub) {
         return sendJson(res, 400, {
-          error: `This UPI Reference Number (${cleanUtr}) has already been redeemed for an active subscription. Each transaction can only be used once.`
+          error: `This UPI Reference Number (${cleanUtr}) has already been redeemed for an active subscription.`
         });
       }
 

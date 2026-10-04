@@ -4236,30 +4236,40 @@ button {
 
 .qr-frame {
   background: #ffffff;
-  padding: 12px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
-  border: 2px dashed rgba(99, 102, 241, 0.4);
+  padding: 14px;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  border: 2px solid rgba(16, 185, 129, 0.4);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  transition: transform var(--transition-fast);
+}
+
+.qr-frame:hover {
+  transform: scale(1.02);
+  border-color: #10b981;
 }
 
 .upi-qr-image {
-  width: 160px;
-  height: 160px;
+  width: 190px;
+  height: 190px;
   object-fit: contain;
   border-radius: var(--radius-md);
   image-rendering: pixelated;
+  background: #ffffff;
 }
 
 .qr-scan-hint {
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
-  color: #475569;
-  letter-spacing: 0.04em;
+  color: #047857;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .upi-info-details-box {
@@ -5151,6 +5161,123 @@ button {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
+.upi-step-box {
+  background: rgba(99, 102, 241, 0.05);
+  border: 1.5px dashed rgba(99, 102, 241, 0.4);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upi-step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upi-step-badge {
+  background: #6366f1;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.upi-step-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 0;
+}
+
+.upi-utr-input-prominent {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 2px solid rgba(99, 102, 241, 0.5);
+  border-radius: var(--radius-md);
+  color: var(--text-heading);
+  font-size: 0.96rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-family: inherit;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.upi-utr-input-prominent:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25);
+}
+
+.upi-utr-help-text {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.btn-pay-rzp-instant {
+  width: 100%;
+  min-height: 56px;
+  padding: 12px 20px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #047857 100%);
+  color: #ffffff;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.btn-pay-rzp-instant:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #047857 0%, #059669 50%, #065f46 100%);
+}
+
+.btn-pay-rzp-instant:active {
+  transform: translateY(0);
+}
+
+.rzp-btn-icon {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  color: #fef08a;
+  filter: drop-shadow(0 0 6px rgba(254, 240, 138, 0.6));
+}
+
+.rzp-btn-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.rzp-btn-title {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+}
+
+.rzp-btn-sub {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .btn-verify-upi {
   margin-top: 6px;
   min-height: 48px;
@@ -5522,6 +5649,904 @@ button {
   color: var(--text-body);
   text-decoration: underline;
 }
+
+/* ==========================================================================
+   MOBILE BOTTOM NAVIGATION DOCK (App-Like Touch Experience for Smartphones)
+   ========================================================================== */
+
+.mobile-bottom-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(62px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: rgba(14, 20, 36, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-color);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+  user-select: none;
+}
+
+[data-theme="light"] .mobile-bottom-dock {
+  background: rgba(255, 255, 255, 0.96);
+  border-top-color: #e2e8f0;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+}
+
+@media (min-width: 769px) {
+  .mobile-bottom-dock {
+    display: none !important;
+  }
+}
+
+.mobile-dock-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 100%;
+  padding: 6px 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-dock-btn i {
+  width: 22px;
+  height: 22px;
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.mobile-dock-btn:active i {
+  transform: scale(0.9);
+}
+
+.mobile-dock-btn.active {
+  color: var(--primary);
+}
+
+.mobile-dock-btn.active i {
+  color: var(--primary);
+}
+
+/* Middle Pro Button with glowing accent */
+.mobile-dock-btn-pro {
+  color: #f59e0b;
+}
+
+.dock-pro-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+  margin-top: -12px;
+  border: 2px solid var(--bg-surface);
+  transition: transform var(--transition-fast);
+}
+
+.dock-pro-icon-wrap i {
+  width: 18px;
+  height: 18px;
+  color: #ffffff !important;
+}
+
+.mobile-dock-btn-pro:active .dock-pro-icon-wrap {
+  transform: scale(0.92);
+}
+
+/* Dock Badge & Avatar */
+.dock-badge-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.dock-badge-chip {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--bg-surface);
+}
+
+.dock-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-avatar-initial {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   COMPREHENSIVE RESPONSIVE STYLES FOR SMARTPHONES & TABLETS (<= 768px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Prevent horizontal spill & add dock clearance */
+  html, body {
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Universal inputs prevention of iOS auto-zoom */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     1. Mobile Studio Header
+     ------------------------------------------------------------------------ */
+  :root {
+    --header-height: 58px;
+  }
+
+  .studio-header {
+    height: var(--header-height);
+  }
+
+  .studio-header__inner {
+    padding: 0 10px;
+    gap: 8px;
+  }
+
+  /* Hide bulky desktop navigation */
+  .header-nav-tabs {
+    display: none !important;
+  }
+
+  /* Hide sample docs dropdown from top header on mobile */
+  .dropdown-wrapper {
+    display: none !important;
+  }
+
+  /* Hide desktop header history button (available in bottom dock) */
+  #open-history-btn {
+    display: none !important;
+  }
+
+  /* Brand Logo & Title on mobile */
+  .brand-container {
+    gap: 8px;
+  }
+
+  .brand-logo-img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .brand-name {
+    font-size: 1.15rem;
+  }
+
+  .brand-tagline {
+    display: none !important;
+  }
+
+  /* Hide bulky search container on small header */
+  .header-search-container {
+    display: none !important;
+  }
+
+  /* Header actions on mobile */
+  .header-actions-group {
+    gap: 6px;
+  }
+
+  .icon-toggle-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-btn-pricing {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+
+  .header-btn-pricing .crown-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .header-btn-auth {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .header-btn-my-account {
+    padding: 5px 8px;
+    gap: 6px;
+  }
+
+  .my-account-label {
+    display: none !important;
+  }
+
+  .my-account-arrow {
+    display: none !important;
+  }
+
+  .avatar-initial {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+  }
+
+  .user-plan-badge {
+    padding: 2px 6px;
+    font-size: 0.65rem;
+  }
+
+  .user-dropdown-menu {
+    right: 4px;
+    width: calc(100vw - 20px);
+    max-width: 320px;
+  }
+
+  /* ------------------------------------------------------------------------
+     2. Mobile Hero & Category Pills
+     ------------------------------------------------------------------------ */
+  .studio-hero {
+    padding: 16px 12px 6px 12px;
+  }
+
+  .hero-chip-badge {
+    font-size: 0.68rem;
+    padding: 3px 10px;
+    max-width: 96%;
+    line-height: 1.35;
+    white-space: normal;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .hero-main-title {
+    font-size: 1.55rem;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .hero-main-subtitle {
+    font-size: 0.84rem;
+    line-height: 1.45;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+
+  /* Smooth swipeable horizontal category filter bar */
+  .category-filter-nav {
+    margin-top: 2px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .category-pills-bar {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 8px;
+    padding: 4px 12px 10px 12px;
+    margin: 0 -12px;
+    justify-content: flex-start;
+    scroll-snap-type: x proximity;
+  }
+
+  .category-pills-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-filter-pill {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    padding: 7px 14px;
+    font-size: 0.8rem;
+    gap: 5px;
+    min-height: 38px;
+  }
+
+  .pill-count-tag {
+    font-size: 0.68rem;
+    padding: 1px 6px;
+  }
+
+  /* ------------------------------------------------------------------------
+     3. Mobile Tools Directory Grid
+     ------------------------------------------------------------------------ */
+  .directory-meta-bar {
+    padding: 0 12px;
+    margin: 6px auto;
+  }
+
+  .current-cat-name {
+    font-size: 1.15rem;
+  }
+
+  .tools-directory-section {
+    padding: 6px 10px 32px 10px;
+  }
+
+  .tools-directory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .studio-tool-card {
+    padding: 14px 12px;
+    gap: 10px;
+    border-radius: var(--radius-md);
+  }
+
+  .card-icon-halo {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+  }
+
+  .card-icon-halo i {
+    width: 18px;
+    height: 18px;
+  }
+
+  .card-badge-pill {
+    font-size: 0.62rem;
+    padding: 2px 6px;
+  }
+
+  .card-main-content h3 {
+    font-size: 0.98rem;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .card-main-content p {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer-line {
+    padding-top: 8px;
+  }
+
+  .card-cat-label {
+    font-size: 0.7rem;
+  }
+
+  .card-enter-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .card-enter-icon i {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ------------------------------------------------------------------------
+     4. Mobile Stage 1: Document Upload & Dropzone
+     ------------------------------------------------------------------------ */
+  #studio-stage-upload {
+    padding: 16px 10px 40px 10px;
+  }
+
+  .stage-upload-card {
+    width: 100%;
+  }
+
+  .tool-hero-badge {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .tool-hero-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+  }
+
+  .stage-title {
+    font-size: 1.45rem;
+    line-height: 1.25;
+  }
+
+  .stage-subtitle {
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .ingestion-zone {
+    padding: 28px 14px;
+    border-radius: var(--radius-lg);
+  }
+
+  .zone-icon-circle {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 12px;
+  }
+
+  .zone-lead-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .zone-heading {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+
+  .zone-subtext {
+    font-size: 0.82rem;
+    margin-bottom: 20px;
+  }
+
+  .zone-actions-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .btn-primary-glow,
+  .btn-secondary-glow {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+    font-size: 0.96rem;
+    padding: 12px 20px;
+  }
+
+  /* Workspace Topbar */
+  .workspace-top-bar {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .back-nav-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .workspace-cat-tag {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+  }
+
+  .btn-ghost-sm {
+    padding: 5px 10px;
+    font-size: 0.76rem;
+  }
+
+  /* ------------------------------------------------------------------------
+     5. Mobile Stage 2: Dedicated Split Workbench (Stacked & Sticky)
+     ------------------------------------------------------------------------ */
+  .workbench-split-layout {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: calc(100vh - var(--header-height) - 52px) !important;
+    overflow: visible !important;
+  }
+
+  .workbench-main-stage {
+    width: 100% !important;
+    flex: none !important;
+    padding: 10px 10px 16px 10px !important;
+    overflow: visible !important;
+  }
+
+  .main-stage-toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .btn-add-more {
+    padding: 6px 12px;
+    font-size: 0.82rem;
+  }
+
+  .stage-count-chip {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+  }
+
+  .btn-stage-tool {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+  }
+
+  .workbench-file-deck {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 8px !important;
+    max-height: 280px !important;
+    overflow-y: auto !important;
+    padding: 4px;
+  }
+
+  .file-deck-card {
+    padding: 10px;
+  }
+
+  .file-deck-card__thumb {
+    height: 120px;
+    margin-bottom: 8px;
+  }
+
+  .file-deck-card__name {
+    font-size: 0.8rem;
+  }
+
+  .pages-thumbnail-grid,
+  .organize-pages-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    gap: 8px !important;
+    padding: 8px 2px !important;
+  }
+
+  .page-thumb-wrapper,
+  .organize-thumb-wrapper {
+    height: 130px !important;
+  }
+
+  .workbench-sidebar {
+    width: 100% !important;
+    border-left: none !important;
+    border-top: 1.5px solid var(--border-color) !important;
+    box-shadow: none !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    padding: 12px 14px;
+  }
+
+  .sidebar-scrollable-body {
+    padding: 12px 14px;
+    overflow: visible;
+  }
+
+  .sidebar-sticky-footer {
+    position: sticky !important;
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 100 !important;
+    padding: 10px 14px !important;
+    background: var(--bg-surface) !important;
+    border-top: 1px solid var(--border-color) !important;
+    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .btn-grand-execute {
+    height: 48px;
+    font-size: 1.02rem;
+  }
+
+  /* ------------------------------------------------------------------------
+     6. Mobile Stage 3: Download Celebration Card
+     ------------------------------------------------------------------------ */
+  #studio-stage-download {
+    padding: 20px 10px 40px 10px;
+  }
+
+  .stage-download-card {
+    padding: 24px 14px;
+    width: 100%;
+    max-width: 95vw;
+  }
+
+  .download-celebration-badge {
+    width: 64px;
+    height: 64px;
+  }
+
+  .download-heading {
+    font-size: 1.45rem;
+  }
+
+  .download-description {
+    font-size: 0.85rem;
+  }
+
+  .download-actions-cluster {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .btn-download-primary,
+  .btn-action-ghost {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+    font-size: 0.95rem;
+  }
+
+  /* ------------------------------------------------------------------------
+     7. Mobile Pricing & Instant UPI Modal (₹5 / ₹100 / ₹1,000)
+     ------------------------------------------------------------------------ */
+  .pricing-modal-card {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    padding: 20px 12px 18px 12px !important;
+    max-height: 88vh !important;
+    border-radius: var(--radius-lg) !important;
+    gap: 14px !important;
+  }
+
+  .pricing-title {
+    font-size: 1.25rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .pricing-subtitle {
+    font-size: 0.8rem !important;
+  }
+
+  .pro-tiers-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .pro-tier-card {
+    padding: 14px 12px !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .tier-price-row .amount {
+    font-size: 1.75rem;
+  }
+
+  .tier-features-list {
+    font-size: 0.78rem;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .btn-tier-select {
+    min-height: 42px;
+    font-size: 0.84rem;
+  }
+
+  .fast-upi-payment-drawer {
+    padding: 12px !important;
+    gap: 12px !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .upi-checkout-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-bottom: 10px;
+  }
+
+  .upi-checkout-title {
+    font-size: 1.05rem;
+  }
+
+  .upi-checkout-sub {
+    font-size: 0.75rem;
+  }
+
+  .upi-payable-pill {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+  }
+
+  .upi-payable-pill strong {
+    font-size: 1.2rem;
+  }
+
+  .upi-checkout-body {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .upi-qr-display-box {
+    margin: 0 auto;
+  }
+
+  .qr-frame {
+    padding: 8px;
+  }
+
+  .upi-qr-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .btn-pay-rzp-instant {
+    min-height: 48px;
+    padding: 10px 12px;
+    width: 100%;
+  }
+
+  .rzp-btn-title {
+    font-size: 0.88rem;
+  }
+
+  .rzp-btn-sub {
+    font-size: 0.68rem;
+  }
+
+  .btn-verify-upi {
+    min-height: 44px;
+    font-size: 0.85rem;
+  }
+
+  /* ------------------------------------------------------------------------
+     8. Mobile Auth & Security Profile Modals
+     ------------------------------------------------------------------------ */
+  .auth-modal-card,
+  .profile-security-modal-card {
+    width: 94vw !important;
+    max-width: 390px !important;
+    padding: 20px 14px !important;
+    border-radius: var(--radius-lg) !important;
+  }
+
+  .auth-header h3,
+  .security-modal-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .btn-google-sso,
+  .btn-security-verify {
+    min-height: 48px;
+    font-size: 0.92rem;
+    width: 100%;
+  }
+
+  /* ------------------------------------------------------------------------
+     9. Mobile History Drawer
+     ------------------------------------------------------------------------ */
+  .history-drawer-pane {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     10. Mobile Admin & Legal Views
+     ------------------------------------------------------------------------ */
+  .admin-container {
+    padding: 12px 8px;
+  }
+
+  .admin-kpi-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .admin-kpi-card {
+    padding: 12px 10px;
+  }
+
+  .kpi-value {
+    font-size: 1.35rem;
+  }
+
+  .table-filter-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .admin-search-input,
+  .admin-select-filter {
+    width: 100%;
+  }
+
+  .legal-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .legal-nav-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+
+  .legal-tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+
+  /* ------------------------------------------------------------------------
+     11. Features & Footer on Mobile
+     ------------------------------------------------------------------------ */
+  .features-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 20px 10px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    gap: 22px;
+    padding: 28px 12px;
+  }
+
+  .footer-brand-col {
+    max-width: 100%;
+  }
+
+  .footer-links-col {
+    width: 100%;
+  }
+
+  .footer-bottom {
+    padding: 16px 12px;
+    font-size: 0.72rem;
+    text-align: center;
+  }
+}
+
+/* Extra small devices (<= 360px) */
+@media (max-width: 360px) {
+  .tools-directory-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .hero-main-title {
+    font-size: 1.35rem;
+  }
+}
+
 
 
 

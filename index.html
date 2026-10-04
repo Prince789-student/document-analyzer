@@ -2,7 +2,10 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="theme-color" content="#070a13">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>DocStudio — Next-Gen Client-Side PDF Engine</title>
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="canonical" href="https://document-analyzer-y7as.onrender.com/">
@@ -67,6 +70,9 @@
 
   <!-- Google Identity Services (GSI) OAuth -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Razorpay Checkout for 1-Click Instant Automatic Pro Activation -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <link rel="stylesheet" href="/src/style.css">
 </head>
@@ -1222,12 +1228,12 @@
           <div class="upi-checkout-header">
             <div>
               <h3 class="upi-checkout-title">
-                <i data-lucide="qr-code"></i> Direct 1-to-1 UPI Payment
+                <i data-lucide="qr-code"></i> Instant UPI Payment & Scanner
               </h3>
-              <p class="upi-checkout-sub">Pay directly to our official UPI ID or scan the QR code from any UPI app</p>
+              <p class="upi-checkout-sub">Scan QR from any UPI app (GPay, PhonePe, Paytm, BHIM) or pay directly</p>
             </div>
             <div class="upi-payable-pill">
-              <span id="label-selected-plan-name">Selected: Monthly Pro (30 Days)</span>
+              <span id="label-selected-plan-name">Selected: Monthly Pro (₹100)</span>
               <strong id="display-payable-amount">₹100</strong>
             </div>
           </div>
@@ -1237,11 +1243,13 @@
             <div class="upi-qr-display-box">
               <div class="qr-frame">
                 <img src="/upi-qr.png" alt="Scan to pay via UPI" class="upi-qr-image" id="pricing-qr-image">
-                <div class="qr-scan-hint">Scan with GPay / PhonePe / Paytm</div>
+                <div class="qr-scan-hint">
+                  <i data-lucide="scan"></i> Scan with PhonePe / GPay / Paytm
+                </div>
               </div>
             </div>
 
-            <!-- UPI ID & Direct Pay Actions -->
+            <!-- UPI ID & Payment Actions -->
             <div class="upi-info-details-box">
               <!-- Official UPI ID & Copy Row -->
               <div class="upi-field-group">
@@ -1250,51 +1258,57 @@
                   <code class="upi-id-text" id="display-upi-id">apnacollegebihar@slc</code>
                   <button type="button" id="btn-copy-upi-id" class="btn-copy-upi" title="Copy UPI ID to clipboard">
                     <i data-lucide="copy"></i>
-                    <span>Copy UPI ID</span>
+                    <span>Copy</span>
                   </button>
                 </div>
               </div>
 
-              <!-- 💳 PROMINENT DIRECT "PAY WITH UPI" BUTTON -->
+              <!-- ⚡ PRIMARY ACTION: 1-CLICK INSTANT PAY WITH RAZORPAY (NO UTR REQUIRED) -->
               <div class="upi-pay-primary-action">
-                <a id="btn-upi-deeplink" href="upi://pay?pa=apnacollegebihar@slc&pn=Prince%20Kumar&am=100.00&cu=INR&tn=DocStudioPro" class="btn-pay-with-upi">
-                  <i data-lucide="smartphone"></i>
-                  <span>Pay with UPI (GPay / PhonePe / Paytm / BHIM)</span>
-                </a>
-              </div>
-
-              <!-- Status notification on launching UPI -->
-              <div id="upi-live-status-badge" class="upi-live-detect-badge" style="display: none;">
-                <span class="live-detect-dot"></span>
-                <span id="upi-live-status-text">Payment initiated! After sending payment, enter your 12-digit UTR below.</span>
-              </div>
-
-              <div class="upi-or-divider">
-                <span>AFTER PAYMENT: SUBMIT DETAILS TO ACTIVATE PRO</span>
+                <button type="button" id="btn-pay-razorpay" class="btn-pay-rzp-instant">
+                  <i data-lucide="zap" class="rzp-btn-icon"></i>
+                  <div class="rzp-btn-text">
+                    <span id="btn-pay-rzp-label" class="rzp-btn-title">⚡ Pay ₹100 via UPI / GPay / PhonePe / Card</span>
+                    <span class="rzp-btn-sub">Instant Automatic Pro Activation • Zero Effort</span>
+                  </div>
+                </button>
               </div>
 
               <!-- Email for Pro Subscription -->
-              <div class="upi-field-group">
-                <label for="input-payer-email">Your Email Address (For Pro Activation):</label>
-                <input type="email" id="input-payer-email" class="upi-utr-input" placeholder="Enter your email (e.g. name@gmail.com)" required>
+              <div class="upi-field-group" style="margin-top: 10px;">
+                <label for="input-payer-email">Active Account Email (Pro will be activated for this user):</label>
+                <input type="email" id="input-payer-email" class="upi-utr-input" placeholder="Sign in with your Google account" readonly style="background: rgba(16, 185, 129, 0.08); font-weight: 700; color: #10b981; border-color: rgba(16, 185, 129, 0.35); cursor: default;">
               </div>
 
-              <!-- Transaction Reference / UTR Input Field -->
-              <div class="upi-field-group">
-                <label for="input-upi-utr">
-                  <span>UPI Transaction ID / 12-digit UTR Number:</span>
-                  <span style="font-size: 0.76rem; color: #10b981; display: block; font-weight: 500; margin-top: 2px;">
-                    Enter the 12-digit UTR / Ref No. from your payment receipt
-                  </span>
-                </label>
-                <input type="text" id="input-upi-utr" class="upi-utr-input" placeholder="e.g. 427812903456 or PhonePe Txn Ref..." maxlength="35" required>
+              <!-- Status notification on launching Razorpay -->
+              <div id="upi-live-status-badge" class="upi-live-detect-badge" style="display: none; margin-top: 8px;">
+                <span class="live-detect-dot"></span>
+                <span id="upi-live-status-text">Connecting to secure payment gateway...</span>
               </div>
 
-              <!-- Submit UTR Button -->
-              <button type="button" id="btn-verify-upi-payment" class="btn-verify-upi">
-                <i data-lucide="check-circle-2"></i>
-                <span id="btn-verify-label">Submit UTR & Activate Pro</span>
-              </button>
+              <!-- Manual Direct UPI Section (Alternative with UTR) -->
+              <div class="manual-upi-accordion" style="margin-top: 14px; border-top: 1px dashed var(--border-color); padding-top: 8px;">
+                <button type="button" id="btn-toggle-manual-upi" class="btn-toggle-manual-upi" style="background:none; border:none; color:var(--text-muted); font-size:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; text-decoration: underline;">
+                  <span>Or pay manually to UPI ID & submit 12-digit UTR</span>
+                  <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
+                </button>
+                <div id="manual-upi-container" style="display: none; margin-top: 10px;">
+                  <div class="upi-step-box">
+                    <div class="upi-step-header">
+                      <span class="upi-step-badge">Manual UTR</span>
+                      <label for="input-upi-utr" class="upi-step-title">Enter 12-Digit UPI Ref / UTR No. <span style="color:#ef4444;">*</span></label>
+                    </div>
+                    <input type="text" id="input-upi-utr" class="upi-utr-input-prominent" placeholder="e.g. 427812345678" maxlength="25" autocomplete="off">
+                    <p class="upi-utr-help-text">
+                      <i data-lucide="info" style="width: 13px; height: 13px; display: inline-block; vertical-align: middle;"></i> Payment successful hone ke baad UPI app se 12-digit UTR yahan enter karein.
+                    </p>
+                  </div>
+                  <button type="button" id="btn-verify-upi-payment" class="btn-verify-upi" style="margin-top: 8px;">
+                    <i data-lucide="shield-check"></i>
+                    <span id="btn-verify-label">Submit UTR & Activate Pro</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1346,6 +1360,40 @@
         </div>
       </aside>
     </div>
+
+    <!-- ====================================================================
+         MOBILE BOTTOM NAVIGATION DOCK (Native App Touch Dock for Smartphones)
+         ==================================================================== -->
+    <nav class="mobile-bottom-dock" id="mobile-bottom-dock" aria-label="Mobile Bottom Navigation">
+      <button type="button" class="mobile-dock-btn active" id="mobile-dock-home" data-dock="home" title="All PDF Tools">
+        <i data-lucide="layout-grid"></i>
+        <span>Tools</span>
+      </button>
+      <button type="button" class="mobile-dock-btn" id="mobile-dock-search" data-dock="search" title="Search Tools">
+        <i data-lucide="search"></i>
+        <span>Search</span>
+      </button>
+      <button type="button" class="mobile-dock-btn mobile-dock-btn-pro" id="mobile-dock-pro" data-dock="pro" title="Unlock Pro Unlimited">
+        <div class="dock-pro-icon-wrap">
+          <i data-lucide="crown"></i>
+        </div>
+        <span>Get Pro</span>
+      </button>
+      <button type="button" class="mobile-dock-btn" id="mobile-dock-history" data-dock="history" title="Download History">
+        <div class="dock-badge-wrap">
+          <i data-lucide="history"></i>
+          <span id="mobile-dock-history-badge" class="dock-badge-chip" style="display: none;">0</span>
+        </div>
+        <span>History</span>
+      </button>
+      <button type="button" class="mobile-dock-btn" id="mobile-dock-account" data-dock="account" title="My Account">
+        <div class="dock-avatar-wrap">
+          <i data-lucide="user" id="mobile-dock-avatar-icon"></i>
+          <span id="mobile-dock-avatar-initial" class="dock-avatar-initial" style="display: none;">U</span>
+        </div>
+        <span id="mobile-dock-account-label">Account</span>
+      </button>
+    </nav>
 
     <!-- Toast Notifications Root -->
     <div id="toast-container" class="toast-container"></div>

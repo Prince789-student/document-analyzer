@@ -26,6 +26,7 @@ class DocuMatrixStudioApp {
     this.selectedPlanDuration = 'monthly';
     this.selectedPlanAmount = 100;
     this.activeUpiId = 'apnacollegebihar@slc';
+    this.pendingOpenPricingAfterLogin = false;
 
     this.selectedToolMeta = null;
     this.activeToolInstance = null;
@@ -109,10 +110,15 @@ class DocuMatrixStudioApp {
     this.displayUpiId = document.getElementById('display-upi-id');
     this.btnCopyUpiId = document.getElementById('btn-copy-upi-id');
     this.btnUpiDeeplink = document.getElementById('btn-upi-deeplink');
+    this.btnPayUpiLabel = document.getElementById('btn-pay-upi-label');
     this.inputPayerEmail = document.getElementById('input-payer-email');
+    this.btnPayRazorpay = document.getElementById('btn-pay-razorpay');
+    this.btnPayRzpLabel = document.getElementById('btn-pay-rzp-label');
+    this.btnToggleManualUpi = document.getElementById('btn-toggle-manual-upi');
+    this.manualUpiContainer = document.getElementById('manual-upi-container');
+    this.btnToggleUtrBox = document.getElementById('btn-toggle-utr-box');
     this.inputUpiUtr = document.getElementById('input-upi-utr');
     this.btnVerifyUpiPayment = document.getElementById('btn-verify-upi-payment');
-    this.btnAutoVerifyUpi = document.getElementById('btn-auto-verify-upi');
     this.upiLiveStatusBadge = document.getElementById('upi-live-status-badge');
     this.upiLiveStatusText = document.getElementById('upi-live-status-text');
     this.pricingQrImage = document.getElementById('pricing-qr-image');
@@ -218,6 +224,18 @@ class DocuMatrixStudioApp {
     this.historyEmptyView = document.getElementById('history-empty-view');
     this.historyItemsContainer = document.getElementById('history-items-container');
     this.clearAllHistoryRecords = document.getElementById('clear-all-history-records');
+
+    // Mobile Bottom Navigation Dock
+    this.mobileBottomDock = document.getElementById('mobile-bottom-dock');
+    this.mobileDockHome = document.getElementById('mobile-dock-home');
+    this.mobileDockSearch = document.getElementById('mobile-dock-search');
+    this.mobileDockPro = document.getElementById('mobile-dock-pro');
+    this.mobileDockHistory = document.getElementById('mobile-dock-history');
+    this.mobileDockHistoryBadge = document.getElementById('mobile-dock-history-badge');
+    this.mobileDockAccount = document.getElementById('mobile-dock-account');
+    this.mobileDockAvatarIcon = document.getElementById('mobile-dock-avatar-icon');
+    this.mobileDockAvatarInitial = document.getElementById('mobile-dock-avatar-initial');
+    this.mobileDockAccountLabel = document.getElementById('mobile-dock-account-label');
   }
 
   refreshIcons() {
@@ -498,10 +516,17 @@ class DocuMatrixStudioApp {
     }
   }
 
+  setMobileDockActive(dockName) {
+    document.querySelectorAll('.mobile-dock-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.dock === dockName);
+    });
+  }
+
   /* --------------------------------------------------------------------------
      Navigation Views (Home Directory vs Studio Tool View vs Admin Portal vs Legal)
      -------------------------------------------------------------------------- */
   showHomeView(updateHash = true) {
+    this.setMobileDockActive('home');
     if (updateHash && window.location.hash !== '#/' && window.location.hash !== '') {
       this.navigateTo('#/');
       return;
@@ -1241,6 +1266,10 @@ class DocuMatrixStudioApp {
     if (this.historyCounterChip) {
       this.historyCounterChip.textContent = history.length;
     }
+    if (this.mobileDockHistoryBadge) {
+      this.mobileDockHistoryBadge.textContent = history.length;
+      this.mobileDockHistoryBadge.style.display = history.length > 0 ? 'inline-block' : 'none';
+    }
   }
 
   openHistoryDrawer() {
@@ -1292,6 +1321,47 @@ class DocuMatrixStudioApp {
      Event Listeners
      -------------------------------------------------------------------------- */
   bindEvents() {
+    // Mobile Bottom Navigation Dock Buttons
+    this.mobileDockHome?.addEventListener('click', () => {
+      this.setMobileDockActive('home');
+      this.navigateTo('#/');
+    });
+
+    this.mobileDockSearch?.addEventListener('click', () => {
+      this.setMobileDockActive('search');
+      if (this.currentView !== 'home') {
+        this.navigateTo('#/');
+      }
+      setTimeout(() => {
+        if (this.globalSearchInput) {
+          this.globalSearchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          this.globalSearchInput.focus();
+        }
+      }, 150);
+    });
+
+    this.mobileDockPro?.addEventListener('click', () => {
+      this.setMobileDockActive('pro');
+      this.openPricingModal();
+    });
+
+    this.mobileDockHistory?.addEventListener('click', () => {
+      this.setMobileDockActive('history');
+      this.openHistoryDrawer();
+    });
+
+    this.mobileDockAccount?.addEventListener('click', () => {
+      this.setMobileDockActive('account');
+      if (authService.isLoggedIn()) {
+        this.userDropdownMenu?.classList.toggle('show');
+        if (this.userDropdownMenu?.classList.contains('show')) {
+          this.userDropdownMenu.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else {
+        this.openAuthModal('signin');
+      }
+    });
+
     // Brand Logo & Back to Directory (SPA Routing)
     this.brandHomeLink?.addEventListener('click', () => this.navigateTo('#/'));
     this.btnBackToDirectory?.addEventListener('click', () => this.navigateTo('#/'));
@@ -1599,19 +1669,7 @@ class DocuMatrixStudioApp {
       const displayName = isPrince ? 'Prince Super Admin' : email.split('@')[0];
       const res = await authService.loginWithGoogle(email, displayName);
       if (res.success) {
-        this.closeAuthModal();
-        if (isPrince) {
-          toast.success('Welcome back, Prince! Super Admin privileges active.');
-          if (this.currentView === 'admin' || window.location.hash === '#/admin') {
-            this.navigateTo('#/admin');
-          }
-        } else {
-          toast.success(`Welcome, ${res.user?.name || email}!`);
-        }
-        const u = authService.getUser();
-        if (u && (!u.phone || !u.pincode)) {
-          setTimeout(() => this.openSecurityModal(), 600);
-        }
+        this.handlePostLoginSuccess(isPrince, res.user?.name || email);
       }
     });
 
@@ -1670,6 +1728,12 @@ class DocuMatrixStudioApp {
       if (this.btnVerifyLabel) {
         this.btnVerifyLabel.textContent = `Submit UTR & Activate Pro (₹${this.selectedPlanAmount})`;
       }
+      if (this.btnPayRzpLabel) {
+        this.btnPayRzpLabel.textContent = `⚡ Pay ₹${this.selectedPlanAmount} with UPI / GPay / PhonePe / Card`;
+      }
+      if (this.btnPayUpiLabel) {
+        this.btnPayUpiLabel.textContent = `Pay ₹${this.selectedPlanAmount} via UPI App (GPay / PhonePe / Paytm)`;
+      }
       const upiId = this.activeUpiId || 'apnacollegebihar@slc';
       const cleanAmt = Number(this.selectedPlanAmount).toFixed(2);
       const upiPayload = `upi://pay?pa=${upiId}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
@@ -1679,7 +1743,7 @@ class DocuMatrixStudioApp {
       }
 
       if (this.pricingQrImage) {
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=2&data=${encodeURIComponent(upiPayload)}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=2&data=${encodeURIComponent(upiPayload)}`;
         this.pricingQrImage.src = qrUrl;
         this.pricingQrImage.onerror = () => {
           this.pricingQrImage.src = '/upi-qr.png';
@@ -1688,11 +1752,17 @@ class DocuMatrixStudioApp {
     };
     this.updateSelectedTier = updateSelectedTier;
 
+    // Handle Plan Selection
+    const handlePlanSelect = (dur, amt) => {
+      updateSelectedTier(dur, amt);
+      this.fastUpiDrawer?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     this.proTierCards?.forEach(card => {
       card.addEventListener('click', () => {
         const dur = card.dataset.tierDuration || 'monthly';
         const amt = card.dataset.tierPrice || (dur === 'daily' ? 5 : (dur === 'yearly' ? 1000 : 100));
-        updateSelectedTier(dur, amt);
+        handlePlanSelect(dur, amt);
       });
     });
 
@@ -1702,8 +1772,7 @@ class DocuMatrixStudioApp {
         const dur = btn.dataset.selectTier || 'monthly';
         const card = btn.closest('.pro-tier-card');
         const amt = card?.dataset.tierPrice || (dur === 'daily' ? 5 : (dur === 'yearly' ? 1000 : 100));
-        updateSelectedTier(dur, amt);
-        this.fastUpiDrawer?.scrollIntoView({ behavior: 'smooth' });
+        handlePlanSelect(dur, amt);
       });
     });
 
@@ -1718,22 +1787,101 @@ class DocuMatrixStudioApp {
       }
     });
 
-    // Direct 1-Click Pay With UPI (Launch UPI App on device)
-    this.btnUpiDeeplink?.addEventListener('click', () => {
-      const amt = this.selectedPlanAmount || 100;
-      if (this.upiLiveStatusBadge) {
-        this.upiLiveStatusBadge.style.display = 'flex';
+    // ⚡ 1-Click Instant Razorpay Payment (Zero UTR, Zero Manual Work, 100% Automatic)
+    this.btnPayRazorpay?.addEventListener('click', async () => {
+      let payerEmail = this.inputPayerEmail?.value?.trim() || authService.getUser()?.email || '';
+
+      if (!payerEmail) {
+        toast.error('Please sign in with your Google account to upgrade to Pro.');
+        this.openAuthModal('signin');
+        return;
       }
-      if (this.upiLiveStatusText) {
-        this.upiLiveStatusText.textContent = `⚡ UPI payment initiated! Complete ₹${amt} payment to apnacollegebihar@slc, then enter the 12-digit UTR below.`;
+
+      const duration = this.selectedPlanDuration || 'monthly';
+      const amount = Number(this.selectedPlanAmount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
+
+      if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = true;
+      if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'flex';
+      if (this.upiLiveStatusText) this.upiLiveStatusText.textContent = `🔒 Initializing secure payment for ₹${amount}...`;
+
+      toast.info(`Opening secure checkout for ₹${amount}...`);
+
+      const orderData = await authService.createRazorpayOrder(amount, duration, 'pro', payerEmail);
+      if (!orderData || !orderData.orderId) {
+        if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
+        if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
+        return;
       }
-      toast.info(`⚡ Launching UPI App to pay ₹${amt} to apnacollegebihar@slc...`);
-      setTimeout(() => {
-        this.inputUpiUtr?.focus();
-      }, 1000);
+
+      const rzpOptions = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency || 'INR',
+        name: 'DocStudio Pro',
+        description: `${duration.toUpperCase()} Pass - Unlimited Operations`,
+        image: '/logo.png',
+        order_id: orderData.orderId,
+        prefill: {
+          name: authService.getUser()?.name || payerEmail.split('@')[0],
+          email: payerEmail,
+          contact: authService.getUser()?.phone ? `+91${authService.getUser()?.phone}` : ''
+        },
+        theme: {
+          color: '#10b981'
+        },
+        modal: {
+          ondismiss: () => {
+            if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
+            if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
+            toast.info('Payment window closed.');
+          }
+        },
+        handler: async (response) => {
+          if (this.upiLiveStatusText) this.upiLiveStatusText.textContent = '🎉 Payment confirmed! Activating Pro...';
+          const verified = await authService.verifyRazorpayPayment(response, amount, duration, payerEmail);
+          if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
+          if (verified) {
+            triggerConfetti();
+            this.closePricingModal();
+            toast.success(`🎉 DocStudio Pro (${duration.toUpperCase()}) activated! Enjoy unlimited operations.`);
+            const u = authService.getUser();
+            if (u && (!u.phone || !u.pincode)) {
+              setTimeout(() => this.openSecurityModal(), 1000);
+            }
+          }
+        }
+      };
+
+      try {
+        if (typeof window.Razorpay !== 'function') {
+          toast.error('Payment gateway SDK is loading. Please try again in 2 seconds.');
+          if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
+          if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
+          return;
+        }
+        const rzp = new window.Razorpay(rzpOptions);
+        rzp.on('payment.failed', function (resp) {
+          toast.error(`Payment failed: ${resp.error?.description || 'Transaction unsuccessful'}`);
+        });
+        rzp.open();
+      } catch (err) {
+        console.error('Razorpay open error:', err);
+        toast.error('Could not open payment window. Please try again.');
+        if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
+        if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
+      }
     });
 
-    // Submit UTR & Activate Pro Plan
+    // Toggle Manual UTR drawer
+    this.btnToggleManualUpi?.addEventListener('click', () => {
+      if (this.manualUpiContainer) {
+        const isHidden = this.manualUpiContainer.style.display === 'none';
+        this.manualUpiContainer.style.display = isHidden ? 'block' : 'none';
+        if (isHidden) this.inputUpiUtr?.focus();
+      }
+    });
+
+    // Genuine UTR Verification & Pro Activation
     this.btnVerifyUpiPayment?.addEventListener('click', async () => {
       let payerEmail = this.inputPayerEmail?.value?.trim() || authService.getUser()?.email || '';
 
@@ -1749,33 +1897,43 @@ class DocuMatrixStudioApp {
         return;
       }
 
-      const cleanUtr = (this.inputUpiUtr?.value || '').trim().replace(/[^a-zA-Z0-9\-_/]/g, '').toUpperCase();
+      const rawUtr = (this.inputUpiUtr?.value || '').trim();
+      const cleanUtr = rawUtr.replace(/[^a-zA-Z0-9\-_/]/g, '').toUpperCase();
 
       if (!cleanUtr) {
-        toast.error('Please enter the 12-digit UPI Reference / UTR Number from your payment receipt.');
-        this.inputUpiUtr?.focus();
+        toast.error('⚠️ UPI Reference / UTR Number daalna zaroori hai! Kripya payment ke baad UPI app se 12-digit UTR enter karein.');
+        if (this.inputUpiUtr) {
+          this.inputUpiUtr.focus();
+          this.inputUpiUtr.style.borderColor = '#ef4444';
+          this.inputUpiUtr.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.35)';
+        }
         return;
       }
 
-      if (cleanUtr.length < 6 || cleanUtr.length > 35) {
-        toast.error('Please enter a valid UPI Transaction ID / UTR Number (from GPay, PhonePe, or Paytm receipt).');
-        this.inputUpiUtr?.focus();
+      if (cleanUtr.length < 10) {
+        toast.error('⚠️ Galat UTR! UPI Reference Number 12-digit ka hota hai (jo payment receipt par likha hota hai).');
+        if (this.inputUpiUtr) {
+          this.inputUpiUtr.focus();
+          this.inputUpiUtr.style.borderColor = '#ef4444';
+          this.inputUpiUtr.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.35)';
+        }
         return;
       }
 
-      if (/^(\d)\1{5,}$/.test(cleanUtr) || cleanUtr === '123456' || cleanUtr === '12345678') {
-        toast.error('Invalid test UTR. Please enter your authentic transaction reference.');
-        this.inputUpiUtr?.focus();
-        return;
+      if (this.inputUpiUtr) {
+        this.inputUpiUtr.style.borderColor = '';
+        this.inputUpiUtr.style.boxShadow = '';
       }
 
       const duration = this.selectedPlanDuration || 'monthly';
       const amount = Number(this.selectedPlanAmount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
 
       if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = true;
+      if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'flex';
+      if (this.upiLiveStatusText) this.upiLiveStatusText.textContent = `🔍 Verifying UTR ${cleanUtr} for ₹${amount}...`;
 
-      toast.info(`Verifying UTR "${cleanUtr}" & activating DocStudio Pro (${duration.toUpperCase()} - ₹${amount})...`);
-      const ok = await authService.upgradeToPro('UPI', amount, duration, cleanUtr, payerEmail, false);
+      toast.info(`Verifying UTR (${cleanUtr}) & activating Pro...`);
+      const ok = await authService.upgradeToPro('UPI', amount, duration, cleanUtr, payerEmail);
 
       if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = false;
 
@@ -1787,6 +1945,8 @@ class DocuMatrixStudioApp {
         if (u && (!u.phone || !u.pincode)) {
           setTimeout(() => this.openSecurityModal(), 1000);
         }
+      } else {
+        if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
       }
     });
 
@@ -1919,11 +2079,26 @@ class DocuMatrixStudioApp {
       if (this.openPricingBtn) {
         this.openPricingBtn.style.display = isUnlimited ? 'none' : 'inline-flex';
       }
+
+      // Mobile Bottom Dock Account state
+      if (this.mobileDockAvatarIcon) this.mobileDockAvatarIcon.style.display = 'none';
+      if (this.mobileDockAvatarInitial) {
+        this.mobileDockAvatarInitial.style.display = 'flex';
+        this.mobileDockAvatarInitial.textContent = initial;
+      }
+      if (this.mobileDockAccountLabel) {
+        this.mobileDockAccountLabel.textContent = isAdmin ? 'Admin' : (user.plan === 'pro' ? 'PRO' : 'Account');
+      }
     } else {
       if (this.btnHeaderLogin) this.btnHeaderLogin.style.display = 'flex';
       if (this.userHeaderWidget) this.userHeaderWidget.style.display = 'none';
       if (this.userDropdownMenu) this.userDropdownMenu.classList.remove('show');
       if (this.openPricingBtn) this.openPricingBtn.style.display = 'inline-flex';
+
+      // Mobile Bottom Dock Account state for guests
+      if (this.mobileDockAvatarIcon) this.mobileDockAvatarIcon.style.display = 'block';
+      if (this.mobileDockAvatarInitial) this.mobileDockAvatarInitial.style.display = 'none';
+      if (this.mobileDockAccountLabel) this.mobileDockAccountLabel.textContent = 'Account';
     }
   }
 
@@ -1968,6 +2143,7 @@ class DocuMatrixStudioApp {
   }
 
   closeAuthModal() {
+    this.pendingOpenPricingAfterLogin = false;
     if (this.authModalOverlay) {
       this.authModalOverlay.style.display = 'none';
       this.authModalOverlay.setAttribute('aria-hidden', 'true');
@@ -2034,19 +2210,7 @@ class DocuMatrixStudioApp {
             });
 
             if (res.success) {
-              this.closeAuthModal();
-              if (isPrince) {
-                toast.success('Welcome back, Prince! Super Admin privileges active.');
-                if (this.currentView === 'admin' || window.location.hash === '#/admin') {
-                  this.navigateTo('#/admin');
-                }
-              } else {
-                toast.success(`Welcome, ${profile.name || profile.email}!`);
-              }
-              const u = authService.getUser();
-              if (u && (!u.phone || !u.pincode)) {
-                setTimeout(() => this.openSecurityModal(), 600);
-              }
+              this.handlePostLoginSuccess(isPrince, profile.name || profile.email);
             }
           } catch (err) {
             console.error('Google profile fetch failed', err);
@@ -2056,6 +2220,30 @@ class DocuMatrixStudioApp {
       });
     } catch (e) {
       console.warn('setupGoogleTokenClient error', e);
+    }
+  }
+
+  handlePostLoginSuccess(isPrince = false, userName = '') {
+    this.closeAuthModal();
+    if (isPrince) {
+      toast.success('Welcome back, Prince! Super Admin privileges active.');
+      if (this.currentView === 'admin' || window.location.hash === '#/admin') {
+        this.navigateTo('#/admin');
+      }
+    } else {
+      toast.success(`Welcome, ${userName}!`);
+    }
+
+    // If user clicked "Get Pro" before login, immediately open Pro subscription modal!
+    if (this.pendingOpenPricingAfterLogin) {
+      this.pendingOpenPricingAfterLogin = false;
+      setTimeout(() => this.openPricingModal(), 400);
+      return;
+    }
+
+    const u = authService.getUser();
+    if (u && (!u.phone || !u.pincode)) {
+      setTimeout(() => this.openSecurityModal(), 600);
     }
   }
 
@@ -2087,14 +2275,7 @@ class DocuMatrixStudioApp {
                 if (response.credential) {
                   const result = await authService.loginWithGoogleCredential(response.credential);
                   if (result.success) {
-                    this.closeAuthModal();
-                    if (authService.isAdmin() && (this.currentView === 'admin' || window.location.hash === '#/admin')) {
-                      this.navigateTo('#/admin');
-                    }
-                    const u = authService.getUser();
-                    if (u && (!u.phone || !u.pincode)) {
-                      setTimeout(() => this.openSecurityModal(), 600);
-                    }
+                    this.handlePostLoginSuccess(authService.isAdmin(), result.user?.name || result.user?.email || 'User');
                   }
                 }
               }
@@ -2170,6 +2351,15 @@ class DocuMatrixStudioApp {
       toast.success('Your account already has DocStudio Pro active with unlimited operations!');
       return;
     }
+
+    // Pehle Login Check: Agar login nahi hai to pehle Login karne ko kahega
+    if (!authService.isLoggedIn()) {
+      this.pendingOpenPricingAfterLogin = true;
+      toast.info('DocStudio Pro subscription lene ke liye pehle apna Google account sign in karein.');
+      this.openAuthModal('signin');
+      return;
+    }
+
     if (this.pricingModalOverlay) {
       this.pricingModalOverlay.style.display = 'flex';
       this.pricingModalOverlay.setAttribute('aria-hidden', 'false');
@@ -2179,12 +2369,14 @@ class DocuMatrixStudioApp {
       if (this.inputPayerEmail) {
         const u = authService.getUser();
         this.inputPayerEmail.value = (u && u.email) ? u.email : '';
+        this.inputPayerEmail.readOnly = true;
       }
     }
     this.refreshIcons();
   }
 
   closePricingModal() {
+    this.pendingOpenPricingAfterLogin = false;
     if (this.pricingModalOverlay) {
       this.pricingModalOverlay.style.display = 'none';
       this.pricingModalOverlay.setAttribute('aria-hidden', 'true');

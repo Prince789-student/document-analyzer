@@ -82,10 +82,7 @@
       "dailyQuota": 5,
       "lastQuotaReset": "2026-10-04T06:11:27.997Z",
       "createdAt": "2026-10-04T06:11:28.004Z",
-      "_id": "usr_17910942879972idp",
-      "planDuration": "daily",
-      "planAmount": 5,
-      "planUtr": ""
+      "_id": "usr_17910942879972idp"
     },
     {
       "id": "usr_1791094367418gw0t",
@@ -112,6 +109,25 @@
       "lastQuotaReset": "2026-10-04T06:59:56.468Z",
       "createdAt": "2026-10-04T06:59:56.468Z",
       "_id": "usr_1791097196468awzh"
+    },
+    {
+      "id": "usr_1791112667466rug2",
+      "name": "Jai Hind",
+      "email": "pk9762920@gmail.com",
+      "password": "$2b$10$mlRB8H5KyGXOu5N/eFozcefHt0KPyNocKNUUzW5rdcfF1UX28vFVC",
+      "role": "user",
+      "plan": "free",
+      "dailyOperationsUsed": 0,
+      "dailyQuota": 5,
+      "lastQuotaReset": "2026-10-04T11:17:47.466Z",
+      "createdAt": "2026-10-04T11:17:47.473Z",
+      "_id": "usr_1791112667466rug2",
+      "phone": "9508621631",
+      "pincode": "803120",
+      "profileVerified": true,
+      "planDuration": "daily",
+      "planAmount": 5,
+      "planUtr": "627759903222"
     }
   ],
   "subscriptions": [
@@ -164,9 +180,86 @@
       "status": "active",
       "paymentMethod": "UPI",
       "createdAt": "2026-10-04T10:48:48.469Z"
+    },
+    {
+      "id": "sub_1791113935287",
+      "userId": "usr_1791112667466rug2",
+      "userEmail": "pk9762920@gmail.com",
+      "plan": "pro",
+      "amount": 5,
+      "duration": "daily",
+      "utrRef": "627759903222",
+      "currency": "INR",
+      "status": "active",
+      "paymentMethod": "UPI",
+      "createdAt": "2026-10-04T11:38:55.287Z"
     }
   ],
   "logs": [
+    {
+      "id": "log_1791115320634",
+      "userId": "usr_1791112667466rug2",
+      "userEmail": "pk9762920@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Jai Hind (pk9762920@gmail.com) - user",
+      "createdAt": "2026-10-04T12:02:00.634Z"
+    },
+    {
+      "id": "log_1791115302753",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "ADMIN_UPDATE_USER",
+      "details": "Admin updated user usr_1791112667466rug2 (Plan: free, Role: undefined)",
+      "createdAt": "2026-10-04T12:01:42.753Z"
+    },
+    {
+      "id": "log_1791113935296",
+      "userId": "usr_1791112667466rug2",
+      "userEmail": "pk9762920@gmail.com",
+      "action": "PRO_SUBSCRIPTION_ACTIVE",
+      "details": "Activated PRO (DAILY - ₹5) via UPI (Ref: 627759903222)",
+      "createdAt": "2026-10-04T11:38:55.296Z"
+    },
+    {
+      "id": "log_1791113386063",
+      "userId": "usr_1791097196468awzh",
+      "userEmail": "testuser@gmail.com",
+      "action": "PRO_SUBSCRIPTION_ACTIVE",
+      "details": "Activated PRO (DAILY - ₹5) via UPI (Ref: 428910482918)",
+      "createdAt": "2026-10-04T11:29:46.063Z"
+    },
+    {
+      "id": "log_1791112745990",
+      "userId": "usr_1791112667466rug2",
+      "userEmail": "pk9762920@gmail.com",
+      "action": "PRO_SUBSCRIPTION_ACTIVE",
+      "details": "Activated PRO (DAILY - ₹5) via UPI (Ref: Direct UPI)",
+      "createdAt": "2026-10-04T11:19:05.990Z"
+    },
+    {
+      "id": "log_1791112686037",
+      "userId": "usr_1791112667466rug2",
+      "userEmail": "pk9762920@gmail.com",
+      "action": "PROFILE_VERIFIED",
+      "details": "Linked Phone: +91-9508621631, PIN: 803120",
+      "createdAt": "2026-10-04T11:18:06.037Z"
+    },
+    {
+      "id": "log_1791112667479",
+      "userId": "usr_1791112667466rug2",
+      "userEmail": "pk9762920@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Jai Hind (pk9762920@gmail.com) - user",
+      "createdAt": "2026-10-04T11:17:47.479Z"
+    },
+    {
+      "id": "log_1791111724905",
+      "userId": "usr_17910942879972idp",
+      "userEmail": "biharibaba654@gmail.com",
+      "action": "PRO_SUBSCRIPTION_ACTIVE",
+      "details": "Activated PRO (DAILY - ₹5) via UPI (Ref: Direct UPI)",
+      "createdAt": "2026-10-04T11:02:04.905Z"
+    },
     {
       "id": "log_1791110928481",
       "userId": "usr_1791044602872r8eb",

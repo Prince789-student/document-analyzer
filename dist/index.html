@@ -1046,25 +1046,27 @@
           </button>
         </div>
 
-        <!-- Optional Manual Fallback (Only shown if Google popup is blocked) -->
-        <div id="manual-auth-box" class="manual-auth-box" style="display: none;">
+        <!-- Email fallback form — always visible as alternative -->
+        <div id="manual-auth-box" class="manual-auth-box" style="display: block;">
           <form id="form-google-signin" class="google-signin-form">
             <div class="google-email-input-group">
-              <label for="google-signin-email">Enter Google Account Email</label>
+              <label for="google-signin-email">Or enter your Google Account Email</label>
               <div class="google-input-wrap">
+                <svg class="google-input-svg" viewBox="0 0 24 24" width="16" height="16">
+                  <path fill="#4285F4" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
                 <input type="email" id="google-signin-email" placeholder="you@gmail.com" autocomplete="email">
               </div>
             </div>
-            <button type="submit" id="btn-submit-google-signin" class="btn-manual-submit">Sign In with Email</button>
+            <button type="submit" id="btn-submit-google-signin" class="btn-manual-submit">Sign In with Google Email</button>
           </form>
         </div>
 
         <div class="auth-footer-note">
           <div class="auth-security-badge">
             <i data-lucide="lock" style="width: 13px; height: 13px; display: inline-block;"></i>
-            <span>Secure Google OAuth &bull; 100% Client-Side Privacy</span>
+            <span>Secure Sign-In &bull; Your data stays private</span>
           </div>
-          <button type="button" id="btn-toggle-manual-box" class="btn-trouble-toggle">Trouble signing in?</button>
         </div>
       </div>
     </div>

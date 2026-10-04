@@ -12,10 +12,11 @@ import {
   getAdminMetrics,
   getAppConfig,
   updateAppConfig,
-  findOrCreateGoogleUser
+  findOrCreateGoogleUser,
+  isSuperAdminEmail
 } from './db.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'docstudio-super-secret-jwt-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'docstudio-super-secret-jwt-key-2026-production';
 
 // Helper to extract JSON body from incoming HTTP request
 export async function parseJsonBody(req) {
@@ -134,6 +135,7 @@ export async function handleApiRoute(req, res, path) {
         details: `Google login: ${user.name} (${user.email}) - ${user.role}`
       });
 
+      const isAdmin = isSuperAdminEmail(user.email);
       return sendJson(res, 200, {
         message: `Welcome, ${user.name}!`,
         token,
@@ -141,10 +143,15 @@ export async function handleApiRoute(req, res, path) {
           id: user._id || user.id,
           name: user.name,
           email: user.email,
-          role: user.role,
-          plan: user.plan,
+          role: isAdmin ? 'admin' : user.role,
+          plan: isAdmin ? 'pro' : user.plan,
+          planDuration: user.planDuration || '',
+          planAmount: user.planAmount || 0,
+          phone: user.phone || '',
+          pincode: user.pincode || '',
+          profileVerified: !!user.profileVerified,
           dailyOperationsUsed: user.dailyOperationsUsed || 0,
-          dailyQuota: user.dailyQuota || 5
+          dailyQuota: isAdmin ? 9999 : (user.dailyQuota || 5)
         }
       });
     } catch (err) {
@@ -168,12 +175,12 @@ export async function handleApiRoute(req, res, path) {
         return sendJson(res, 400, { error: 'An account with this email already exists.' });
       }
 
-      const isSuperAdmin = email.toLowerCase().trim() === 'prince86944@gmail.com';
+      const isSuperAdmin = isSuperAdminEmail(email);
       const role = isSuperAdmin ? 'admin' : 'user';
       const plan = isSuperAdmin ? 'pro' : 'free';
 
       const user = await createUser({ name, email, password, role, plan });
-      const token = jwt.sign({ id: user._id || user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ id: user._id || user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
 
       await recordLog({
         userId: user._id || user.id,
@@ -191,6 +198,9 @@ export async function handleApiRoute(req, res, path) {
           email: user.email,
           role: user.role,
           plan: user.plan,
+          phone: user.phone || '',
+          pincode: user.pincode || '',
+          profileVerified: !!user.profileVerified,
           dailyOperationsUsed: user.dailyOperationsUsed || 0,
           dailyQuota: user.dailyQuota || 5
         }
@@ -218,14 +228,15 @@ export async function handleApiRoute(req, res, path) {
         return sendJson(res, 401, { error: 'Invalid credentials. Incorrect password.' });
       }
 
-      // Guarantee Super Admin role for prince86944@gmail.com
-      if (user.email.toLowerCase() === 'prince86944@gmail.com' && user.role !== 'admin') {
-        await updateUser(user._id || user.id, { role: 'admin', plan: 'pro' });
+      // Guarantee Super Admin role for prince86944
+      const isSuper = isSuperAdminEmail(user.email);
+      if (isSuper && (user.role !== 'admin' || user.plan !== 'pro')) {
+        await updateUser(user._id || user.id, { role: 'admin', plan: 'pro', dailyQuota: 9999 });
         user.role = 'admin';
         user.plan = 'pro';
       }
 
-      const token = jwt.sign({ id: user._id || user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ id: user._id || user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
 
       await recordLog({
         userId: user._id || user.id,
@@ -243,6 +254,9 @@ export async function handleApiRoute(req, res, path) {
           email: user.email,
           role: user.role,
           plan: user.plan,
+          phone: user.phone || '',
+          pincode: user.pincode || '',
+          profileVerified: !!user.profileVerified,
           dailyOperationsUsed: user.dailyOperationsUsed || 0,
           dailyQuota: user.dailyQuota || 5
         }
@@ -258,39 +272,119 @@ export async function handleApiRoute(req, res, path) {
     if (!user) {
       return sendJson(res, 401, { error: 'Not authenticated' });
     }
+    const isAdmin = isSuperAdminEmail(user.email);
     return sendJson(res, 200, {
       user: {
         id: user._id || user.id,
         name: user.name,
         email: user.email,
-        role: user.role,
-        plan: user.plan,
+        role: isAdmin ? 'admin' : user.role,
+        plan: isAdmin ? 'pro' : user.plan,
+        planDuration: user.planDuration || '',
+        planAmount: user.planAmount || 0,
+        phone: user.phone || '',
+        pincode: user.pincode || '',
+        profileVerified: !!user.profileVerified,
         dailyOperationsUsed: user.dailyOperationsUsed || 0,
-        dailyQuota: user.dailyQuota || 5
+        dailyQuota: isAdmin ? 9999 : (user.dailyQuota || 5)
       }
     });
   }
 
+  // 3.1 UPDATE USER PROFILE (Security: Phone Number & PIN Code Verification)
+  if ((path === '/api/user/profile' || path === '/api/user/update-profile') && (req.method === 'POST' || req.method === 'PUT')) {
+    try {
+      let user = await authenticateRequest(req);
+      const { phone, pincode, email } = await parseJsonBody(req);
+      
+      if (!user && email) {
+        user = await findUserByEmail(email);
+      }
+      if (!user) {
+        return sendJson(res, 401, { error: 'Please sign in to update your security profile.' });
+      }
+
+      const cleanPhone = (phone || '').toString().trim().replace(/[^0-9]/g, '');
+      const cleanPincode = (pincode || '').toString().trim().replace(/[^0-9]/g, '');
+
+      if (cleanPhone.length < 10) {
+        return sendJson(res, 400, { error: 'Please enter a valid 10-digit mobile number.' });
+      }
+      if (cleanPincode.length !== 6) {
+        return sendJson(res, 400, { error: 'Please enter a valid 6-digit Indian PIN code.' });
+      }
+
+      const updated = await updateUser(user._id || user.id, {
+        phone: cleanPhone,
+        pincode: cleanPincode,
+        profileVerified: true
+      });
+
+      const token = jwt.sign(
+        { id: updated._id || updated.id, email: updated.email, role: updated.role },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+
+      await recordLog({
+        userId: updated._id || updated.id,
+        userEmail: updated.email,
+        action: 'PROFILE_VERIFIED',
+        details: `Linked Phone: +91-${cleanPhone}, PIN: ${cleanPincode}`
+      });
+
+      return sendJson(res, 200, {
+        message: 'Security profile verified successfully!',
+        token,
+        user: {
+          id: updated._id || updated.id,
+          name: updated.name,
+          email: updated.email,
+          role: updated.role,
+          plan: updated.plan,
+          planDuration: updated.planDuration || '',
+          planAmount: updated.planAmount || 0,
+          phone: cleanPhone,
+          pincode: cleanPincode,
+          profileVerified: true,
+          dailyOperationsUsed: updated.dailyOperationsUsed || 0,
+          dailyQuota: updated.dailyQuota || 5
+        }
+      });
+    } catch (err) {
+      return sendJson(res, 500, { error: err.message });
+    }
+  }
+
   // 4. UPGRADE SUBSCRIPTION (Pro Tier: ₹5 Daily, ₹100 Monthly, ₹1000 Yearly via UPI)
   if (path === '/api/subscription/upgrade' && req.method === 'POST') {
-    const user = await authenticateRequest(req);
-    if (!user) {
-      return sendJson(res, 401, { error: 'Please sign in with Google to activate your Pro subscription.' });
-    }
+    let user = await authenticateRequest(req);
     try {
       const {
         plan = 'pro',
         duration = 'monthly', // 'daily' | 'monthly' | 'yearly'
         amount = 100,
         paymentMethod = 'UPI',
-        utrRef = ''
+        utrRef = '',
+        payerEmail = ''
       } = await parseJsonBody(req);
+
+      if (!user && payerEmail) {
+        user = await findOrCreateGoogleUser({ email: payerEmail, name: payerEmail.split('@')[0] });
+      }
+
+      if (!user) {
+        return sendJson(res, 400, { error: 'Please enter your Google account email to activate your Pro subscription.' });
+      }
 
       const userId = user._id || user.id;
 
       // Update user plan to PRO with unlimited operations
       const updated = await updateUser(userId, {
         plan: 'pro',
+        planDuration: duration,
+        planAmount: Number(amount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100)),
+        planUtr: utrRef,
         dailyQuota: 9999
       });
 
@@ -299,11 +393,17 @@ export async function handleApiRoute(req, res, path) {
         userId,
         userEmail: user.email,
         plan: 'pro',
-        amount: Number(amount) || 100,
+        amount: Number(amount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100)),
         paymentMethod,
         duration,
         utrRef
       });
+
+      const token = jwt.sign(
+        { id: updated._id || updated.id, email: updated.email, role: updated.role },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
 
       await recordLog({
         userId,
@@ -314,18 +414,22 @@ export async function handleApiRoute(req, res, path) {
 
       return sendJson(res, 200, {
         message: `Congratulations! DocStudio Pro (${duration.toUpperCase()}) is now activated!`,
+        token,
         subscription: sub,
         user: {
           id: updated._id || updated.id,
           name: updated.name,
           email: updated.email,
           role: updated.role,
-          plan: updated.plan,
+          plan: 'pro',
           planDuration: duration,
           planAmount: Number(amount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100)),
           planUtr: utrRef,
+          phone: updated.phone || '',
+          pincode: updated.pincode || '',
+          profileVerified: !!updated.profileVerified,
           dailyOperationsUsed: updated.dailyOperationsUsed || 0,
-          dailyQuota: updated.dailyQuota
+          dailyQuota: 9999
         }
       });
     } catch (err) {

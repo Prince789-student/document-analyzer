@@ -87,9 +87,19 @@ class DocuMatrixStudioApp {
     this.googleSigninEmail = document.getElementById('google-signin-email');
     this.btnSubmitGoogleSignin = document.getElementById('btn-submit-google-signin');
 
+    // Account Security & Profile Verification Elements (+91 Phone & PIN)
+    this.securityModalOverlay = document.getElementById('profile-security-modal-overlay');
+    this.btnCloseSecurityModal = document.getElementById('btn-close-security-modal');
+    this.formSecurityProfile = document.getElementById('form-security-profile');
+    this.securityPhone = document.getElementById('security-phone');
+    this.securityPincode = document.getElementById('security-pincode');
+    this.btnSkipSecurityProfile = document.getElementById('btn-skip-security-profile');
+
     // Pricing & Fast UPI Checkout Elements (DocStudio PRO: ₹5 / ₹100 / ₹1,000)
     this.pricingModalOverlay = document.getElementById('pricing-modal-overlay');
     this.btnClosePricingModal = document.getElementById('btn-close-pricing-modal');
+    this.selectedPlanDuration = 'monthly';
+    this.selectedPlanAmount = 100;
     this.proTierCards = document.querySelectorAll('.pro-tier-card');
     this.btnTierSelects = document.querySelectorAll('.btn-tier-select');
     this.fastUpiDrawer = document.getElementById('fast-upi-payment-drawer');
@@ -1554,7 +1564,7 @@ class DocuMatrixStudioApp {
         return;
       }
 
-      const isPrince = email.toLowerCase() === 'prince86944@gmail.com';
+      const isPrince = email.toLowerCase() === 'prince86944@gmail.com' || email.toLowerCase() === 'prince869442@gmail.com' || email.toLowerCase().startsWith('prince86944');
       const displayName = isPrince ? 'Prince Super Admin' : email.split('@')[0];
       const res = await authService.loginWithGoogle(email, displayName);
       if (res.success) {
@@ -1567,11 +1577,50 @@ class DocuMatrixStudioApp {
         } else {
           toast.success(`Welcome, ${res.user?.name || email}!`);
         }
+        const u = authService.getUser();
+        if (u && (!u.phone || !u.pincode)) {
+          setTimeout(() => this.openSecurityModal(), 600);
+        }
       }
     });
 
     // Initialize Google Identity Services
     this.initGoogleIdentityServices();
+
+    // 5.1 Account Security & Verification Modal (+91 Phone & Area PIN)
+    this.btnCloseSecurityModal?.addEventListener('click', () => this.closeSecurityModal());
+    this.btnSkipSecurityProfile?.addEventListener('click', () => {
+      this.closeSecurityModal();
+      toast.info('Security profile verification postponed.');
+    });
+    this.securityModalOverlay?.addEventListener('click', (e) => {
+      if (e.target === this.securityModalOverlay) this.closeSecurityModal();
+    });
+
+    this.formSecurityProfile?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const phone = this.securityPhone?.value.trim().replace(/[^0-9]/g, '');
+      const pincode = this.securityPincode?.value.trim().replace(/[^0-9]/g, '');
+
+      if (!phone || phone.length !== 10) {
+        toast.error('Please enter a valid 10-digit Indian mobile number.');
+        this.securityPhone?.focus();
+        return;
+      }
+      if (!pincode || pincode.length !== 6) {
+        toast.error('Please enter a valid 6-digit Indian PIN code.');
+        this.securityPincode?.focus();
+        return;
+      }
+
+      toast.info('Securing and verifying your account...');
+      const res = await authService.updateUserProfile(phone, pincode);
+      if (res.success) {
+        this.closeSecurityModal();
+        triggerConfetti();
+        toast.success('🛡️ Security Profile Verified! Mobile & PIN linked successfully.');
+      }
+    });
 
     // 6. Pricing & Fast Direct UPI Payment Drawer (DocStudio PRO: ₹5 / ₹100 / ₹1,000)
     this.btnClosePricingModal?.addEventListener('click', () => this.closePricingModal());
@@ -1636,32 +1685,34 @@ class DocuMatrixStudioApp {
       }
     });
 
-    // Verify UPI Payment & Activate Pro Instantly
+    // Verify UPI Payment & Activate Pro Instantly (Supports direct email input & session)
     this.btnVerifyUpiPayment?.addEventListener('click', async () => {
-      let payerEmail = this.inputPayerEmail?.value?.trim();
-      if (!authService.isLoggedIn()) {
-        if (!payerEmail) {
-          payerEmail = 'prince86944@gmail.com';
-        }
-        toast.info(`Linking Google account: ${payerEmail}...`);
-        const loginRes = await authService.loginWithGoogle(payerEmail, payerEmail.split('@')[0]);
-        if (!loginRes.success) {
-          toast.error('Could not authenticate Google account.');
-          return;
-        }
+      let payerEmail = this.inputPayerEmail?.value?.trim() || authService.getUser()?.email || '';
+
+      if (!payerEmail) {
+        toast.error('Please enter your Google account email to activate Pro.');
+        this.inputPayerEmail?.focus();
+        return;
       }
 
+      const duration = this.selectedPlanDuration || 'monthly';
+      const amount = Number(this.selectedPlanAmount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
       const utr = this.inputUpiUtr?.value.trim() || '';
+
       if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = true;
 
-      toast.info(`Verifying payment of ₹${this.selectedPlanAmount} for DocStudio Pro (${this.selectedPlanDuration.toUpperCase()})...`);
-      const ok = await authService.upgradeToPro('UPI', this.selectedPlanAmount, this.selectedPlanDuration, utr);
+      toast.info(`Activating DocStudio Pro (${duration.toUpperCase()} - ₹${amount}) for ${payerEmail}...`);
+      const ok = await authService.upgradeToPro('UPI', amount, duration, utr, payerEmail);
       if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = false;
 
       if (ok) {
         triggerConfetti();
         this.closePricingModal();
-        toast.success(`🎉 DocStudio Pro (${this.selectedPlanDuration.toUpperCase()}) activated! Enjoy unlimited operations.`);
+        toast.success(`🎉 DocStudio Pro (${duration.toUpperCase()}) activated! Enjoy unlimited operations.`);
+        const u = authService.getUser();
+        if (u && (!u.phone || !u.pincode)) {
+          setTimeout(() => this.openSecurityModal(), 1000);
+        }
       }
     });
 
@@ -1742,8 +1793,9 @@ class DocuMatrixStudioApp {
       if (this.userAvatarInitial) this.userAvatarInitial.textContent = initial;
       if (this.myAccountLabel) this.myAccountLabel.textContent = 'My Account';
 
+      const isAdmin = authService.isAdmin();
       if (this.userPlanBadge) {
-        if (user.role === 'admin') {
+        if (isAdmin) {
           this.userPlanBadge.textContent = 'ADMIN';
           this.userPlanBadge.className = 'user-plan-badge admin';
         } else if (user.plan === 'pro') {
@@ -1756,11 +1808,16 @@ class DocuMatrixStudioApp {
         }
       }
 
-      if (this.dropdownUserName) this.dropdownUserName.textContent = user.name || 'DocStudio User';
-      if (this.dropdownUserEmail) this.dropdownUserEmail.textContent = user.email;
+      if (this.dropdownUserName) {
+        this.dropdownUserName.textContent = (user.name || 'DocStudio User') + (isAdmin ? ' (Super Admin)' : '');
+      }
+      if (this.dropdownUserEmail) {
+        const phoneTxt = user.phone ? ` • 📞 +91-${user.phone}` : '';
+        this.dropdownUserEmail.textContent = user.email + phoneTxt;
+      }
 
       if (this.dropdownPlanTitle) {
-        if (user.role === 'admin') {
+        if (isAdmin) {
           this.dropdownPlanTitle.textContent = 'Super Admin • Lifetime Access';
         } else if (user.plan === 'pro') {
           const durText = user.planDuration === 'daily' ? 'Daily Pass (₹5)' : (user.planDuration === 'yearly' ? 'Yearly Pro (₹1,000)' : 'Monthly Pro (₹100)');
@@ -1770,7 +1827,7 @@ class DocuMatrixStudioApp {
         }
       }
 
-      const isUnlimited = user.role === 'admin' || user.plan === 'pro' || user.plan === 'enterprise';
+      const isUnlimited = isAdmin || user.plan === 'pro' || user.plan === 'enterprise';
       if (this.userQuotaCount) {
         this.userQuotaCount.textContent = isUnlimited ? 'Unlimited' : `${Math.max(0, 5 - (user.dailyOperationsUsed || 0))} / 5 left today`;
       }
@@ -1780,10 +1837,10 @@ class DocuMatrixStudioApp {
       }
 
       if (this.dropdownAdminBtn) {
-        this.dropdownAdminBtn.style.display = user.role === 'admin' ? 'flex' : 'none';
+        this.dropdownAdminBtn.style.display = isAdmin ? 'flex' : 'none';
       }
       if (this.dropdownUpgradeBtn) {
-        this.dropdownUpgradeBtn.style.display = (user.plan === 'pro' || user.role === 'admin') ? 'none' : 'flex';
+        this.dropdownUpgradeBtn.style.display = (user.plan === 'pro' || isAdmin) ? 'none' : 'flex';
       }
     } else {
       if (this.btnHeaderLogin) this.btnHeaderLogin.style.display = 'flex';
@@ -1908,6 +1965,10 @@ class DocuMatrixStudioApp {
               } else {
                 toast.success(`Welcome, ${profile.name || profile.email}!`);
               }
+              const u = authService.getUser();
+              if (u && (!u.phone || !u.pincode)) {
+                setTimeout(() => this.openSecurityModal(), 600);
+              }
             }
           } catch (err) {
             console.error('Google profile fetch failed', err);
@@ -1952,6 +2013,10 @@ class DocuMatrixStudioApp {
                     if (authService.isAdmin() && (this.currentView === 'admin' || window.location.hash === '#/admin')) {
                       this.navigateTo('#/admin');
                     }
+                    const u = authService.getUser();
+                    if (u && (!u.phone || !u.pincode)) {
+                      setTimeout(() => this.openSecurityModal(), 600);
+                    }
                   }
                 }
               }
@@ -1985,6 +2050,26 @@ class DocuMatrixStudioApp {
       }
     } catch (e) {
       console.warn('initGoogleIdentityServices error:', e);
+    }
+  }
+
+  openSecurityModal() {
+    if (!this.securityModalOverlay) return;
+    const user = authService.getUser();
+    if (user) {
+      if (this.securityPhone && user.phone) this.securityPhone.value = user.phone;
+      if (this.securityPincode && user.pincode) this.securityPincode.value = user.pincode;
+    }
+    this.securityModalOverlay.style.display = 'flex';
+    this.securityModalOverlay.setAttribute('aria-hidden', 'false');
+    this.securityPhone?.focus();
+    this.refreshIcons();
+  }
+
+  closeSecurityModal() {
+    if (this.securityModalOverlay) {
+      this.securityModalOverlay.style.display = 'none';
+      this.securityModalOverlay.setAttribute('aria-hidden', 'true');
     }
   }
 

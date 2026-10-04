@@ -1070,6 +1070,77 @@
     </div>
 
     <!-- ====================================================================
+         ACCOUNT SECURITY & PROFILE VERIFICATION MODAL (+91 Phone & Area PIN)
+         Ensures genuine safety, prevents fraud, complies with Indian digital security
+         ==================================================================== -->
+    <div id="profile-security-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">
+      <div class="security-modal-card">
+        <button type="button" id="btn-close-security-modal" class="modal-close-btn">&times;</button>
+        
+        <div class="security-modal-header">
+          <div class="security-shield-icon">
+            <i data-lucide="shield-check"></i>
+          </div>
+          <div class="security-badge-compliance">
+            <i data-lucide="lock" style="width: 12px; height: 12px;"></i>
+            <span>Indian Digital Security &amp; UPI Compliance</span>
+          </div>
+          <h2 class="security-title">Verify Account Security</h2>
+          <p class="security-subtitle">Please link your verified Indian mobile number and area PIN code to activate account protection and UPI transaction safety.</p>
+        </div>
+
+        <form id="form-security-profile" class="security-profile-form">
+          <!-- Mobile Number with +91 Prefix -->
+          <div class="security-form-group">
+            <label for="security-phone">Mobile Number (WhatsApp / SMS Verification):</label>
+            <div class="phone-input-wrap">
+              <span class="country-prefix">+91</span>
+              <input type="tel" id="security-phone" placeholder="98765 43210" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" required autocomplete="tel-national">
+            </div>
+            <span class="field-hint">Used strictly for invoice generation and instant UPI confirmation</span>
+          </div>
+
+          <!-- Area Postal PIN Code -->
+          <div class="security-form-group">
+            <label for="security-pincode">Area Postal PIN Code (6 Digits):</label>
+            <div class="pincode-input-wrap">
+              <i data-lucide="map-pin" class="field-prefix-icon"></i>
+              <input type="text" id="security-pincode" placeholder="e.g. 800001" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required autocomplete="postal-code">
+            </div>
+            <span class="field-hint">Required for Indian digital service compliance &amp; billing region</span>
+          </div>
+
+          <!-- Trust Badges Row -->
+          <div class="security-trust-box">
+            <div class="trust-item">
+              <i data-lucide="shield"></i>
+              <span>256-Bit Encrypted</span>
+            </div>
+            <div class="trust-item">
+              <i data-lucide="check-circle-2"></i>
+              <span>100% Spam-Free</span>
+            </div>
+            <div class="trust-item">
+              <i data-lucide="indian-rupee"></i>
+              <span>Instant UPI Link</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="security-actions-col">
+            <button type="submit" id="btn-submit-security-profile" class="btn-security-verify">
+              <i data-lucide="check-circle"></i>
+              <span>Verify &amp; Secure My Account</span>
+            </button>
+            <button type="button" id="btn-skip-security-profile" class="btn-security-skip">
+              Skip for now &bull; Remind me later
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ====================================================================
          SUBSCRIPTION & PRICING MODAL (DocStudio PRO Only: ₹5 / ₹100 / ₹1,000 via UPI)
          ==================================================================== -->
     <div id="pricing-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">

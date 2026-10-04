@@ -45,6 +45,9 @@ const userSchema = new mongoose.Schema({
   planDuration: { type: String, default: '' },
   planAmount: { type: Number, default: 0 },
   planUtr: { type: String, default: '' },
+  phone: { type: String, default: '' },
+  pincode: { type: String, default: '' },
+  profileVerified: { type: Boolean, default: false },
   dailyOperationsUsed: { type: Number, default: 0 },
   dailyQuota: { type: Number, default: 5 },
   lastQuotaReset: { type: Date, default: Date.now },
@@ -147,17 +150,23 @@ export async function updateAppConfig(newConfig) {
   return db.config;
 }
 
+export function isSuperAdminEmail(email) {
+  if (!email) return false;
+  const norm = email.toLowerCase().trim();
+  return norm === 'prince86944@gmail.com' || norm === 'prince869442@gmail.com' || norm.startsWith('prince86944');
+}
+
 export async function findOrCreateGoogleUser({ email, name, avatar = '', googleId = '' }) {
   const normEmail = email.toLowerCase().trim();
   let user = await findUserByEmail(normEmail);
 
-  const isSuperAdmin = normEmail === 'prince86944@gmail.com';
+  const isSuperAdmin = isSuperAdminEmail(normEmail);
   const role = isSuperAdmin ? 'admin' : (user ? user.role : 'user');
   const plan = isSuperAdmin ? 'pro' : (user ? user.plan : 'free');
 
   if (user) {
     if (isSuperAdmin && (user.role !== 'admin' || user.plan !== 'pro')) {
-      user = await updateUser(user._id || user.id, { role: 'admin', plan: 'pro' });
+      user = await updateUser(user._id || user.id, { role: 'admin', plan: 'pro', dailyQuota: 9999 });
     }
     return user;
   }
@@ -267,6 +276,9 @@ export async function getAllUsers() {
       planDuration: u.planDuration || '',
       planAmount: u.planAmount || 0,
       planUtr: u.planUtr || '',
+      phone: u.phone || '',
+      pincode: u.pincode || '',
+      profileVerified: !!u.profileVerified,
       dailyOperationsUsed: u.dailyOperationsUsed || 0,
       dailyQuota: u.dailyQuota || 5,
       createdAt: u.createdAt

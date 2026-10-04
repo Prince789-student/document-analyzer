@@ -2128,7 +2128,7 @@ class DocuMatrixStudioApp {
   openAuthModal(mode = 'signin') {
     this.setAuthMode(mode);
     if (this.manualAuthBox) {
-      this.manualAuthBox.style.display = 'none';
+      this.manualAuthBox.style.display = 'block';
     }
     if (this.authModalOverlay) {
       this.authModalOverlay.style.display = 'flex';
@@ -2151,6 +2151,8 @@ class DocuMatrixStudioApp {
   }
 
   triggerGoogleOAuth() {
+    toast.info('Connecting to Google Account Chooser...');
+
     if (this.googleTokenClient) {
       try {
         this.googleTokenClient.requestAccessToken({ prompt: 'select_account' });
@@ -2163,22 +2165,37 @@ class DocuMatrixStudioApp {
     if (window.google?.accounts?.oauth2 && this.googleClientId) {
       this.setupGoogleTokenClient(this.googleClientId);
       if (this.googleTokenClient) {
-        this.googleTokenClient.requestAccessToken({ prompt: 'select_account' });
-        return;
+        try {
+          this.googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+          return;
+        } catch (err) {
+          console.warn('OAuth request failed after setup', err);
+        }
       }
     }
 
     if (window.google?.accounts?.id) {
       try {
-        window.google.accounts.id.prompt();
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.warn('Google One Tap notice:', notification.getNotDisplayedReason());
+            if (this.manualAuthBox) {
+              this.manualAuthBox.style.display = 'block';
+              this.googleSigninEmail?.focus();
+            }
+            toast.info('Enter your Gmail below to sign in instantly.');
+          }
+        });
         return;
-      } catch (e) {}
+      } catch (e) {
+        console.warn('One Tap prompt error', e);
+      }
     }
 
     if (this.manualAuthBox) {
       this.manualAuthBox.style.display = 'block';
       this.googleSigninEmail?.focus();
-      toast.info('Google popup unavailable. Enter email to continue.');
+      toast.info('Please enter your Google account email below to sign in.');
     }
   }
 
@@ -2188,9 +2205,22 @@ class DocuMatrixStudioApp {
       this.googleTokenClient = window.google.accounts.oauth2.initTokenClient({
         client_id: clientId,
         scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid',
+        error_callback: (err) => {
+          console.warn('Google OAuth popup error:', err);
+          toast.info('Google popup not available on this domain yet. Please enter your Gmail below.');
+          if (this.manualAuthBox) {
+            this.manualAuthBox.style.display = 'block';
+            this.googleSigninEmail?.focus();
+          }
+        },
         callback: async (tokenResponse) => {
           if (tokenResponse.error) {
             console.error('Google OAuth error:', tokenResponse);
+            toast.info('Google popup closed or unauthorized. Enter your Gmail below to sign in instantly.');
+            if (this.manualAuthBox) {
+              this.manualAuthBox.style.display = 'block';
+              this.googleSigninEmail?.focus();
+            }
             return;
           }
           try {
@@ -2214,7 +2244,11 @@ class DocuMatrixStudioApp {
             }
           } catch (err) {
             console.error('Google profile fetch failed', err);
-            toast.error('Google authentication error. Please try again.');
+            toast.error('Google authentication error. Enter your Gmail below.');
+            if (this.manualAuthBox) {
+              this.manualAuthBox.style.display = 'block';
+              this.googleSigninEmail?.focus();
+            }
           }
         }
       });

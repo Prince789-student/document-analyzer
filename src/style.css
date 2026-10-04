@@ -3874,11 +3874,33 @@ button {
   color: #8ab4f8;
 }
 
+.auth-or-divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0 12px 0;
+  text-align: center;
+}
+
+.auth-or-divider::before,
+.auth-or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.auth-or-divider span {
+  padding: 0 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
 .manual-auth-box {
-  margin-top: 14px;
+  margin-top: 6px;
   padding: 14px;
   background: var(--bg-surface-elevated);
-  border: 1px dashed var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   animation: fadeIn 0.2s ease-out;
 }

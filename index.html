@@ -1035,9 +1035,6 @@
           <p class="auth-subtitle">Sign in using your Google account to access your documents and quotas</p>
         </div>
 
-        <!-- Google Identity Services (GSI) Container -->
-        <div id="google-gsi-button-wrap" class="gsi-button-wrap"></div>
-
         <!-- 1-Click Continue with Google Button -->
         <div class="google-auth-box">
           <button type="button" id="btn-main-google-oauth" class="btn-google-large">
@@ -1051,19 +1048,26 @@
           </button>
         </div>
 
-        <!-- Email fallback form — always visible as alternative -->
-        <div id="manual-auth-box" class="manual-auth-box" style="display: block;">
+        <!-- Sleek Divider -->
+        <div class="auth-or-divider">
+          <span>OR SIGN IN WITH GOOGLE EMAIL</span>
+        </div>
+
+        <!-- Email Sign-In Form (Always Visible & 1-Click Instant) -->
+        <div id="manual-auth-box" class="manual-auth-box">
           <form id="form-google-signin" class="google-signin-form">
             <div class="google-email-input-group">
-              <label for="google-signin-email">Or enter your Google Account Email</label>
               <div class="google-input-wrap">
-                <svg class="google-input-svg" viewBox="0 0 24 24" width="16" height="16">
+                <svg class="google-input-svg" viewBox="0 0 24 24" width="18" height="18">
                   <path fill="#4285F4" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                 </svg>
-                <input type="email" id="google-signin-email" placeholder="you@gmail.com" autocomplete="email">
+                <input type="email" id="google-signin-email" placeholder="Enter your Gmail (e.g. name@gmail.com)" required autocomplete="email">
               </div>
             </div>
-            <button type="submit" id="btn-submit-google-signin" class="btn-manual-submit">Sign In with Google Email</button>
+            <button type="submit" id="btn-submit-google-signin" class="btn-manual-submit">
+              <span>Sign In with Email</span>
+              <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+            </button>
           </form>
         </div>
 

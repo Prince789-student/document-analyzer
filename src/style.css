@@ -158,18 +158,20 @@ button {
   left: 0;
   right: 0;
   height: var(--header-height);
-  background: rgba(14, 20, 36, 0.82);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-color);
   z-index: 1000;
   display: flex;
   align-items: center;
   transition: background var(--transition-smooth);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
 }
 
 [data-theme="light"] .studio-header {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
 }
 
 .studio-header__inner {

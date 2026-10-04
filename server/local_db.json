@@ -97,6 +97,22 @@
   ],
   "logs": [
     {
+      "id": "log_1791093529967",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T05:58:49.967Z"
+    },
+    {
+      "id": "log_1791093348481",
+      "userId": "usr_1791044602872r8eb",
+      "userEmail": "prince86944@gmail.com",
+      "action": "GOOGLE_SIGNIN",
+      "details": "Google login: Prince (Super Admin) (prince86944@gmail.com) - admin",
+      "createdAt": "2026-10-04T05:55:48.481Z"
+    },
+    {
       "id": "log_1791093270342",
       "userId": "usr_1791044602872r8eb",
       "userEmail": "prince86944@gmail.com",

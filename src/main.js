@@ -79,12 +79,13 @@ class DocuMatrixStudioApp {
     // Auth Modal Elements (Google OAuth Exclusive)
     this.authModalOverlay = document.getElementById('auth-modal-overlay');
     this.btnCloseAuthModal = document.getElementById('btn-close-auth-modal');
+    this.btnMainGoogleOauth = document.getElementById('btn-main-google-oauth');
     this.googleGsiButtonWrap = document.getElementById('google-gsi-button-wrap');
+    this.manualAuthBox = document.getElementById('manual-auth-box');
+    this.btnToggleManualBox = document.getElementById('btn-toggle-manual-box');
     this.formGoogleSignin = document.getElementById('form-google-signin');
     this.googleSigninEmail = document.getElementById('google-signin-email');
     this.btnSubmitGoogleSignin = document.getElementById('btn-submit-google-signin');
-    this.chipLoginPrince = document.getElementById('chip-login-prince');
-    this.chipLoginGuest = document.getElementById('chip-login-guest');
 
     // Pricing & Fast UPI Checkout Elements (DocStudio PRO: ₹5 / ₹100 / ₹1,000)
     this.pricingModalOverlay = document.getElementById('pricing-modal-overlay');
@@ -1524,7 +1525,23 @@ class DocuMatrixStudioApp {
       if (e.target === this.authModalOverlay) this.closeAuthModal();
     });
 
-    // Genuine Google Account Sign-In Form (Users log in with their own Google account)
+    // 1-Click Continue with Google Button (Triggers real Google Account Chooser)
+    this.btnMainGoogleOauth?.addEventListener('click', () => {
+      this.triggerGoogleOAuth();
+    });
+
+    // Trouble signing in toggle (reveals fallback email form)
+    this.btnToggleManualBox?.addEventListener('click', () => {
+      if (this.manualAuthBox) {
+        const isHidden = this.manualAuthBox.style.display === 'none';
+        this.manualAuthBox.style.display = isHidden ? 'block' : 'none';
+        if (isHidden) {
+          this.googleSigninEmail?.focus();
+        }
+      }
+    });
+
+    // Manual email fallback form
     this.formGoogleSignin?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = this.googleSigninEmail?.value.trim();
@@ -1553,25 +1570,7 @@ class DocuMatrixStudioApp {
       }
     });
 
-    // Discreet Quick Account Switcher (Testing Chips)
-    this.chipLoginPrince?.addEventListener('click', async () => {
-      const res = await authService.loginWithGoogle('prince86944@gmail.com', 'Prince Super Admin');
-      if (res.success) {
-        this.closeAuthModal();
-        toast.success('Super Admin session active.');
-        this.navigateTo('#/admin');
-      }
-    });
-
-    this.chipLoginGuest?.addEventListener('click', async () => {
-      const res = await authService.loginWithGoogle('user@gmail.com', 'Standard User');
-      if (res.success) {
-        this.closeAuthModal();
-        toast.success('Logged in as Standard User (Free Plan: 5 ops/day).');
-      }
-    });
-
-    // Initialize Google Identity Services if client ID available
+    // Initialize Google Identity Services
     this.initGoogleIdentityServices();
 
     // 6. Pricing & Fast Direct UPI Payment Drawer (DocStudio PRO: ₹5 / ₹100 / ₹1,000)
@@ -1818,12 +1817,12 @@ class DocuMatrixStudioApp {
 
   openAuthModal(mode = 'signin') {
     this.setAuthMode(mode);
+    if (this.manualAuthBox) {
+      this.manualAuthBox.style.display = 'none';
+    }
     if (this.authModalOverlay) {
       this.authModalOverlay.style.display = 'flex';
       this.authModalOverlay.setAttribute('aria-hidden', 'false');
-      setTimeout(() => {
-        this.googleSigninEmail?.focus();
-      }, 100);
     }
     if (window.google?.accounts?.id) {
       try {
@@ -1840,56 +1839,152 @@ class DocuMatrixStudioApp {
     }
   }
 
+  triggerGoogleOAuth() {
+    if (this.googleTokenClient) {
+      try {
+        this.googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+        return;
+      } catch (err) {
+        console.warn('OAuth request error, re-initializing', err);
+      }
+    }
+
+    if (window.google?.accounts?.oauth2 && this.googleClientId) {
+      this.setupGoogleTokenClient(this.googleClientId);
+      if (this.googleTokenClient) {
+        this.googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+        return;
+      }
+    }
+
+    if (window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.prompt();
+        return;
+      } catch (e) {}
+    }
+
+    if (this.manualAuthBox) {
+      this.manualAuthBox.style.display = 'block';
+      this.googleSigninEmail?.focus();
+      toast.info('Google popup unavailable. Enter email to continue.');
+    }
+  }
+
+  setupGoogleTokenClient(clientId) {
+    if (!window.google?.accounts?.oauth2) return;
+    try {
+      this.googleTokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid',
+        callback: async (tokenResponse) => {
+          if (tokenResponse.error) {
+            console.error('Google OAuth error:', tokenResponse);
+            return;
+          }
+          try {
+            toast.info('Authenticating with Google...');
+            const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+            });
+            if (!userInfoRes.ok) throw new Error('Could not fetch Google profile');
+            const profile = await userInfoRes.json();
+
+            const isPrince = profile.email?.toLowerCase() === 'prince86944@gmail.com';
+            const res = await authService.loginWithGoogle({
+              email: profile.email,
+              name: profile.name || profile.email.split('@')[0],
+              avatar: profile.picture || '',
+              googleId: profile.sub || ''
+            });
+
+            if (res.success) {
+              this.closeAuthModal();
+              if (isPrince) {
+                toast.success('Welcome back, Prince! Super Admin privileges active.');
+                if (this.currentView === 'admin' || window.location.hash === '#/admin') {
+                  this.navigateTo('#/admin');
+                }
+              } else {
+                toast.success(`Welcome, ${profile.name || profile.email}!`);
+              }
+            }
+          } catch (err) {
+            console.error('Google profile fetch failed', err);
+            toast.error('Google authentication error. Please try again.');
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('setupGoogleTokenClient error', e);
+    }
+  }
+
   async initGoogleIdentityServices() {
     try {
-      let clientId = '';
+      let clientId = '818059891079-kh6vpef04bkov0ic1ajk7a5g100oaejt.apps.googleusercontent.com';
       try {
         const res = await fetch('/api/config');
         if (res.ok) {
           const cfg = await res.json();
-          clientId = cfg.googleClientId;
+          if (cfg.googleClientId) clientId = cfg.googleClientId;
         }
       } catch (e) {
         console.warn('Config fetch notice:', e);
       }
 
-      if (!clientId) {
-        return;
-      }
+      this.googleClientId = clientId;
 
-      const pollGsi = setInterval(() => {
+      const checkGsi = () => {
+        if (window.google?.accounts?.oauth2) {
+          this.setupGoogleTokenClient(clientId);
+        }
+
         if (window.google?.accounts?.id) {
-          clearInterval(pollGsi);
-          window.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: async (response) => {
-              if (response.credential) {
-                const result = await authService.loginWithGoogleCredential(response.credential);
-                if (result.success) {
-                  this.closeAuthModal();
-                  if (authService.isAdmin() && (this.currentView === 'admin' || window.location.hash === '#/admin')) {
-                    this.navigateTo('#/admin');
+          try {
+            window.google.accounts.id.initialize({
+              client_id: clientId,
+              callback: async (response) => {
+                if (response.credential) {
+                  const result = await authService.loginWithGoogleCredential(response.credential);
+                  if (result.success) {
+                    this.closeAuthModal();
+                    if (authService.isAdmin() && (this.currentView === 'admin' || window.location.hash === '#/admin')) {
+                      this.navigateTo('#/admin');
+                    }
                   }
                 }
               }
-            }
-          });
-
-          if (this.googleGsiButtonWrap) {
-            window.google.accounts.id.renderButton(this.googleGsiButtonWrap, {
-              theme: 'outline',
-              size: 'large',
-              width: 320,
-              text: 'continue_with',
-              shape: 'rectangular'
             });
+
+            if (this.googleGsiButtonWrap) {
+              window.google.accounts.id.renderButton(this.googleGsiButtonWrap, {
+                theme: 'outline',
+                size: 'large',
+                width: 320,
+                text: 'continue_with',
+                shape: 'rectangular'
+              });
+            }
+          } catch (e) {
+            console.warn('GSI render error:', e);
           }
         }
-      }, 400);
+      };
 
-      setTimeout(() => clearInterval(pollGsi), 10000);
+      if (window.google?.accounts) {
+        checkGsi();
+      } else {
+        const interval = setInterval(() => {
+          if (window.google?.accounts) {
+            clearInterval(interval);
+            checkGsi();
+          }
+        }, 300);
+        setTimeout(() => clearInterval(interval), 10000);
+      }
     } catch (e) {
-      console.warn('GSI notice:', e);
+      console.warn('initGoogleIdentityServices error:', e);
     }
   }
 

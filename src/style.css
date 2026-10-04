@@ -3872,68 +3872,66 @@ button {
   background: #1f2022;
   border-color: #8ab4f8;
   color: #8ab4f8;
-}
-
-.google-quick-accounts {
+.manual-auth-box {
   margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--border-color);
-}
-
-.chooser-divider {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.quick-accounts-chips {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.quick-chip-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 14px;
   background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-color);
-  font-size: 0.76rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.btn-manual-submit {
+  width: 100%;
+  height: 40px;
+  margin-top: 10px;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
   font-weight: 600;
-  color: var(--text-body);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.quick-chip-btn:hover {
-  background: var(--bg-surface-hover);
-  border-color: var(--primary);
+.btn-manual-submit:hover {
+  background: var(--primary-hover);
+}
+
+.auth-footer-note {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.auth-security-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-trouble-toggle {
+  background: transparent;
+  border: none;
   color: var(--primary);
-  transform: translateY(-1px);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.85;
+  transition: opacity var(--transition-fast);
 }
 
-.quick-chip-btn .chip-ic-admin {
-  width: 14px;
-  height: 14px;
-  color: #f59e0b;
-}
-
-.quick-chip-btn .chip-ic-user {
-  width: 14px;
-  height: 14px;
-  color: var(--primary);
-}
-
-.google-avatar-wrap.admin-avatar {
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+.btn-trouble-toggle:hover {
+  opacity: 1;
 }
 
 .google-account-details {

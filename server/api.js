@@ -89,7 +89,7 @@ export async function handleApiRoute(req, res, path) {
     const config = await getAppConfig();
     return sendJson(res, 200, {
       ...config,
-      googleClientId: process.env.GOOGLE_CLIENT_ID || ''
+      googleClientId: process.env.GOOGLE_CLIENT_ID || '818059891079-kh6vpef04bkov0ic1ajk7a5g100oaejt.apps.googleusercontent.com'
     });
   }
 

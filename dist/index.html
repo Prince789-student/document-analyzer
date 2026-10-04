@@ -68,9 +68,9 @@
   <!-- Google Identity Services (GSI) OAuth -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <script type="module" crossorigin src="/assets/index-DsOS6IB_.js"></script>
+  <script type="module" crossorigin src="/assets/index-DnFSfBjx.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-C0FnF6B9.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-BfUgTVRk.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-NCSJx7bU.css">
 </head>
 <body>
   <div id="app" class="app-root">
@@ -1033,53 +1033,38 @@
         <!-- Google Identity Services (GSI) Container -->
         <div id="google-gsi-button-wrap" class="gsi-button-wrap"></div>
 
-        <!-- Google Sign-In Email Form -->
+        <!-- 1-Click Continue with Google Button -->
         <div class="google-auth-box">
+          <button type="button" id="btn-main-google-oauth" class="btn-google-large">
+            <svg class="google-svg" viewBox="0 0 24 24" width="22" height="22">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.41 7.37 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.17 0 9.99 0 12s.46 3.83 1.26 5.42l4.02-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.59 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Continue with Google</span>
+          </button>
+        </div>
+
+        <!-- Optional Manual Fallback (Only shown if Google popup is blocked) -->
+        <div id="manual-auth-box" class="manual-auth-box" style="display: none;">
           <form id="form-google-signin" class="google-signin-form">
             <div class="google-email-input-group">
-              <label for="google-signin-email">Your Google Account Email</label>
+              <label for="google-signin-email">Enter Google Account Email</label>
               <div class="google-input-wrap">
-                <svg class="google-input-svg" viewBox="0 0 24 24" width="18" height="18">
-                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"/>
-                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.41 7.37 24 12 24z"/>
-                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.17 0 9.99 0 12s.46 3.83 1.26 5.42l4.02-3.15z"/>
-                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.59 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                </svg>
-                <input type="email" id="google-signin-email" placeholder="example@gmail.com" required autocomplete="email">
+                <input type="email" id="google-signin-email" placeholder="you@gmail.com" autocomplete="email">
               </div>
             </div>
-            <button type="submit" id="btn-submit-google-signin" class="btn-google-large">
-              <svg class="google-svg" viewBox="0 0 24 24" width="20" height="20">
-                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"/>
-                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.41 7.37 24 12 24z"/>
-                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.17 0 9.99 0 12s.46 3.83 1.26 5.42l4.02-3.15z"/>
-                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.59 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-              </svg>
-              <span>Continue with Google</span>
-            </button>
+            <button type="submit" id="btn-submit-google-signin" class="btn-manual-submit">Sign In with Email</button>
           </form>
         </div>
 
-        <!-- Discreet Quick Switcher for Testing (Prince Super Admin & Guest) -->
-        <div class="google-quick-accounts">
-          <div class="chooser-divider">
-            <span>Quick Test Accounts</span>
-          </div>
-          <div class="quick-accounts-chips">
-            <button type="button" class="quick-chip-btn" id="chip-login-prince" title="Log in as Prince (Super Admin)">
-              <i data-lucide="shield-check" class="chip-ic-admin"></i>
-              <span>Prince (Super Admin)</span>
-            </button>
-            <button type="button" class="quick-chip-btn" id="chip-login-guest" title="Log in as Standard Free User">
-              <i data-lucide="user" class="chip-ic-user"></i>
-              <span>Standard User (Free)</span>
-            </button>
-          </div>
-        </div>
-
         <div class="auth-footer-note">
-          <i data-lucide="lock" style="width: 13px; height: 13px; display: inline-block;"></i>
-          <span>Secure Google OAuth &bull; 100% Client-Side Privacy &bull; Zero Server Retention</span>
+          <div class="auth-security-badge">
+            <i data-lucide="lock" style="width: 13px; height: 13px; display: inline-block;"></i>
+            <span>Secure Google OAuth &bull; 100% Client-Side Privacy</span>
+          </div>
+          <button type="button" id="btn-toggle-manual-box" class="btn-trouble-toggle">Trouble signing in?</button>
         </div>
       </div>
     </div>

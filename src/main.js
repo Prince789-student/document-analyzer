@@ -114,6 +114,9 @@ class DocuMatrixStudioApp {
     this.mobilePaymentAction = document.getElementById('mobile-payment-action');
     this.btnUpiDeeplink = document.getElementById('btn-upi-deeplink');
     this.btnPayUpiLabel = document.getElementById('btn-pay-upi-label');
+    this.btnUpiAppChoices = document.querySelectorAll('[data-upi-app]');
+    this.btnToggleQrMobile = document.getElementById('btn-toggle-qr-mobile');
+    this.upiQrDisplayBox = document.querySelector('.upi-qr-display-box');
     this.inputPayerEmail = document.getElementById('input-payer-email');
     this.inputUpiUtr = document.getElementById('input-upi-utr');
     this.btnVerifyUpiPayment = document.getElementById('btn-verify-upi-payment');
@@ -1776,12 +1779,16 @@ class DocuMatrixStudioApp {
       if (this.mobilePaymentAction) {
         this.mobilePaymentAction.style.display = isMobile ? 'flex' : 'none';
       }
+      if (this.upiQrDisplayBox) {
+        // On mobile devices, keep QR hidden by default so 1-tap UPI app buttons are immediately visible
+        this.upiQrDisplayBox.style.display = isMobile ? 'none' : 'block';
+      }
 
       if (this.btnVerifyLabel) {
         this.btnVerifyLabel.textContent = `Verify & Activate (₹${this.selectedPlanAmount})`;
       }
       if (this.btnPayUpiLabel) {
-        this.btnPayUpiLabel.textContent = `⚡ Pay ₹${this.selectedPlanAmount} via UPI App (GPay / PhonePe / Paytm)`;
+        this.btnPayUpiLabel.textContent = `⚡ Pay ₹${this.selectedPlanAmount} via Any UPI App`;
       }
       const upiId = this.activeUpiId || 'apnacollegebihar@slc';
       const cleanAmt = Number(this.selectedPlanAmount).toFixed(2);
@@ -1800,6 +1807,65 @@ class DocuMatrixStudioApp {
       }
     };
     this.updateSelectedTier = updateSelectedTier;
+
+    // Helper to launch specific UPI app or standard intent
+    const launchUpiApp = (appType = 'generic') => {
+      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
+      const payeeName = 'Prince Kumar';
+      const note = 'DocStudioPro';
+      const baseParams = `pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=${encodeURIComponent(note)}`;
+
+      let targetUri = `upi://pay?${baseParams}`;
+      let appName = 'UPI App';
+      if (appType === 'phonepe') {
+        targetUri = `phonepe://pay?${baseParams}`;
+        appName = 'PhonePe';
+      } else if (appType === 'gpay') {
+        targetUri = `tez://upi/pay?${baseParams}`;
+        appName = 'Google Pay';
+      } else if (appType === 'paytm') {
+        targetUri = `paytmmp://pay?${baseParams}`;
+        appName = 'Paytm';
+      }
+
+      toast.info(`Opening ${appName}... Payment complete karke 12-digit UTR number enter karein.`);
+
+      try {
+        window.location.href = targetUri;
+      } catch (err) {
+        window.location.href = `upi://pay?${baseParams}`;
+      }
+
+      setTimeout(() => {
+        this.inputUpiUtr?.focus();
+      }, 1500);
+    };
+
+    // Primary 1-Tap UPI Launch
+    this.btnUpiDeeplink?.addEventListener('click', (e) => {
+      e.preventDefault();
+      launchUpiApp('generic');
+    });
+
+    // Quick Launch Buttons for specific UPI apps (PhonePe, GPay, Paytm, etc.)
+    this.btnUpiAppChoices?.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const appType = btn.dataset.upiApp || 'generic';
+        launchUpiApp(appType);
+      });
+    });
+
+    // Toggle QR Code on mobile if paying from another phone
+    this.btnToggleQrMobile?.addEventListener('click', () => {
+      if (!this.upiQrDisplayBox) return;
+      const isHidden = this.upiQrDisplayBox.style.display === 'none';
+      this.upiQrDisplayBox.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) {
+        this.upiQrDisplayBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
 
     // Handle Plan Selection
     const handlePlanSelect = (dur, amt) => {

@@ -71,12 +71,9 @@
   <!-- Google Identity Services (GSI) OAuth -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <!-- Razorpay Checkout for 1-Click Instant Automatic Pro Activation -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-  <script type="module" crossorigin src="/assets/index-DAIFX-h-.js"></script>
+  <script type="module" crossorigin src="/assets/index-CQFVKeTf.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-C0FnF6B9.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-DDKvPhV5.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-CDrfAWEX.css">
 </head>
 <body>
   <div id="app" class="app-root">
@@ -1350,27 +1347,60 @@
                 </div>
               </div>
 
-              <!-- ⚡ PRIMARY ACTION: 1-CLICK INSTANT PAY WITH RAZORPAY (NO UTR REQUIRED) -->
-              <div class="upi-pay-primary-action">
-                <button type="button" id="btn-pay-razorpay" class="btn-pay-rzp-instant">
-                  <i data-lucide="zap" class="rzp-btn-icon"></i>
-                  <div class="rzp-btn-text">
-                    <span id="btn-pay-rzp-label" class="rzp-btn-title">⚡ Pay ₹100 via UPI / GPay / PhonePe / Card</span>
-                    <span class="rzp-btn-sub">Instant Automatic Pro Activation • Zero Effort</span>
+              <!-- LAPTOP / DESKTOP PAYMENT BLOCKED NOTICE (Payments only on mobile phone) -->
+              <div id="desktop-payment-block" class="desktop-payment-block">
+                <div class="desktop-blocked-card">
+                  <div class="device-blocked-icon-wrap">
+                    <i data-lucide="laptop" class="laptop-ic"></i>
+                    <i data-lucide="arrow-right" class="arrow-ic"></i>
+                    <i data-lucide="smartphone" class="phone-ic"></i>
                   </div>
-                </button>
+                  <div class="desktop-blocked-text">
+                    <h4 class="desktop-blocked-title">Payments Only Supported on Mobile Phone</h4>
+                    <p class="desktop-blocked-desc">
+                      Laptop/Desktop payments are disabled. Please open <strong>DocStudio</strong> on your smartphone browser to complete 1-tap UPI payment via GPay, PhonePe, or Paytm.
+                    </p>
+                  </div>
+                  <div class="laptop-qr-instructions">
+                    <i data-lucide="scan" style="width: 14px; height: 14px; color: #10b981;"></i>
+                    <span>Or scan the QR code with PhonePe / GPay / Paytm app on your phone</span>
+                  </div>
+                  <button type="button" class="btn-disabled-laptop" disabled>
+                    <i data-lucide="smartphone"></i>
+                    <span>Direct Payment Disabled on Laptop (Use Phone)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- SMARTPHONE / MOBILE PHONE DIRECT UPI ACTION -->
+              <div id="mobile-payment-action" class="mobile-payment-action" style="display: none;">
+                <a id="btn-upi-deeplink" class="btn-pay-mobile-upi" href="#" target="_blank">
+                  <i data-lucide="zap" class="upi-btn-icon"></i>
+                  <div class="upi-btn-text">
+                    <span id="btn-pay-upi-label" class="upi-btn-heading">⚡ Pay ₹100 via UPI App (GPay / PhonePe / Paytm)</span>
+                    <span class="upi-btn-sub">Instant 1-Tap UPI Launch on Smartphone</span>
+                  </div>
+                </a>
+
+                <div class="mobile-utr-verify-wrap">
+                  <label for="input-upi-utr" class="utr-label">
+                    <i data-lucide="receipt"></i> Enter 12-Digit UTR / Transaction Reference from UPI receipt:
+                  </label>
+                  <div class="utr-input-row">
+                    <input type="text" id="input-upi-utr" class="upi-utr-input-prominent" placeholder="e.g. 427812345678" maxlength="22" inputmode="numeric">
+                    <button type="button" id="btn-verify-upi-payment" class="btn-verify-mobile-utr">
+                      <i data-lucide="check-circle-2"></i>
+                      <span id="btn-verify-label">Verify &amp; Activate</span>
+                    </button>
+                  </div>
+                  <span class="utr-hint-text">Found in GPay, PhonePe, or Paytm payment details screen as "UPI Ref No." or "UTR"</span>
+                </div>
               </div>
 
               <!-- Email for Pro Subscription -->
               <div class="upi-field-group" style="margin-top: 10px;">
                 <label for="input-payer-email">Active Account Email (Pro will be activated for this user):</label>
                 <input type="email" id="input-payer-email" class="upi-utr-input" placeholder="Sign in with your Google account" readonly style="background: rgba(16, 185, 129, 0.08); font-weight: 700; color: #10b981; border-color: rgba(16, 185, 129, 0.35); cursor: default;">
-              </div>
-
-              <!-- Status notification on launching Razorpay -->
-              <div id="upi-live-status-badge" class="upi-live-detect-badge" style="display: none; margin-top: 8px;">
-                <span class="live-detect-dot"></span>
-                <span id="upi-live-status-text">Connecting to secure payment gateway...</span>
               </div>
 
 

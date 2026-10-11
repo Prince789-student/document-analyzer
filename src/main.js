@@ -110,18 +110,13 @@ class DocuMatrixStudioApp {
     this.btnVerifyLabel = document.getElementById('btn-verify-label');
     this.displayUpiId = document.getElementById('display-upi-id');
     this.btnCopyUpiId = document.getElementById('btn-copy-upi-id');
+    this.desktopPaymentBlock = document.getElementById('desktop-payment-block');
+    this.mobilePaymentAction = document.getElementById('mobile-payment-action');
     this.btnUpiDeeplink = document.getElementById('btn-upi-deeplink');
     this.btnPayUpiLabel = document.getElementById('btn-pay-upi-label');
     this.inputPayerEmail = document.getElementById('input-payer-email');
-    this.btnPayRazorpay = document.getElementById('btn-pay-razorpay');
-    this.btnPayRzpLabel = document.getElementById('btn-pay-rzp-label');
-    this.btnToggleManualUpi = document.getElementById('btn-toggle-manual-upi');
-    this.manualUpiContainer = document.getElementById('manual-upi-container');
-    this.btnToggleUtrBox = document.getElementById('btn-toggle-utr-box');
     this.inputUpiUtr = document.getElementById('input-upi-utr');
     this.btnVerifyUpiPayment = document.getElementById('btn-verify-upi-payment');
-    this.upiLiveStatusBadge = document.getElementById('upi-live-status-badge');
-    this.upiLiveStatusText = document.getElementById('upi-live-status-text');
     this.pricingQrImage = document.getElementById('pricing-qr-image');
 
     // Quota Modal Elements
@@ -1771,14 +1766,19 @@ class DocuMatrixStudioApp {
         };
         this.labelSelectedPlanName.textContent = `Selected: ${nameMap[duration] || 'Monthly Pro (₹100)'}`;
       }
-      if (this.btnVerifyLabel) {
-        this.btnVerifyLabel.textContent = `Submit UTR & Activate Pro (₹${this.selectedPlanAmount})`;
+      const isMobile = this.isMobileDevice();
+      if (this.desktopPaymentBlock) {
+        this.desktopPaymentBlock.style.display = isMobile ? 'none' : 'block';
       }
-      if (this.btnPayRzpLabel) {
-        this.btnPayRzpLabel.textContent = `⚡ Pay ₹${this.selectedPlanAmount} with UPI / GPay / PhonePe / Card`;
+      if (this.mobilePaymentAction) {
+        this.mobilePaymentAction.style.display = isMobile ? 'flex' : 'none';
+      }
+
+      if (this.btnVerifyLabel) {
+        this.btnVerifyLabel.textContent = `Verify & Activate (₹${this.selectedPlanAmount})`;
       }
       if (this.btnPayUpiLabel) {
-        this.btnPayUpiLabel.textContent = `Pay ₹${this.selectedPlanAmount} via UPI App (GPay / PhonePe / Paytm)`;
+        this.btnPayUpiLabel.textContent = `⚡ Pay ₹${this.selectedPlanAmount} via UPI App (GPay / PhonePe / Paytm)`;
       }
       const upiId = this.activeUpiId || 'apnacollegebihar@slc';
       const cleanAmt = Number(this.selectedPlanAmount).toFixed(2);
@@ -1833,8 +1833,8 @@ class DocuMatrixStudioApp {
       }
     });
 
-    // ⚡ 1-Click Instant Razorpay Payment (Zero UTR, Zero Manual Work, 100% Automatic)
-    this.btnPayRazorpay?.addEventListener('click', async () => {
+    // ⚡ Mobile UPI Payment Verification (Verify UTR & Activate Pro on Smartphone)
+    this.btnVerifyUpiPayment?.addEventListener('click', async () => {
       let payerEmail = this.inputPayerEmail?.value?.trim() || authService.getUser()?.email || '';
 
       if (!payerEmail) {
@@ -1843,78 +1843,38 @@ class DocuMatrixStudioApp {
         return;
       }
 
-      const duration = this.selectedPlanDuration || 'monthly';
-      const amount = Number(this.selectedPlanAmount) || (duration === 'daily' ? 5 : (duration === 'yearly' ? 1000 : 100));
+      const rawUtr = (this.inputUpiUtr?.value || '').trim();
+      const cleanUtr = rawUtr.replace(/[^a-zA-Z0-9\-_/]/g, '').toUpperCase();
 
-      if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = true;
-      if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'flex';
-      if (this.upiLiveStatusText) this.upiLiveStatusText.textContent = `🔒 Initializing secure payment for ₹${amount}...`;
-
-      toast.info(`Opening secure checkout for ₹${amount}...`);
-
-      const orderData = await authService.createRazorpayOrder(amount, duration, 'pro', payerEmail);
-      if (!orderData || !orderData.orderId) {
-        if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
-        if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
+      if (!cleanUtr || cleanUtr.length < 10) {
+        toast.error('Please enter the authentic 12-digit UPI Reference (UTR) number from your payment receipt.');
+        this.inputUpiUtr?.focus();
         return;
       }
 
-      const rzpOptions = {
-        key: orderData.keyId,
-        amount: orderData.amount,
-        currency: orderData.currency || 'INR',
-        name: 'DocStudio Pro',
-        description: `${duration.toUpperCase()} Pass - Unlimited Operations`,
-        image: '/logo.png',
-        order_id: orderData.orderId,
-        prefill: {
-          name: authService.getUser()?.name || payerEmail.split('@')[0],
-          email: payerEmail,
-          contact: authService.getUser()?.phone ? `+91${authService.getUser()?.phone}` : ''
-        },
-        theme: {
-          color: '#10b981'
-        },
-        modal: {
-          ondismiss: () => {
-            if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
-            if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
-            toast.info('Payment window closed.');
-          }
-        },
-        handler: async (response) => {
-          if (this.upiLiveStatusText) this.upiLiveStatusText.textContent = '🎉 Payment confirmed! Activating Pro...';
-          const verified = await authService.verifyRazorpayPayment(response, amount, duration, payerEmail);
-          if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
-          if (verified) {
-            triggerConfetti();
-            this.closePricingModal();
-            toast.success(`🎉 DocStudio Pro (${duration.toUpperCase()}) activated! Enjoy unlimited operations.`);
-            const u = authService.getUser();
-            if (u && (!u.phone || !u.pincode)) {
-              setTimeout(() => this.openSecurityModal(), 1000);
-            }
-          }
-        }
-      };
+      if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = true;
+      if (this.btnVerifyLabel) this.btnVerifyLabel.textContent = 'Verifying with Bank...';
 
-      try {
-        if (typeof window.Razorpay !== 'function') {
-          toast.error('Payment gateway SDK is loading. Please try again in 2 seconds.');
-          if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
-          if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
-          return;
+      toast.info('Verifying UPI reference number...');
+      const success = await authService.upgradeToPro(
+        'UPI',
+        this.selectedPlanAmount,
+        this.selectedPlanDuration,
+        cleanUtr,
+        payerEmail
+      );
+
+      if (this.btnVerifyUpiPayment) this.btnVerifyUpiPayment.disabled = false;
+      if (this.btnVerifyLabel) this.btnVerifyLabel.textContent = 'Verify & Activate';
+
+      if (success) {
+        triggerConfetti();
+        this.closePricingModal();
+        toast.success(`🎉 DocStudio Pro (${(this.selectedPlanDuration || 'monthly').toUpperCase()}) activated! Enjoy unlimited operations.`);
+        const u = authService.getUser();
+        if (u && (!u.phone || !u.pincode)) {
+          setTimeout(() => this.openSecurityModal(), 1000);
         }
-        const rzp = new window.Razorpay(rzpOptions);
-        rzp.on('payment.failed', function (resp) {
-          toast.error(`Payment failed: ${resp.error?.description || 'Transaction unsuccessful'}`);
-        });
-        rzp.open();
-      } catch (err) {
-        console.error('Razorpay open error:', err);
-        toast.error('Could not open payment window. Please try again.');
-        if (this.btnPayRazorpay) this.btnPayRazorpay.disabled = false;
-        if (this.upiLiveStatusBadge) this.upiLiveStatusBadge.style.display = 'none';
       }
     });
 
@@ -2377,6 +2337,13 @@ class DocuMatrixStudioApp {
       this.adminEditModalOverlay.style.display = 'none';
       this.adminEditModalOverlay.setAttribute('aria-hidden', 'true');
     }
+  }
+
+  isMobileDevice() {
+    const ua = navigator.userAgent || '';
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    const isTouchMobile = window.innerWidth <= 768 && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    return isMobileUA || isTouchMobile;
   }
 
   openPricingModal() {

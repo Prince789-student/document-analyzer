@@ -75,6 +75,7 @@ class DocuMatrixStudioApp {
     this.userQuotaFill = document.getElementById('user-quota-fill');
     this.dropdownUpgradeBtn = document.getElementById('dropdown-upgrade-btn');
     this.dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
+    this.dropdownSecurityBtn = document.getElementById('dropdown-security-btn');
     this.dropdownLogoutBtn = document.getElementById('dropdown-logout-btn');
 
     // Auth Modal Elements (Google OAuth Exclusive)
@@ -136,6 +137,20 @@ class DocuMatrixStudioApp {
     this.adminUsersTbody = document.getElementById('admin-users-tbody');
     this.adminSubscriptionsTbody = document.getElementById('admin-subscriptions-tbody');
     this.adminLogsContainer = document.getElementById('admin-logs-container');
+
+    // Admin Edit User Modal Elements
+    this.adminEditModalOverlay = document.getElementById('admin-edit-user-modal-overlay');
+    this.btnCloseAdminEditModal = document.getElementById('btn-close-admin-edit-modal');
+    this.btnCancelAdminEdit = document.getElementById('btn-cancel-admin-edit');
+    this.formAdminEditUser = document.getElementById('form-admin-edit-user');
+    this.adminEditUserId = document.getElementById('admin-edit-user-id');
+    this.adminEditName = document.getElementById('admin-edit-name');
+    this.adminEditEmail = document.getElementById('admin-edit-email');
+    this.adminEditPhone = document.getElementById('admin-edit-phone');
+    this.adminEditPincode = document.getElementById('admin-edit-pincode');
+    this.adminEditPlan = document.getElementById('admin-edit-plan');
+    this.adminEditQuota = document.getElementById('admin-edit-quota');
+    this.adminEditVerified = document.getElementById('admin-edit-verified');
     this.kpiTotalUsers = document.getElementById('kpi-total-users');
     this.kpiProUsers = document.getElementById('kpi-pro-users');
     this.kpiProRatio = document.getElementById('kpi-pro-ratio');
@@ -1646,11 +1661,22 @@ class DocuMatrixStudioApp {
     // Initialize Google Identity Services
     this.initGoogleIdentityServices();
 
-    // 5.1 Mandatory Account Security & Verification Modal (+91 Phone & Area PIN)
+    // 5.1 Account Security & Verification Modal (+91 Phone & Area PIN)
+    this.btnCloseSecurityModal?.addEventListener('click', () => {
+      this.closeSecurityModal(true);
+    });
+
+    this.dropdownSecurityBtn?.addEventListener('click', () => {
+      this.userDropdownMenu?.classList.remove('open');
+      this.openSecurityModal();
+    });
+
     this.formSecurityProfile?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const phone = this.securityPhone?.value.trim().replace(/[^0-9]/g, '');
-      const pincode = this.securityPincode?.value.trim().replace(/[^0-9]/g, '');
+      let phone = (this.securityPhone?.value || '').trim().replace(/[^0-9]/g, '');
+      if (phone.length > 10) phone = phone.slice(-10);
+      let pincode = (this.securityPincode?.value || '').trim().replace(/[^0-9]/g, '');
+      if (pincode.length > 6) pincode = pincode.slice(0, 6);
 
       if (!phone || phone.length !== 10) {
         toast.error('Please enter a valid 10-digit Indian mobile number.');
@@ -1666,9 +1692,59 @@ class DocuMatrixStudioApp {
       toast.info('Securing and verifying your account...');
       const res = await authService.updateUserProfile(phone, pincode);
       if (res.success) {
-        this.closeSecurityModal();
+        this.closeSecurityModal(true);
         triggerConfetti();
         toast.success('🛡️ Security Profile Verified! Mobile & PIN linked successfully.');
+      }
+    });
+
+    // Admin Edit User Modal Event Handlers
+    this.btnCloseAdminEditModal?.addEventListener('click', () => this.closeAdminEditModal());
+    this.btnCancelAdminEdit?.addEventListener('click', () => this.closeAdminEditModal());
+    this.adminEditModalOverlay?.addEventListener('click', (e) => {
+      if (e.target === this.adminEditModalOverlay) this.closeAdminEditModal();
+    });
+
+    this.formAdminEditUser?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = this.adminEditUserId?.value;
+      if (!id) return;
+
+      const name = (this.adminEditName?.value || '').trim();
+      let phone = (this.adminEditPhone?.value || '').trim().replace(/[^0-9]/g, '');
+      if (phone.length > 10) phone = phone.slice(-10);
+      let pincode = (this.adminEditPincode?.value || '').trim().replace(/[^0-9]/g, '');
+      if (pincode.length > 6) pincode = pincode.slice(0, 6);
+
+      if (phone && phone.length !== 10) {
+        toast.error('If providing phone, please enter a valid 10-digit Indian mobile number.');
+        this.adminEditPhone?.focus();
+        return;
+      }
+      if (pincode && pincode.length !== 6) {
+        toast.error('If providing PIN code, please enter a valid 6-digit Indian PIN code.');
+        this.adminEditPincode?.focus();
+        return;
+      }
+
+      const plan = this.adminEditPlan?.value || 'free';
+      const quota = parseInt(this.adminEditQuota?.value, 10) || (plan === 'pro' || plan === 'enterprise' ? 9999 : 5);
+      const profileVerified = this.adminEditVerified?.checked || false;
+
+      toast.info('Saving user details...');
+      const updated = await adminService.updateUser(id, {
+        name,
+        phone,
+        pincode,
+        plan,
+        dailyQuota: quota,
+        profileVerified
+      });
+
+      if (updated) {
+        this.closeAdminEditModal();
+        triggerConfetti();
+        await this.loadAdminDashboard();
       }
     });
 
@@ -2269,13 +2345,37 @@ class DocuMatrixStudioApp {
 
   closeSecurityModal(force = false) {
     const user = authService.getUser();
-    // STRICT SECURITY: Logged in user CANNOT close modal without completing verification
+    // STRICT SECURITY: Logged in user CANNOT close modal without completing verification unless forced
     if (!force && user && !authService.isProfileVerified()) {
       return;
     }
     if (this.securityModalOverlay) {
       this.securityModalOverlay.style.display = 'none';
       this.securityModalOverlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  openAdminEditModal(user) {
+    if (!this.adminEditModalOverlay || !user) return;
+    if (this.adminEditUserId) this.adminEditUserId.value = user.id || user._id;
+    if (this.adminEditName) this.adminEditName.value = user.name || '';
+    if (this.adminEditEmail) this.adminEditEmail.value = user.email || '';
+    if (this.adminEditPhone) this.adminEditPhone.value = user.phone || '';
+    if (this.adminEditPincode) this.adminEditPincode.value = user.pincode || '';
+    if (this.adminEditPlan) this.adminEditPlan.value = user.plan || 'free';
+    if (this.adminEditQuota) this.adminEditQuota.value = user.dailyQuota !== undefined ? user.dailyQuota : (user.plan === 'pro' ? 9999 : 5);
+    if (this.adminEditVerified) this.adminEditVerified.checked = Boolean(user.profileVerified || (user.phone && user.pincode));
+
+    this.adminEditModalOverlay.style.display = 'flex';
+    this.adminEditModalOverlay.setAttribute('aria-hidden', 'false');
+    this.adminEditPhone?.focus();
+    this.refreshIcons();
+  }
+
+  closeAdminEditModal() {
+    if (this.adminEditModalOverlay) {
+      this.adminEditModalOverlay.style.display = 'none';
+      this.adminEditModalOverlay.setAttribute('aria-hidden', 'true');
     }
   }
 
@@ -2380,7 +2480,9 @@ class DocuMatrixStudioApp {
     const filtered = this.adminUsersList.filter(u => {
       const matchQuery = !query ||
         (u.name && u.name.toLowerCase().includes(query)) ||
-        (u.email && u.email.toLowerCase().includes(query));
+        (u.email && u.email.toLowerCase().includes(query)) ||
+        (u.phone && String(u.phone).includes(query)) ||
+        (u.pincode && String(u.pincode).includes(query));
 
       let matchPlan = true;
       if (planFilter === 'free') matchPlan = u.plan === 'free';
@@ -2399,7 +2501,7 @@ class DocuMatrixStudioApp {
     if (users.length === 0) {
       this.adminUsersTbody.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-dim);">
+          <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-dim);">
             <i data-lucide="users" style="width: 24px; height: 24px; margin-bottom: 8px; display: inline-block;"></i>
             <div>No matching user accounts found.</div>
           </td>
@@ -2428,6 +2530,29 @@ class DocuMatrixStudioApp {
                 </div>
                 <div class="user-row-email">${u.email}</div>
               </div>
+            </div>
+          </td>
+          <td>
+            <div class="user-contact-col">
+              ${u.phone ? `
+                <span class="contact-item phone" title="Mobile Number: +91-${u.phone}">
+                  <i data-lucide="phone"></i> +91-${u.phone}
+                </span>
+              ` : `
+                <span class="contact-item missing"><i data-lucide="phone-off"></i> No Phone</span>
+              `}
+              ${u.pincode ? `
+                <span class="contact-item pincode" title="Area PIN Code: ${u.pincode}">
+                  <i data-lucide="map-pin"></i> PIN: ${u.pincode}
+                </span>
+              ` : `
+                <span class="contact-item missing"><i data-lucide="map-pin-off"></i> No PIN</span>
+              `}
+              ${(!u.phone || !u.pincode) ? `
+                <button type="button" class="btn-quick-add-contact" data-action="edit-user" data-user-id="${u.id || u._id}" title="Click to add Phone & PIN Code">
+                  <i data-lucide="plus"></i> Add Phone &amp; PIN
+                </button>
+              ` : ''}
             </div>
           </td>
           <td>
@@ -2471,6 +2596,10 @@ class DocuMatrixStudioApp {
           </td>
           <td style="text-align: right;">
             <div class="user-actions-group">
+              <button type="button" class="btn-user-action edit-user" data-action="edit-user" data-user-id="${u.id || u._id}" title="Edit User (Phone, PIN, Plan, Quota)">
+                <i data-lucide="pencil"></i>
+              </button>
+
               <select class="admin-action-select" data-action="change-plan" data-user-id="${u.id || u._id}" title="Change Subscription Plan">
                 <option value="free" ${u.plan === 'free' ? 'selected' : ''}>Plan: Free</option>
                 <option value="pro" ${u.plan === 'pro' ? 'selected' : ''}>Plan: Pro</option>
@@ -2494,6 +2623,16 @@ class DocuMatrixStudioApp {
     }).join('');
 
     // Bind event handlers for action buttons in user table
+    this.adminUsersTbody.querySelectorAll('[data-action="edit-user"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const userId = btn.dataset.userId;
+        const targetUser = (this.adminUsersList || []).find(x => (x.id || x._id) === userId);
+        if (targetUser) {
+          this.openAdminEditModal(targetUser);
+        }
+      });
+    });
+
     this.adminUsersTbody.querySelectorAll('[data-action="change-plan"]').forEach(select => {
       select.addEventListener('change', async (e) => {
         const userId = e.target.dataset.userId;

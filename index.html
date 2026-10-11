@@ -319,6 +319,10 @@
                   <i data-lucide="shield" style="color: #6366f1;"></i>
                   <span>Admin Command Center</span>
                 </button>
+                <button type="button" id="dropdown-security-btn" class="glass-dropdown-item">
+                  <i data-lucide="phone-call" style="color: #10b981;"></i>
+                  <span>Phone &amp; PIN Security</span>
+                </button>
                 <button type="button" id="dropdown-upgrade-btn" class="glass-dropdown-item highlight-item">
                   <i data-lucide="crown" style="color: #f59e0b;"></i>
                   <span>Upgrade / Extend Pro</span>
@@ -766,9 +770,10 @@
               <thead>
                 <tr>
                   <th>User Profile</th>
+                  <th>Contact (Phone &amp; PIN)</th>
                   <th>Role</th>
-                  <th>Active Plan & Duration</th>
-                  <th>Payment & UTR Reference</th>
+                  <th>Active Plan &amp; Duration</th>
+                  <th>Payment &amp; UTR Reference</th>
                   <th>Daily Quota</th>
                   <th>Registered</th>
                   <th style="text-align: right;">Actions</th>
@@ -1064,6 +1069,7 @@
          ==================================================================== -->
     <div id="profile-security-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">
       <div class="security-modal-card">
+        <button type="button" id="btn-close-security-modal" class="modal-close-btn" title="Close modal">&times;</button>
         
         <div class="security-modal-header">
           <div class="security-shield-icon">
@@ -1083,7 +1089,7 @@
             <label for="security-phone">Mobile Number (WhatsApp / SMS Verification):</label>
             <div class="phone-input-wrap">
               <span class="country-prefix">+91</span>
-              <input type="tel" id="security-phone" placeholder="98765 43210" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" required autocomplete="tel-national">
+              <input type="tel" id="security-phone" placeholder="98765 43210" maxlength="14" pattern="[0-9]{10}" inputmode="numeric" required autocomplete="tel-national">
             </div>
             <span class="field-hint">Used strictly for invoice generation and instant UPI confirmation</span>
           </div>
@@ -1119,6 +1125,103 @@
             <button type="submit" id="btn-submit-security-profile" class="btn-security-verify">
               <i data-lucide="check-circle"></i>
               <span>Verify &amp; Secure My Account</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         ADMIN EDIT USER MODAL (Admin can add/update Phone, PIN, Plan & Quota)
+         ==================================================================== -->
+    <div id="admin-edit-user-modal-overlay" class="modal-backdrop" aria-hidden="true" style="display: none;">
+      <div class="security-modal-card admin-edit-modal-card">
+        <button type="button" id="btn-close-admin-edit-modal" class="modal-close-btn" title="Close modal">&times;</button>
+        
+        <div class="security-modal-header">
+          <div class="security-shield-icon" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">
+            <i data-lucide="user-cog"></i>
+          </div>
+          <div class="security-badge-compliance">
+            <i data-lucide="shield-check" style="width: 12px; height: 12px;"></i>
+            <span>Admin Command Center</span>
+          </div>
+          <h2 class="security-title">Edit User Account</h2>
+          <p class="security-subtitle">Update contact details, verify phone &amp; PIN code, or modify subscription quotas.</p>
+        </div>
+
+        <form id="form-admin-edit-user" class="security-profile-form">
+          <input type="hidden" id="admin-edit-user-id">
+
+          <!-- User Name -->
+          <div class="security-form-group">
+            <label for="admin-edit-name">Full Name:</label>
+            <div class="pincode-input-wrap">
+              <i data-lucide="user" class="field-prefix-icon"></i>
+              <input type="text" id="admin-edit-name" placeholder="User Name" required>
+            </div>
+          </div>
+
+          <!-- Email (Read-only) -->
+          <div class="security-form-group">
+            <label for="admin-edit-email">Email Address:</label>
+            <div class="pincode-input-wrap">
+              <i data-lucide="mail" class="field-prefix-icon"></i>
+              <input type="email" id="admin-edit-email" placeholder="email@example.com" readonly style="opacity: 0.75; cursor: not-allowed;">
+            </div>
+          </div>
+
+          <!-- Mobile Number with +91 Prefix -->
+          <div class="security-form-group">
+            <label for="admin-edit-phone">Mobile Number (+91 Indian Mobile):</label>
+            <div class="phone-input-wrap">
+              <span class="country-prefix">+91</span>
+              <input type="tel" id="admin-edit-phone" placeholder="98765 43210" maxlength="14" pattern="[0-9]{10}" inputmode="numeric">
+            </div>
+            <span class="field-hint">10-digit mobile number for WhatsApp/SMS &amp; UPI records</span>
+          </div>
+
+          <!-- Area Postal PIN Code -->
+          <div class="security-form-group">
+            <label for="admin-edit-pincode">Area Postal PIN Code (6 Digits):</label>
+            <div class="pincode-input-wrap">
+              <i data-lucide="map-pin" class="field-prefix-icon"></i>
+              <input type="text" id="admin-edit-pincode" placeholder="e.g. 803120" maxlength="6" pattern="[0-9]{6}" inputmode="numeric">
+            </div>
+          </div>
+
+          <!-- Plan & Quota row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="security-form-group">
+              <label for="admin-edit-plan">Subscription Plan:</label>
+              <select id="admin-edit-plan" class="admin-select-filter" style="width: 100%; height: 42px;">
+                <option value="free">Free Tier</option>
+                <option value="pro">DocStudio Pro</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+            <div class="security-form-group">
+              <label for="admin-edit-quota">Daily Quota (Ops):</label>
+              <input type="number" id="admin-edit-quota" min="0" max="99999" class="admin-search-input" style="width: 100%; height: 42px;" placeholder="5">
+            </div>
+          </div>
+
+          <!-- Verified Switch -->
+          <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px; padding: 10px 14px; background: var(--bg-surface-elevated); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <input type="checkbox" id="admin-edit-verified" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;">
+            <label for="admin-edit-verified" style="margin: 0; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text-heading);">
+              Mark Account Security &amp; Profile as Verified
+            </label>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; gap: 10px; margin-top: 16px;">
+            <button type="button" id="btn-cancel-admin-edit" class="action-btn-ghost" style="flex: 1; justify-content: center; height: 44px;">
+              Cancel
+            </button>
+            <button type="submit" id="btn-submit-admin-edit" class="btn-security-verify" style="flex: 2; margin-top: 0; height: 44px;">
+              <i data-lucide="save"></i>
+              <span>Save User Details</span>
             </button>
           </div>
         </form>

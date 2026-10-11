@@ -310,10 +310,16 @@ export async function handleApiRoute(req, res, path) {
         return sendJson(res, 401, { error: 'Please sign in to update your security profile.' });
       }
 
-      const cleanPhone = (phone || '').toString().trim().replace(/[^0-9]/g, '');
-      const cleanPincode = (pincode || '').toString().trim().replace(/[^0-9]/g, '');
+      let cleanPhone = (phone || '').toString().trim().replace(/[^0-9]/g, '');
+      if (cleanPhone.length > 10) {
+        cleanPhone = cleanPhone.slice(-10);
+      }
+      let cleanPincode = (pincode || '').toString().trim().replace(/[^0-9]/g, '');
+      if (cleanPincode.length > 6) {
+        cleanPincode = cleanPincode.slice(0, 6);
+      }
 
-      if (cleanPhone.length < 10) {
+      if (cleanPhone.length !== 10) {
         return sendJson(res, 400, { error: 'Please enter a valid 10-digit mobile number.' });
       }
       if (cleanPincode.length !== 6) {
@@ -752,18 +758,45 @@ export async function handleApiRoute(req, res, path) {
     if (!user || user.role !== 'admin') {
       return sendJson(res, 403, { error: 'Access denied: Admin credentials required.' });
     }
-    const { id, plan, role, dailyQuota } = await parseJsonBody(req);
+    const { id, name, phone, pincode, plan, role, dailyQuota, profileVerified } = await parseJsonBody(req);
+    if (!id) {
+      return sendJson(res, 400, { error: 'User ID is required.' });
+    }
+
     const updateData = {};
-    if (plan) updateData.plan = plan;
-    if (role) updateData.role = role;
-    if (dailyQuota !== undefined) updateData.dailyQuota = dailyQuota;
+    if (name !== undefined && name !== null) updateData.name = String(name).trim();
+    if (plan !== undefined) updateData.plan = plan;
+    if (role !== undefined) updateData.role = role;
+    if (dailyQuota !== undefined) updateData.dailyQuota = Number(dailyQuota);
+
+    if (phone !== undefined) {
+      let cleanPhone = String(phone || '').trim().replace(/[^0-9]/g, '');
+      if (cleanPhone.length > 10) cleanPhone = cleanPhone.slice(-10);
+      updateData.phone = cleanPhone;
+    }
+
+    if (pincode !== undefined) {
+      let cleanPin = String(pincode || '').trim().replace(/[^0-9]/g, '');
+      if (cleanPin.length > 6) cleanPin = cleanPin.slice(0, 6);
+      updateData.pincode = cleanPin;
+    }
+
+    if (profileVerified !== undefined) {
+      updateData.profileVerified = Boolean(profileVerified);
+    } else if (updateData.phone && updateData.phone.length === 10 && updateData.pincode && updateData.pincode.length === 6) {
+      updateData.profileVerified = true;
+    }
 
     const updated = await updateUser(id, updateData);
+    if (!updated) {
+      return sendJson(res, 404, { error: 'User not found.' });
+    }
+
     await recordLog({
       userId: user._id || user.id,
       userEmail: user.email,
       action: 'ADMIN_UPDATE_USER',
-      details: `Admin updated user ${id} (Plan: ${plan}, Role: ${role})`
+      details: `Admin updated user ${id} (Phone: ${updateData.phone || 'unchanged'}, PIN: ${updateData.pincode || 'unchanged'}, Plan: ${plan || 'unchanged'})`
     });
 
     return sendJson(res, 200, { message: 'User updated successfully!', user: updated });

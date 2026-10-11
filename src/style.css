@@ -3634,13 +3634,74 @@ button {
   background: rgba(239, 68, 68, 0.1);
 }
 
-.protected-badge {
+.btn-user-action.edit-user:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.user-contact-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.contact-item {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  color: #f59e0b;
+  gap: 5px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.contact-item.phone {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-family: var(--font-mono);
+}
+
+.contact-item.pincode {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  font-family: var(--font-mono);
+}
+
+.contact-item.missing {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  border: 1px dashed rgba(239, 68, 68, 0.3);
+  font-size: 0.72rem;
+}
+
+.btn-quick-add-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+  border: 1px dashed rgba(99, 102, 241, 0.4);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-quick-add-contact:hover {
+  background: #6366f1;
+  color: #ffffff;
+  border-style: solid;
+}
+
+.admin-edit-modal-card {
+  max-width: 480px;
 }
 
 /* Telemetry & Audit Logs */

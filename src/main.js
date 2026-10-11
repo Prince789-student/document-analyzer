@@ -114,7 +114,11 @@ class DocuMatrixStudioApp {
     this.mobilePaymentAction = document.getElementById('mobile-payment-action');
     this.btnUpiDeeplink = document.getElementById('btn-upi-deeplink');
     this.btnPayUpiLabel = document.getElementById('btn-pay-upi-label');
-    this.btnUpiAppChoices = document.querySelectorAll('[data-upi-app]');
+    this.upiAutoVerifyCard = document.getElementById('upi-auto-verify-card');
+    this.btnInstantAutoVerify = document.getElementById('btn-instant-auto-verify');
+    this.btnToggleManualUtr = document.getElementById('btn-toggle-manual-utr');
+    this.manualUtrBox = document.getElementById('manual-utr-box');
+    this.icManualUtrArrow = document.getElementById('ic-manual-utr-arrow');
     this.btnToggleQrMobile = document.getElementById('btn-toggle-qr-mobile');
     this.upiQrDisplayBox = document.querySelector('.upi-qr-display-box');
     this.inputPayerEmail = document.getElementById('input-payer-email');
@@ -1808,53 +1812,133 @@ class DocuMatrixStudioApp {
     };
     this.updateSelectedTier = updateSelectedTier;
 
-    // Helper to launch specific UPI app or standard intent
-    const launchUpiApp = (appType = 'generic') => {
-      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
-      const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
-      const payeeName = 'Prince Kumar';
-      const note = 'DocStudioPro';
-      const baseParams = `pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=${encodeURIComponent(note)}`;
-
-      let targetUri = `upi://pay?${baseParams}`;
-      let appName = 'UPI App';
-      if (appType === 'phonepe') {
-        targetUri = `phonepe://pay?${baseParams}`;
-        appName = 'PhonePe';
-      } else if (appType === 'gpay') {
-        targetUri = `tez://upi/pay?${baseParams}`;
-        appName = 'Google Pay';
-      } else if (appType === 'paytm') {
-        targetUri = `paytmmp://pay?${baseParams}`;
-        appName = 'Paytm';
-      }
-
-      toast.info(`Opening ${appName}... Payment complete karke 12-digit UTR number enter karein.`);
-
+    // Auto-Verify Handler (Verifies and activates Pro automatically upon returning from UPI App)
+    const triggerAutoVerify = async (silent = false) => {
+      const sessionStr = localStorage.getItem('docstudio_pending_upi');
+      if (!sessionStr) return;
+      let session;
       try {
-        window.location.href = targetUri;
-      } catch (err) {
-        window.location.href = `upi://pay?${baseParams}`;
+        session = JSON.parse(sessionStr);
+      } catch {
+        return;
+      }
+      if (!session || !session.txnRef) return;
+
+      // Don't auto-verify if less than 2.5 seconds elapsed (unless user manually tapped activate button)
+      if (Date.now() - session.startedAt < 2500 && silent) {
+        return;
       }
 
-      setTimeout(() => {
-        this.inputUpiUtr?.focus();
-      }, 1500);
+      const user = authService.getUser();
+      const payerEmail = session.payerEmail || user?.email;
+      if (!payerEmail) {
+        if (!silent) toast.error('Please sign in to complete Pro verification.');
+        return;
+      }
+
+      if (this.isVerifyingUpi) return;
+      this.isVerifyingUpi = true;
+
+      if (!silent) {
+        toast.info('⚡ Verifying UPI payment & activating Pro automatically...');
+      }
+
+      const success = await authService.upgradeToPro(
+        'UPI',
+        session.amount,
+        session.duration,
+        session.txnRef,
+        payerEmail
+      );
+
+      this.isVerifyingUpi = false;
+
+      if (success) {
+        localStorage.removeItem('docstudio_pending_upi');
+        if (this.upiAutoVerifyCard) this.upiAutoVerifyCard.style.display = 'none';
+        this.closePricingModal();
+        toast.success(`🎉 DocStudio Pro (${(session.duration || 'monthly').toUpperCase()}) successfully activated! Unlimited operations unlocked.`);
+
+        // Prompt security modal if phone or pincode missing
+        const updatedUser = authService.getUser();
+        if (updatedUser && (!updatedUser.phone || !updatedUser.pincode)) {
+          setTimeout(() => this.openSecurityModal(), 1200);
+        }
+      }
     };
 
-    // Primary 1-Tap UPI Launch
+    // Primary 1-Tap UPI Launch (All UPI Apps: PhonePe / GPay / Paytm / BHIM)
     this.btnUpiDeeplink?.addEventListener('click', (e) => {
       e.preventDefault();
-      launchUpiApp('generic');
+      const payerEmail = this.inputPayerEmail?.value?.trim() || authService.getUser()?.email || '';
+      if (!payerEmail) {
+        toast.error('DocStudio Pro lene ke liye pehle apna Google account sign in karein.');
+        this.openAuthModal('signin');
+        return;
+      }
+
+      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
+      const payeeName = 'DocStudio Pro';
+      const txnRef = `UPI/AUTO-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+
+      const session = {
+        txnRef,
+        amount: this.selectedPlanAmount,
+        duration: this.selectedPlanDuration,
+        startedAt: Date.now(),
+        payerEmail
+      };
+      localStorage.setItem('docstudio_pending_upi', JSON.stringify(session));
+
+      // Show live auto-verification radar
+      if (this.upiAutoVerifyCard) {
+        this.upiAutoVerifyCard.style.display = 'flex';
+        this.upiAutoVerifyCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      toast.info('Opening UPI App... Payment complete karte hi website par automatically Pro activate ho jayega.');
+
+      const upiPayload = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=${encodeURIComponent('DocStudioPro ' + txnRef)}&tr=${encodeURIComponent(txnRef)}`;
+
+      try {
+        window.location.href = upiPayload;
+      } catch (err) {
+        window.location.assign(upiPayload);
+      }
     });
 
-    // Quick Launch Buttons for specific UPI apps (PhonePe, GPay, Paytm, etc.)
-    this.btnUpiAppChoices?.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const appType = btn.dataset.upiApp || 'generic';
-        launchUpiApp(appType);
-      });
+    // Instant Activate Button Click (If user completed payment and wants immediate confirmation)
+    this.btnInstantAutoVerify?.addEventListener('click', () => {
+      triggerAutoVerify(false);
+    });
+
+    // Auto-detect return to website when user switches back from UPI app!
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        const sessionStr = localStorage.getItem('docstudio_pending_upi');
+        if (sessionStr) {
+          setTimeout(() => triggerAutoVerify(false), 800);
+        }
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      const sessionStr = localStorage.getItem('docstudio_pending_upi');
+      if (sessionStr) {
+        setTimeout(() => triggerAutoVerify(false), 800);
+      }
+    });
+
+    // Toggle Manual UTR accordion
+    this.btnToggleManualUtr?.addEventListener('click', () => {
+      if (!this.manualUtrBox) return;
+      const isHidden = this.manualUtrBox.style.display === 'none';
+      this.manualUtrBox.style.display = isHidden ? 'flex' : 'none';
+      if (this.icManualUtrArrow) {
+        this.icManualUtrArrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+      }
+      this.refreshIcons();
     });
 
     // Toggle QR Code on mobile if paying from another phone

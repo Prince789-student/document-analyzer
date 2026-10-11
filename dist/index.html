@@ -71,9 +71,9 @@
   <!-- Google Identity Services (GSI) OAuth -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <script type="module" crossorigin src="/assets/index-h6p8eBmY.js"></script>
+  <script type="module" crossorigin src="/assets/index-Cs5YZFmV.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-C0FnF6B9.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-DqNpht4P.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-Bf6EmSYg.css">
 </head>
 <body>
   <div id="app" class="app-root">
@@ -1385,59 +1385,60 @@
                 <!-- Phone UPI Exclusive Notice -->
                 <div class="mobile-upi-exclusive-banner">
                   <div class="mobile-exclusive-badge">
-                    <i data-lucide="smartphone"></i>
-                    <span>PHONE PAYMENTS • STRICTLY VIA UPI APPS</span>
+                    <i data-lucide="zap"></i>
+                    <span>AUTO-VERIFY UPI PAYMENT • ALL APPS</span>
                   </div>
                   <p class="mobile-exclusive-desc">
-                    Mobile browser par payment sirf installed <strong>UPI App</strong> (PhonePe, Google Pay, Paytm, BHIM) se hi supported hai.
+                    Button par click karte hi aapka <strong>UPI App (GPay / PhonePe / Paytm / BHIM)</strong> open hoga. Payment complete karte hi website par automatically Pro plan activate ho jayega!
                   </p>
                 </div>
 
-                <!-- Primary 1-Tap All UPI Launch Button -->
+                <!-- Single All-in-One UPI Launch Button -->
                 <a id="btn-upi-deeplink" class="btn-pay-mobile-upi" href="#">
                   <i data-lucide="zap" class="upi-btn-icon"></i>
                   <div class="upi-btn-text">
-                    <span id="btn-pay-upi-label" class="upi-btn-heading">⚡ Pay ₹100 via Any UPI App</span>
-                    <span class="upi-btn-sub">Instant 1-Tap Open in PhonePe / GPay / Paytm / BHIM</span>
+                    <span id="btn-pay-upi-label" class="upi-btn-heading">⚡ Pay ₹100 via UPI App (All Apps)</span>
+                    <span class="upi-btn-sub">Open PhonePe / GPay / Paytm / BHIM &amp; Auto-Verify</span>
                   </div>
                 </a>
 
-                <!-- Dedicated Quick Launch Buttons for Popular UPI Apps -->
-                <div class="upi-app-buttons-grid">
-                  <button type="button" class="btn-upi-quick-app btn-phonepe-launch" data-upi-app="phonepe" title="Pay with PhonePe">
-                    <span class="app-icon-badge phonepe-badge">P</span>
-                    <span class="app-btn-text">PhonePe</span>
-                  </button>
-                  <button type="button" class="btn-upi-quick-app btn-gpay-launch" data-upi-app="gpay" title="Pay with Google Pay">
-                    <span class="app-icon-badge gpay-badge">G</span>
-                    <span class="app-btn-text">Google Pay</span>
-                  </button>
-                  <button type="button" class="btn-upi-quick-app btn-paytm-launch" data-upi-app="paytm" title="Pay with Paytm">
-                    <span class="app-icon-badge paytm-badge">₹</span>
-                    <span class="app-btn-text">Paytm</span>
-                  </button>
-                  <button type="button" class="btn-upi-quick-app btn-other-launch" data-upi-app="generic" title="Pay with BHIM / Cred / Other UPI">
-                    <span class="app-icon-badge other-badge">UPI</span>
-                    <span class="app-btn-text">All Apps</span>
+                <!-- Live Auto-Verification Radar Card (Shown while awaiting payment & return) -->
+                <div id="upi-auto-verify-card" class="upi-auto-verify-card" style="display: none;">
+                  <div class="auto-verify-radar">
+                    <div class="radar-ping"></div>
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                  </div>
+                  <div class="auto-verify-details">
+                    <h5 class="auto-verify-title">UPI Payment Processing...</h5>
+                    <p class="auto-verify-desc">
+                      UPI App me payment complete kijiye. Website par wapas aate hi automatic subscription activate ho jayega.
+                    </p>
+                  </div>
+                  <button type="button" id="btn-instant-auto-verify" class="btn-auto-verify-now">
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Payment Ho Gaya? Click to Instant Activate</span>
                   </button>
                 </div>
 
-                <!-- Step 2: Verification with 12-Digit UTR -->
-                <div class="mobile-utr-verify-wrap">
-                  <div class="utr-step-tag">
-                    <span class="utr-step-pill">STEP 2</span>
+                <!-- Manual UTR Fallback Accordion (Optional) -->
+                <div class="manual-utr-accordion">
+                  <button type="button" id="btn-toggle-manual-utr" class="btn-toggle-manual-utr">
+                    <i data-lucide="receipt"></i>
+                    <span>Manual UTR number enter karna hai? (Optional)</span>
+                    <i data-lucide="chevron-down" id="ic-manual-utr-arrow"></i>
+                  </button>
+                  <div id="manual-utr-box" class="manual-utr-box" style="display: none;">
                     <label for="input-upi-utr" class="utr-label">
-                      <i data-lucide="receipt"></i> Payment ke baad 12-Digit UTR Number yahan dalein:
+                      <i data-lucide="hash"></i> 12-Digit UTR / Transaction Reference:
                     </label>
+                    <div class="utr-input-row">
+                      <input type="text" id="input-upi-utr" class="upi-utr-input-prominent" placeholder="e.g. 427812345678" maxlength="22" inputmode="numeric">
+                      <button type="button" id="btn-verify-upi-payment" class="btn-verify-mobile-utr">
+                        <i data-lucide="check-circle-2"></i>
+                        <span id="btn-verify-label">Verify</span>
+                      </button>
+                    </div>
                   </div>
-                  <div class="utr-input-row">
-                    <input type="text" id="input-upi-utr" class="upi-utr-input-prominent" placeholder="e.g. 427812345678" maxlength="22" inputmode="numeric">
-                    <button type="button" id="btn-verify-upi-payment" class="btn-verify-mobile-utr">
-                      <i data-lucide="check-circle-2"></i>
-                      <span id="btn-verify-label">Verify &amp; Activate</span>
-                    </button>
-                  </div>
-                  <span class="utr-hint-text">Found in GPay, PhonePe, or Paytm payment receipt screen as "UPI Ref No." or "UTR"</span>
                 </div>
 
                 <!-- Optional Toggle for QR Code on Mobile -->

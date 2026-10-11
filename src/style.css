@@ -5563,97 +5563,131 @@ button {
   margin: 0;
 }
 
-.upi-app-buttons-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  width: 100%;
-}
-
-@media (max-width: 480px) {
-  .upi-app-buttons-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.btn-upi-quick-app {
+/* Live Auto-Verification Card */
+.upi-auto-verify-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+  border: 1.5px solid rgba(99, 102, 241, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 10px 6px;
-  min-height: 54px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  color: var(--text-heading);
+  text-align: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
 }
 
-.btn-upi-quick-app:hover {
-  border-color: #6366f1;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-}
-
-.btn-upi-quick-app:active {
-  transform: translateY(0);
-}
-
-.app-icon-badge {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+.auto-verify-radar {
+  position: relative;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 0.75rem;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.15);
 }
 
-.phonepe-badge {
-  background: #5f259f;
+.radar-ping {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid #6366f1;
+  animation: radarWave 1.8s infinite ease-out;
 }
 
-.gpay-badge {
-  background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+@keyframes radarWave {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.9); opacity: 0; }
 }
 
-.paytm-badge {
-  background: #00baf2;
+.spin-icon {
+  width: 22px;
+  height: 22px;
+  color: #6366f1;
+  animation: spin 1s linear infinite;
 }
 
-.other-badge {
-  background: #10b981;
-  font-size: 0.62rem;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.app-btn-text {
-  font-size: 0.72rem;
+.auto-verify-title {
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--text-heading);
-  letter-spacing: 0.01em;
+  margin: 0;
 }
 
-.utr-step-tag {
+.auto-verify-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+  max-width: 320px;
+}
+
+.btn-auto-verify-now {
+  width: 100%;
+  min-height: 44px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.btn-auto-verify-now:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+}
+
+/* Manual UTR Accordion */
+.manual-utr-accordion {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-toggle-manual-utr {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  justify-content: space-between;
+  padding: 8px 4px;
+  width: 100%;
+  transition: color var(--transition-fast);
 }
 
-.utr-step-pill {
-  background: #6366f1;
-  color: #ffffff;
-  font-size: 0.65rem;
-  font-weight: 900;
-  padding: 2px 6px;
-  border-radius: 4px;
-  letter-spacing: 0.04em;
+.btn-toggle-manual-utr:hover {
+  color: var(--text-heading);
+}
+
+.manual-utr-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .btn-toggle-qr-mobile {

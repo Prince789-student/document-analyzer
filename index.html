@@ -1187,8 +1187,15 @@
             </div>
           </div>
 
-          <!-- Plan & Quota row -->
+          <!-- Role, Plan & Quota row -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="security-form-group">
+              <label for="admin-edit-role">System Role:</label>
+              <select id="admin-edit-role" class="admin-select-filter" style="width: 100%; height: 42px;">
+                <option value="user">Regular User</option>
+                <option value="admin">Administrator (Admin)</option>
+              </select>
+            </div>
             <div class="security-form-group">
               <label for="admin-edit-plan">Subscription Plan:</label>
               <select id="admin-edit-plan" class="admin-select-filter" style="width: 100%; height: 42px;">
@@ -1197,10 +1204,11 @@
                 <option value="enterprise">Enterprise</option>
               </select>
             </div>
-            <div class="security-form-group">
-              <label for="admin-edit-quota">Daily Quota (Ops):</label>
-              <input type="number" id="admin-edit-quota" min="0" max="99999" class="admin-search-input" style="width: 100%; height: 42px;" placeholder="5">
-            </div>
+          </div>
+
+          <div class="security-form-group">
+            <label for="admin-edit-quota">Daily Quota (Operations / day):</label>
+            <input type="number" id="admin-edit-quota" min="0" max="99999" class="admin-search-input" style="width: 100%; height: 42px;" placeholder="5 (or 9999 for unlimited)">
           </div>
 
           <!-- Verified Switch -->

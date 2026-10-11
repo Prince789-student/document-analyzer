@@ -141,7 +141,8 @@ export async function handleApiRoute(req, res, path) {
         details: `Google login: ${user.name} (${user.email}) - ${user.role}`
       });
 
-      const isAdmin = isSuperAdminEmail(user.email);
+      const isSuper = isSuperAdminEmail(user.email);
+      const isAdmin = isSuper || user.role === 'admin';
       return sendJson(res, 200, {
         message: `Welcome, ${user.name}!`,
         token,
@@ -150,6 +151,7 @@ export async function handleApiRoute(req, res, path) {
           name: user.name,
           email: user.email,
           role: isAdmin ? 'admin' : user.role,
+          isSuperAdmin: isSuper,
           plan: isAdmin ? 'pro' : user.plan,
           planDuration: user.planDuration || '',
           planAmount: user.planAmount || 0,
@@ -278,13 +280,15 @@ export async function handleApiRoute(req, res, path) {
     if (!user) {
       return sendJson(res, 401, { error: 'Not authenticated' });
     }
-    const isAdmin = isSuperAdminEmail(user.email);
+    const isSuper = isSuperAdminEmail(user.email);
+    const isAdmin = isSuper || user.role === 'admin';
     return sendJson(res, 200, {
       user: {
         id: user._id || user.id,
         name: user.name,
         email: user.email,
         role: isAdmin ? 'admin' : user.role,
+        isSuperAdmin: isSuper,
         plan: isAdmin ? 'pro' : user.plan,
         planDuration: user.planDuration || '',
         planAmount: user.planAmount || 0,
@@ -586,7 +590,7 @@ export async function handleApiRoute(req, res, path) {
       }
 
       const userId = user._id || user.id;
-      const targetRole = (user.role === 'admin' && isSuperAdminEmail(user.email)) ? 'admin' : 'user';
+      const targetRole = (user.role === 'admin' || isSuperAdminEmail(user.email)) ? 'admin' : 'user';
 
       // Update user plan to PRO with unlimited operations
       const updated = await updateUser(userId, {
@@ -787,6 +791,13 @@ export async function handleApiRoute(req, res, path) {
       updateData.profileVerified = true;
     }
 
+    const targetUser = await findUserById(id);
+    if (targetUser && isSuperAdminEmail(targetUser.email)) {
+      updateData.role = 'admin';
+      updateData.plan = 'pro';
+      updateData.dailyQuota = 9999;
+    }
+
     const updated = await updateUser(id, updateData);
     if (!updated) {
       return sendJson(res, 404, { error: 'User not found.' });
@@ -796,7 +807,7 @@ export async function handleApiRoute(req, res, path) {
       userId: user._id || user.id,
       userEmail: user.email,
       action: 'ADMIN_UPDATE_USER',
-      details: `Admin updated user ${id} (Phone: ${updateData.phone || 'unchanged'}, PIN: ${updateData.pincode || 'unchanged'}, Plan: ${plan || 'unchanged'})`
+      details: `Admin updated user ${id} (Role: ${updateData.role || 'unchanged'}, Phone: ${updateData.phone || 'unchanged'}, PIN: ${updateData.pincode || 'unchanged'}, Plan: ${plan || 'unchanged'})`
     });
 
     return sendJson(res, 200, { message: 'User updated successfully!', user: updated });
@@ -809,6 +820,10 @@ export async function handleApiRoute(req, res, path) {
       return sendJson(res, 403, { error: 'Access denied: Admin credentials required.' });
     }
     const { id } = await parseJsonBody(req);
+    const targetUser = await findUserById(id);
+    if (targetUser && isSuperAdminEmail(targetUser.email)) {
+      return sendJson(res, 403, { error: 'Super Admin Prince (prince86944@gmail.com) is permanently protected and cannot be deleted.' });
+    }
     await deleteUser(id);
     return sendJson(res, 200, { message: 'User deleted successfully.' });
   }

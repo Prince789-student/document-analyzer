@@ -143,6 +143,7 @@ class DocuMatrixStudioApp {
     this.adminEditEmail = document.getElementById('admin-edit-email');
     this.adminEditPhone = document.getElementById('admin-edit-phone');
     this.adminEditPincode = document.getElementById('admin-edit-pincode');
+    this.adminEditRole = document.getElementById('admin-edit-role');
     this.adminEditPlan = document.getElementById('admin-edit-plan');
     this.adminEditQuota = document.getElementById('admin-edit-quota');
     this.adminEditVerified = document.getElementById('admin-edit-verified');
@@ -1722,6 +1723,7 @@ class DocuMatrixStudioApp {
         return;
       }
 
+      const role = this.adminEditRole?.value || 'user';
       const plan = this.adminEditPlan?.value || 'free';
       const quota = parseInt(this.adminEditQuota?.value, 10) || (plan === 'pro' || plan === 'enterprise' ? 9999 : 5);
       const profileVerified = this.adminEditVerified?.checked || false;
@@ -1731,6 +1733,7 @@ class DocuMatrixStudioApp {
         name,
         phone,
         pincode,
+        role,
         plan,
         dailyQuota: quota,
         profileVerified
@@ -2322,6 +2325,11 @@ class DocuMatrixStudioApp {
     if (this.adminEditEmail) this.adminEditEmail.value = user.email || '';
     if (this.adminEditPhone) this.adminEditPhone.value = user.phone || '';
     if (this.adminEditPincode) this.adminEditPincode.value = user.pincode || '';
+    const isSuper = (user.email || '').toLowerCase() === 'prince86944@gmail.com' || (user.email || '').toLowerCase() === 'prince869442@gmail.com';
+    if (this.adminEditRole) {
+      this.adminEditRole.value = isSuper ? 'admin' : (user.role || 'user');
+      this.adminEditRole.disabled = isSuper;
+    }
     if (this.adminEditPlan) this.adminEditPlan.value = user.plan || 'free';
     if (this.adminEditQuota) this.adminEditQuota.value = user.dailyQuota !== undefined ? user.dailyQuota : (user.plan === 'pro' ? 9999 : 5);
     if (this.adminEditVerified) this.adminEditVerified.checked = Boolean(user.profileVerified || (user.phone && user.pincode));
@@ -2523,7 +2531,13 @@ class DocuMatrixStudioApp {
             </div>
           </td>
           <td>
-            <span class="user-tag ${roleClass}">${u.role.toUpperCase()}</span>
+            ${isSuperAdmin ? `
+              <span class="user-tag super-admin-tag" title="Super Administrator (Permanent &amp; Protected)"><i data-lucide="crown"></i> SUPER ADMIN</span>
+            ` : (u.role === 'admin' ? `
+              <span class="user-tag admin" title="System Administrator"><i data-lucide="shield-check"></i> ADMIN</span>
+            ` : `
+              <span class="user-tag user">USER</span>
+            `)}
           </td>
           <td>
             <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
@@ -2563,7 +2577,7 @@ class DocuMatrixStudioApp {
           </td>
           <td style="text-align: right;">
             <div class="user-actions-group">
-              <button type="button" class="btn-user-action edit-user" data-action="edit-user" data-user-id="${u.id || u._id}" title="Edit User (Phone, PIN, Plan, Quota)">
+              <button type="button" class="btn-user-action edit-user" data-action="edit-user" data-user-id="${u.id || u._id}" title="Edit User (Phone, PIN, Role, Plan, Quota)">
                 <i data-lucide="pencil"></i>
               </button>
 
@@ -2574,14 +2588,14 @@ class DocuMatrixStudioApp {
               </select>
 
               ${!isSuperAdmin ? `
-                <button type="button" class="btn-user-action toggle-role" data-action="toggle-role" data-user-id="${u.id || u._id}" data-role="${u.role}" title="Toggle Admin / User Role">
-                  <i data-lucide="${u.role === 'admin' ? 'shield-minus' : 'shield-check'}"></i>
+                <button type="button" class="btn-user-action toggle-role" data-action="toggle-role" data-user-id="${u.id || u._id}" data-role="${u.role}" title="${u.role === 'admin' ? 'Demote to Regular User' : 'Promote to Administrator (Make Admin)'}">
+                  <i data-lucide="${u.role === 'admin' ? 'shield-minus' : 'shield-plus'}"></i>
                 </button>
                 <button type="button" class="btn-user-action delete-user" data-action="delete" data-user-id="${u.id || u._id}" data-email="${u.email}" title="Delete User">
                   <i data-lucide="trash-2"></i>
                 </button>
               ` : `
-                <span class="protected-badge" title="Super Admin is protected"><i data-lucide="lock"></i></span>
+                <span class="protected-badge" title="Super Admin Prince is protected"><i data-lucide="lock"></i></span>
               `}
             </div>
           </td>

@@ -1092,6 +1092,18 @@ class DocuMatrixStudioApp {
   async executeTool() {
     if (!this.activeToolInstance || this.activeFiles.length === 0 || this.isProcessing) return;
 
+    if (!authService.isLoggedIn()) {
+      toast.info('Document process karne ke liye pehle apna account sign in karein.');
+      this.openAuthModal('signin');
+      return;
+    }
+
+    if (!authService.isAdmin() && !authService.isProfileVerified()) {
+      toast.info('Kripya aage badhne ke liye apna Mobile Number aur PIN code enter karein.');
+      this.openSecurityModal();
+      return;
+    }
+
     // Check quota before execution
     const usageCheck = await authService.checkAndRecordUsage(
       this.selectedToolMeta?.id || 'tool',
@@ -1588,12 +1600,15 @@ class DocuMatrixStudioApp {
       if (this.currentView === 'admin' && !authService.isAdmin()) {
         this.navigateTo('#/');
       }
+      if (authService.isLoggedIn() && !authService.isAdmin() && !authService.isProfileVerified()) {
+        setTimeout(() => this.openSecurityModal(), 400);
+      }
     });
 
     // Check security profile on initial load for unverified users
     setTimeout(() => {
       this.checkMandatorySecurityProfile();
-    }, 800);
+    }, 600);
 
     // 3. User Avatar dropdown toggle
     this.btnUserAvatar?.addEventListener('click', (e) => {
@@ -2350,12 +2365,8 @@ class DocuMatrixStudioApp {
     if (!authService.isLoggedIn()) return false;
     if (authService.isAdmin()) return false;
     if (!authService.isProfileVerified()) {
-      const email = (authService.getUser()?.email || '').toLowerCase().trim();
-      const dismissed = sessionStorage.getItem('docstudio_security_dismissed_' + email);
-      if (!dismissed) {
-        this.openSecurityModal();
-        return true;
-      }
+      this.openSecurityModal();
+      return true;
     }
     return false;
   }

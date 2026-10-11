@@ -47,18 +47,12 @@ class AuthService {
   }
 
   isProfileVerified() {
-    if (!this.user) return true;
+    if (!this.user) return false;
+    if (this.isAdmin()) return true;
     const email = (this.user.email || '').toLowerCase().trim();
-    if (localStorage.getItem('docstudio_security_verified_' + email) === 'true') {
-      return true;
-    }
     const phone = String(this.user.phone || localStorage.getItem('docstudio_user_phone_' + email) || '').trim().replace(/[^0-9]/g, '');
     const pincode = String(this.user.pincode || localStorage.getItem('docstudio_user_pincode_' + email) || '').trim().replace(/[^0-9]/g, '');
-    if ((phone.length >= 10 && pincode.length >= 6) || !!this.user.profileVerified || this.isAdmin() || this.isPro()) {
-      localStorage.setItem('docstudio_security_verified_' + email, 'true');
-      return true;
-    }
-    return false;
+    return phone.length === 10 && pincode.length === 6;
   }
 
   getQuotaRemaining() {

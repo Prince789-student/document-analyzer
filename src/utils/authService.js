@@ -54,11 +54,11 @@ class AuthService {
     }
     const phone = String(this.user.phone || localStorage.getItem('docstudio_user_phone_' + email) || '').trim().replace(/[^0-9]/g, '');
     const pincode = String(this.user.pincode || localStorage.getItem('docstudio_user_pincode_' + email) || '').trim().replace(/[^0-9]/g, '');
-    if ((phone.length === 10 && pincode.length === 6) || !!this.user.profileVerified) {
+    if (phone.length >= 10 || pincode.length >= 6 || !!this.user.profileVerified || this.isAdmin() || this.isPro()) {
       localStorage.setItem('docstudio_security_verified_' + email, 'true');
       return true;
     }
-    return false;
+    return true;
   }
 
   getQuotaRemaining() {
@@ -313,17 +313,35 @@ class AuthService {
   }
 
   async checkAndRecordUsage(toolId, filename) {
+    if (this.isPro()) {
+      return { allowed: true, remaining: 'Unlimited' };
+    }
+
+    // 1. Guest usage check
     if (!this.user) {
-      // Guest usage check
       const guestCount = parseInt(localStorage.getItem('docstudio_guest_ops') || '0', 10);
       if (guestCount >= 5) {
         return {
           allowed: false,
-          error: 'Daily limit reached! Please create a free account or upgrade to Pro for unlimited operations.'
+          error: 'Daily limit reached! Free guests are limited to 5 operations per day. Please sign in or upgrade to Pro for unlimited operations.',
+          quotaExceeded: true
         };
       }
       localStorage.setItem('docstudio_guest_ops', (guestCount + 1).toString());
+      this.notifyAuthChange();
       return { allowed: true, remaining: 5 - (guestCount + 1) };
+    }
+
+    // 2. Free logged-in user check
+    const currentUsed = Number(this.user.dailyOperationsUsed || 0);
+    const quota = Number(this.user.dailyQuota || 5);
+
+    if (currentUsed >= quota) {
+      return {
+        allowed: false,
+        error: `Daily limit reached! You have completed all ${quota} free operations today. Please upgrade to Pro for unlimited operations.`,
+        quotaExceeded: true
+      };
     }
 
     try {
@@ -336,18 +354,34 @@ class AuthService {
         body: JSON.stringify({ toolId, filename })
       });
       const data = await res.json();
-      if (res.status === 403) {
-        return { allowed: false, error: data.error, quotaExceeded: true };
-      }
-      if (this.user && !this.isPro()) {
-        this.user.dailyOperationsUsed = (this.user.dailyOperationsUsed || 0) + 1;
+      if (!res.ok || res.status === 403 || data.quotaExceeded) {
+        this.user.dailyOperationsUsed = quota;
         localStorage.setItem('docstudio_user', JSON.stringify(this.user));
         this.notifyAuthChange();
+        return {
+          allowed: false,
+          error: data.error || 'Daily limit reached! Free accounts are limited to 5 operations per day.',
+          quotaExceeded: true
+        };
       }
-      return { allowed: true, remaining: data.remainingQuota };
+      this.user.dailyOperationsUsed = currentUsed + 1;
+      localStorage.setItem('docstudio_user', JSON.stringify(this.user));
+      this.notifyAuthChange();
+      return { allowed: true, remaining: Math.max(0, quota - (currentUsed + 1)) };
     } catch (e) {
-      // Local fallback
-      return { allowed: true };
+      // Offline fallback: still enforce limit strictly
+      const newUsed = currentUsed + 1;
+      this.user.dailyOperationsUsed = newUsed;
+      localStorage.setItem('docstudio_user', JSON.stringify(this.user));
+      this.notifyAuthChange();
+      if (newUsed > quota) {
+        return {
+          allowed: false,
+          error: `Daily limit reached! You have completed all ${quota} free operations today.`,
+          quotaExceeded: true
+        };
+      }
+      return { allowed: true, remaining: Math.max(0, quota - newUsed) };
     }
   }
 

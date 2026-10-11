@@ -114,8 +114,9 @@ class DocuMatrixStudioApp {
     this.mobilePaymentAction = document.getElementById('mobile-payment-action');
     this.btnUpiDeeplink = document.getElementById('btn-upi-deeplink');
     this.btnPayUpiLabel = document.getElementById('btn-pay-upi-label');
-    this.upiAutoVerifyCard = document.getElementById('upi-auto-verify-card');
-    this.btnInstantAutoVerify = document.getElementById('btn-instant-auto-verify');
+    this.btnUpiGpay = document.getElementById('btn-upi-gpay');
+    this.btnUpiPhonepe = document.getElementById('btn-upi-phonepe');
+    this.btnUpiPaytm = document.getElementById('btn-upi-paytm');
     this.btnToggleManualUtr = document.getElementById('btn-toggle-manual-utr');
     this.manualUtrBox = document.getElementById('manual-utr-box');
     this.icManualUtrArrow = document.getElementById('ic-manual-utr-arrow');
@@ -1578,14 +1579,12 @@ class DocuMatrixStudioApp {
      Authentication, Subscription & Admin Command Center Management
      -------------------------------------------------------------------------- */
   initAuthAndAdmin() {
-    // 1. Initial Auth Header Rendering & Strict Security Verification Check
+    // 1. Initial Auth Header Rendering
     this.updateAuthHeader(authService.getUser());
-    this.checkMandatorySecurityProfile();
 
     // 2. Auth state change listener
     window.addEventListener('docstudio:auth-change', (e) => {
       this.updateAuthHeader(e.detail.user);
-      this.checkMandatorySecurityProfile();
       if (this.currentView === 'admin' && !authService.isAdmin()) {
         this.navigateTo('#/');
       }
@@ -1780,11 +1779,16 @@ class DocuMatrixStudioApp {
       }
       const upiId = this.activeUpiId || 'apnacollegebihar@slc';
       const cleanAmt = Number(this.selectedPlanAmount).toFixed(2);
-      const upiPayload = `upi://pay?pa=${upiId}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+      const payeeName = 'Prince Kumar';
+      const upiPayload = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+      const gpayPayload = `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+      const phonepePayload = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+      const paytmPayload = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
 
-      if (this.btnUpiDeeplink) {
-        this.btnUpiDeeplink.href = upiPayload;
-      }
+      if (this.btnUpiDeeplink) this.btnUpiDeeplink.href = upiPayload;
+      if (this.btnUpiGpay) this.btnUpiGpay.href = gpayPayload;
+      if (this.btnUpiPhonepe) this.btnUpiPhonepe.href = phonepePayload;
+      if (this.btnUpiPaytm) this.btnUpiPaytm.href = paytmPayload;
 
       if (this.pricingQrImage) {
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=2&data=${encodeURIComponent(upiPayload)}`;
@@ -1799,8 +1803,7 @@ class DocuMatrixStudioApp {
     // Clean any legacy pending upi tokens
     localStorage.removeItem('docstudio_pending_upi');
 
-    // Primary 1-Tap UPI Launch (All UPI Apps: PhonePe / GPay / Paytm / BHIM)
-    this.btnUpiDeeplink?.addEventListener('click', (e) => {
+    const handleUpiAppLaunch = (getUri, appName) => (e) => {
       e.preventDefault();
       const payerEmail = this.inputPayerEmail?.value?.trim() || authService.getUser()?.email || '';
       if (!payerEmail) {
@@ -1808,22 +1811,39 @@ class DocuMatrixStudioApp {
         this.openAuthModal('signin');
         return;
       }
+      const uri = getUri();
+      toast.info(`${appName} open ho raha hai... Payment complete karne ke baad 12-digit UTR enter karein.`);
+      try {
+        window.location.href = uri;
+      } catch (err) {
+        window.location.assign(uri);
+      }
+    };
 
+    const getCleanUpiUri = (scheme = 'upi') => {
       const upiId = this.activeUpiId || 'apnacollegebihar@slc';
       const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
       const payeeName = 'Prince Kumar';
+      return `${scheme}://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+    };
 
-      // Standard clean NPCI UPI URI: NO slashes, NO unsupported tr parameter that breaks bank switches
-      const upiPayload = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
-
-      toast.info('UPI App open ho raha hai... Payment complete karne ke baad 12-digit UTR enter karein.');
-
-      try {
-        window.location.href = upiPayload;
-      } catch (err) {
-        window.location.assign(upiPayload);
-      }
-    });
+    // 1-Tap UPI Launchers
+    this.btnUpiDeeplink?.addEventListener('click', handleUpiAppLaunch(() => getCleanUpiUri('upi'), 'UPI App'));
+    this.btnUpiGpay?.addEventListener('click', handleUpiAppLaunch(() => {
+      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
+      return `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+    }, 'Google Pay'));
+    this.btnUpiPhonepe?.addEventListener('click', handleUpiAppLaunch(() => {
+      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
+      return `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+    }, 'PhonePe'));
+    this.btnUpiPaytm?.addEventListener('click', handleUpiAppLaunch(() => {
+      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
+      return `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
+    }, 'Paytm'));
 
     // Toggle Manual UTR accordion
     this.btnToggleManualUtr?.addEventListener('click', () => {
@@ -1919,10 +1939,6 @@ class DocuMatrixStudioApp {
         triggerConfetti();
         this.closePricingModal();
         toast.success(`🎉 DocStudio Pro (${(this.selectedPlanDuration || 'monthly').toUpperCase()}) activated! Enjoy unlimited operations.`);
-        const u = authService.getUser();
-        if (u && (!u.phone || !u.pincode)) {
-          setTimeout(() => this.openSecurityModal(), 1000);
-        }
       }
     });
 
@@ -2257,10 +2273,7 @@ class DocuMatrixStudioApp {
       return;
     }
 
-    const u = authService.getUser();
-    if (u && (!u.phone || !u.pincode)) {
-      setTimeout(() => this.openSecurityModal(), 600);
-    }
+    // Profile modal is only opened when user explicitly selects it from account menu
   }
 
   async initGoogleIdentityServices() {
@@ -2330,16 +2343,7 @@ class DocuMatrixStudioApp {
   }
 
   checkMandatorySecurityProfile() {
-    const user = authService.getUser();
-    if (user && !authService.isProfileVerified()) {
-      const email = (user.email || '').toLowerCase().trim();
-      // If user has already dismissed or provided details in this session, don't popup again!
-      if (sessionStorage.getItem('docstudio_security_dismissed_' + email) === 'true') {
-        return false;
-      }
-      this.openSecurityModal();
-      return true;
-    }
+    // Disabled auto-prompting so users are never blocked or nagged
     return false;
   }
 

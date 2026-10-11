@@ -704,19 +704,27 @@ export async function handleApiRoute(req, res, path) {
     const user = await authenticateRequest(req);
     const { toolId, filename } = await parseJsonBody(req);
 
+    if (req.headers.authorization && !user) {
+      return sendJson(res, 401, { error: 'Session expired. Please log in again.' });
+    }
+
     if (user) {
       const userId = user._id || user.id;
-      const isPro = user.plan === 'pro' || user.plan === 'enterprise' || user.role === 'admin';
+      const isSuper = isSuperAdminEmail(user.email);
+      const isPro = isSuper || user.role === 'admin' || user.plan === 'pro' || user.plan === 'enterprise';
 
-      if (!isPro && user.dailyOperationsUsed >= (user.dailyQuota || 5)) {
+      const currentUsed = user.dailyOperationsUsed || 0;
+      const quota = isPro ? 9999 : (user.dailyQuota || 5);
+
+      if (!isPro && currentUsed >= quota) {
         return sendJson(res, 403, {
-          error: 'Daily limit reached! Free accounts are limited to 5 operations per day. Please upgrade to Pro for unlimited processing.',
+          error: `Daily limit reached! Free accounts are limited to ${quota} operations per day. Please upgrade to Pro for unlimited processing.`,
           quotaExceeded: true
         });
       }
 
       const updated = await updateUser(userId, {
-        dailyOperationsUsed: (user.dailyOperationsUsed || 0) + 1
+        dailyOperationsUsed: currentUsed + 1
       });
 
       await recordLog({
@@ -724,12 +732,12 @@ export async function handleApiRoute(req, res, path) {
         userEmail: user.email,
         action: `TOOL_EXECUTE:${toolId}`,
         toolId,
-        details: `Processed: ${filename || 'Document'}`
+        details: `Processed: ${filename || 'Document'} (${currentUsed + 1}/${quota})`
       });
 
       return sendJson(res, 200, {
         success: true,
-        remainingQuota: isPro ? 'Unlimited' : Math.max(0, 5 - updated.dailyOperationsUsed),
+        remainingQuota: isPro ? 'Unlimited' : Math.max(0, quota - (currentUsed + 1)),
         plan: user.plan
       });
     } else {

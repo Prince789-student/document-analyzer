@@ -1389,10 +1389,28 @@
                   <a id="btn-upi-deeplink" class="btn-pay-mobile-upi" href="#">
                     <i data-lucide="zap" class="upi-btn-icon"></i>
                     <div class="upi-btn-text">
-                      <span id="btn-pay-upi-label" class="upi-btn-heading">⚡ Pay ₹100 via UPI App (GPay / PhonePe / Paytm / BHIM)</span>
-                      <span class="upi-btn-sub">Tap to open UPI app &amp; complete payment</span>
+                      <span id="btn-pay-upi-label" class="upi-btn-heading">⚡ Pay ₹100 via Any UPI App</span>
+                      <span class="upi-btn-sub">Tap to choose PhonePe / GPay / Paytm / BHIM</span>
                     </div>
                   </a>
+
+                  <!-- Specific UPI App Launchers -->
+                  <div class="upi-quick-apps-grid">
+                    <a id="btn-upi-gpay" class="btn-quick-app gpay-btn" href="#">
+                      <span>Google Pay</span>
+                    </a>
+                    <a id="btn-upi-phonepe" class="btn-quick-app phonepe-btn" href="#">
+                      <span>PhonePe</span>
+                    </a>
+                    <a id="btn-upi-paytm" class="btn-quick-app paytm-btn" href="#">
+                      <span>Paytm</span>
+                    </a>
+                  </div>
+
+                  <div class="upi-wallet-tip">
+                    <i data-lucide="info" style="width: 14px; height: 14px; flex-shrink: 0; color: #f59e0b;"></i>
+                    <span>Bank Account UPI se pay karein. FamX/Wallet balance se ₹5 transfer bank block kar sakti hai.</span>
+                  </div>
                 </div>
 
                 <!-- Step 2 Box: Mandatory UTR Verification (Never allows free activation) -->

@@ -2079,7 +2079,7 @@ class DocuMatrixStudioApp {
       if (this.btnHeaderLogin) this.btnHeaderLogin.style.display = 'flex';
       if (this.userHeaderWidget) this.userHeaderWidget.style.display = 'none';
       if (this.userDropdownMenu) this.userDropdownMenu.classList.remove('show');
-      if (this.openPricingBtn) this.openPricingBtn.style.display = 'inline-flex';
+      if (this.openPricingBtn) this.openPricingBtn.style.display = 'none';
 
       // Mobile Bottom Dock Account state for guests
       if (this.mobileDockAvatarIcon) this.mobileDockAvatarIcon.style.display = 'block';

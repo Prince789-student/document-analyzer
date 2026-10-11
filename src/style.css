@@ -7076,6 +7076,10 @@ button {
   }
 }
 
-
-
-
+/* Permanently hide Get Pro & Upgrade buttons (100% Free Mode) */
+.header-btn-pricing,
+#open-pricing-btn,
+#dropdown-upgrade-btn,
+.mobile-dock-btn[data-nav-tool="pro"] {
+  display: none !important;
+}

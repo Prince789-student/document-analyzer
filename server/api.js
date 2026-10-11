@@ -157,7 +157,7 @@ export async function handleApiRoute(req, res, path) {
           planAmount: user.planAmount || 0,
           phone: user.phone || '',
           pincode: user.pincode || '',
-          profileVerified: !!user.profileVerified,
+          profileVerified: !!user.profileVerified || (!!user.phone && user.phone.length === 10 && !!user.pincode && user.pincode.length === 6),
           dailyOperationsUsed: user.dailyOperationsUsed || 0,
           dailyQuota: isAdmin ? 9999 : (user.dailyQuota || 5)
         }
@@ -264,7 +264,7 @@ export async function handleApiRoute(req, res, path) {
           plan: user.plan,
           phone: user.phone || '',
           pincode: user.pincode || '',
-          profileVerified: !!user.profileVerified,
+          profileVerified: !!user.profileVerified || (!!user.phone && user.phone.length === 10 && !!user.pincode && user.pincode.length === 6),
           dailyOperationsUsed: user.dailyOperationsUsed || 0,
           dailyQuota: user.dailyQuota || 5
         }
@@ -294,7 +294,7 @@ export async function handleApiRoute(req, res, path) {
         planAmount: user.planAmount || 0,
         phone: user.phone || '',
         pincode: user.pincode || '',
-        profileVerified: !!user.profileVerified,
+        profileVerified: !!user.profileVerified || (!!user.phone && user.phone.length === 10 && !!user.pincode && user.pincode.length === 6),
         dailyOperationsUsed: user.dailyOperationsUsed || 0,
         dailyQuota: isAdmin ? 9999 : (user.dailyQuota || 5)
       }

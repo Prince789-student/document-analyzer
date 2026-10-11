@@ -649,13 +649,6 @@ class DocuMatrixStudioApp {
   }
 
   async showToolView(toolId, preloadedFiles = null, updateHash = true) {
-    if (authService.isLoggedIn() && !authService.isProfileVerified()) {
-      this.checkMandatorySecurityProfile();
-      toast.error('Account Security Verification Required: Please verify your 10-digit mobile number and 6-digit area PIN code to proceed.');
-      this.navigateTo('#/');
-      return;
-    }
-
     if (updateHash && window.location.hash !== `#/${toolId}`) {
       if (preloadedFiles) {
         this.pendingFilesForRoute = preloadedFiles;
@@ -1096,11 +1089,6 @@ class DocuMatrixStudioApp {
      Execution Pipeline & Stage 3 (Download Celebration)
      -------------------------------------------------------------------------- */
   async executeTool() {
-    if (authService.isLoggedIn() && !authService.isProfileVerified()) {
-      this.checkMandatorySecurityProfile();
-      toast.error('Account Security Verification Required: Please verify your 10-digit mobile number and 6-digit area PIN code before processing files.');
-      return;
-    }
     if (!this.activeToolInstance || this.activeFiles.length === 0 || this.isProcessing) return;
 
     // Check quota before execution
@@ -1174,11 +1162,6 @@ class DocuMatrixStudioApp {
      File Handling & Sample Generation
      -------------------------------------------------------------------------- */
   handleFileSelection(filesList) {
-    if (authService.isLoggedIn() && !authService.isProfileVerified()) {
-      this.checkMandatorySecurityProfile();
-      toast.error('Account Security Verification Required: Please verify your 10-digit mobile number and 6-digit area PIN code before uploading files.');
-      return;
-    }
     if (!filesList || filesList.length === 0) return;
     const incoming = Array.from(filesList);
 
@@ -1192,11 +1175,6 @@ class DocuMatrixStudioApp {
   }
 
   async loadSampleDocForCurrentTool() {
-    if (authService.isLoggedIn() && !authService.isProfileVerified()) {
-      this.checkMandatorySecurityProfile();
-      toast.error('Account Security Verification Required: Please verify your mobile number and area PIN code.');
-      return;
-    }
     if (!this.selectedToolMeta) return;
     const id = this.selectedToolMeta.id;
     const accept = (this.selectedToolMeta.accept || '').toLowerCase();
@@ -1667,6 +1645,12 @@ class DocuMatrixStudioApp {
     // 5.1 Account Security & Verification Modal (+91 Phone & Area PIN)
     this.btnCloseSecurityModal?.addEventListener('click', () => {
       this.closeSecurityModal(true);
+    });
+
+    this.securityModalOverlay?.addEventListener('click', (e) => {
+      if (e.target === this.securityModalOverlay) {
+        this.closeSecurityModal(true);
+      }
     });
 
     this.dropdownSecurityBtn?.addEventListener('click', () => {
@@ -2437,6 +2421,11 @@ class DocuMatrixStudioApp {
   checkMandatorySecurityProfile() {
     const user = authService.getUser();
     if (user && !authService.isProfileVerified()) {
+      const email = (user.email || '').toLowerCase().trim();
+      // If user has already dismissed or provided details in this session, don't popup again!
+      if (sessionStorage.getItem('docstudio_security_dismissed_' + email) === 'true') {
+        return false;
+      }
       this.openSecurityModal();
       return true;
     }
@@ -2447,8 +2436,11 @@ class DocuMatrixStudioApp {
     if (!this.securityModalOverlay) return;
     const user = authService.getUser();
     if (user) {
-      if (this.securityPhone && user.phone) this.securityPhone.value = user.phone;
-      if (this.securityPincode && user.pincode) this.securityPincode.value = user.pincode;
+      const email = (user.email || '').toLowerCase().trim();
+      const cachedPhone = user.phone || localStorage.getItem('docstudio_user_phone_' + email) || '';
+      const cachedPin = user.pincode || localStorage.getItem('docstudio_user_pincode_' + email) || '';
+      if (this.securityPhone && cachedPhone) this.securityPhone.value = cachedPhone;
+      if (this.securityPincode && cachedPin) this.securityPincode.value = cachedPin;
     }
     this.securityModalOverlay.style.display = 'flex';
     this.securityModalOverlay.setAttribute('aria-hidden', 'false');
@@ -2458,9 +2450,9 @@ class DocuMatrixStudioApp {
 
   closeSecurityModal(force = false) {
     const user = authService.getUser();
-    // STRICT SECURITY: Logged in user CANNOT close modal without completing verification unless forced
-    if (!force && user && !authService.isProfileVerified()) {
-      return;
+    if (user) {
+      const email = (user.email || '').toLowerCase().trim();
+      sessionStorage.setItem('docstudio_security_dismissed_' + email, 'true');
     }
     if (this.securityModalOverlay) {
       this.securityModalOverlay.style.display = 'none';

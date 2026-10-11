@@ -263,9 +263,19 @@ export async function deleteUser(id) {
   return true;
 }
 
+export const FAKE_DEMO_EMAILS = [
+  'admin@docstudio.com',
+  'pro@docstudio.com',
+  'demo@docstudio.com',
+  'testuser@gmail.com',
+  'rahul.test@gmail.com'
+];
+
 export async function getAllUsers() {
   if (isMongoConnected) {
-    const users = await MongoUser.find().select('-password').sort({ createdAt: -1 });
+    const users = await MongoUser.find({
+      email: { $nin: FAKE_DEMO_EMAILS, $not: /@docstudio\.com$/i }
+    }).select('-password').sort({ createdAt: -1 });
     return users.map(u => ({
       id: u._id.toString(),
       _id: u._id.toString(),
@@ -285,7 +295,12 @@ export async function getAllUsers() {
     }));
   }
   const db = readLocalDb();
-  return db.users.map(({ password, ...rest }) => rest);
+  return (db.users || [])
+    .filter(u => {
+      const email = (u.email || '').toLowerCase().trim();
+      return !FAKE_DEMO_EMAILS.includes(email) && !email.endsWith('@docstudio.com');
+    })
+    .map(({ password, ...rest }) => rest);
 }
 
 export async function createSubscription({ userId, userEmail, plan = 'pro', amount = 100, paymentMethod = 'UPI', duration = 'monthly', utrRef = '' }) {
@@ -438,9 +453,38 @@ export async function getAdminMetrics() {
 }
 
 // --------------------------------------------------------------------------
-// Default Seed Users
+// Default Seed Users (Real Super Admin Only, Purge Legacy Demo/Test Users)
 // --------------------------------------------------------------------------
 async function seedDefaultUsers() {
+  // 1. Purge legacy demo / fake accounts so only real users remain
+  if (isMongoConnected) {
+    try {
+      await MongoUser.deleteMany({
+        $or: [
+          { email: { $in: FAKE_DEMO_EMAILS } },
+          { email: { $regex: /@docstudio\.com$/i } }
+        ]
+      });
+      console.log('Cleaned up demo/test users from MongoDB Atlas');
+    } catch (e) {
+      console.warn('MongoDB cleanup notice:', e.message);
+    }
+  }
+
+  const db = readLocalDb();
+  if (db.users && db.users.length > 0) {
+    const originalLen = db.users.length;
+    db.users = db.users.filter(u => {
+      const email = (u.email || '').toLowerCase().trim();
+      return !FAKE_DEMO_EMAILS.includes(email) && !email.endsWith('@docstudio.com');
+    });
+    if (db.users.length !== originalLen) {
+      writeLocalDb(db);
+      console.log('Purged demo/test users from local database');
+    }
+  }
+
+  // 2. Ensure Super Admin exists & is properly configured
   const superAdmin = await findUserByEmail('prince86944@gmail.com');
   if (!superAdmin) {
     await createUser({
@@ -450,44 +494,8 @@ async function seedDefaultUsers() {
       role: 'admin',
       plan: 'pro'
     });
-    console.log('Seeded Super Admin: prince86944@gmail.com / admin123');
-  } else if (superAdmin.role !== 'admin') {
-    await updateUser(superAdmin._id || superAdmin.id, { role: 'admin', plan: 'pro' });
-  }
-
-  const admin = await findUserByEmail('admin@docstudio.com');
-  if (!admin) {
-    await createUser({
-      name: 'DocStudio Admin',
-      email: 'admin@docstudio.com',
-      password: 'admin123',
-      role: 'admin',
-      plan: 'pro'
-    });
-    console.log('Seeded default Admin: admin@docstudio.com / admin123');
-  }
-
-  const pro = await findUserByEmail('pro@docstudio.com');
-  if (!pro) {
-    await createUser({
-      name: 'Alex Rivera (Pro)',
-      email: 'pro@docstudio.com',
-      password: 'pro123',
-      role: 'user',
-      plan: 'pro'
-    });
-    console.log('Seeded default Pro user: pro@docstudio.com / pro123');
-  }
-
-  const demo = await findUserByEmail('demo@docstudio.com');
-  if (!demo) {
-    await createUser({
-      name: 'Demo Free User',
-      email: 'demo@docstudio.com',
-      password: 'demo123',
-      role: 'user',
-      plan: 'free'
-    });
-    console.log('Seeded default Demo user: demo@docstudio.com / demo123');
+    console.log('Ensured Super Admin: prince86944@gmail.com');
+  } else if (superAdmin.role !== 'admin' || superAdmin.plan !== 'pro') {
+    await updateUser(superAdmin._id || superAdmin.id, { role: 'admin', plan: 'pro', dailyQuota: 9999 });
   }
 }

@@ -1,45 +1,6 @@
 {
   "users": [
     {
-      "id": "usr_1791043874732crzc",
-      "name": "DocStudio Admin",
-      "email": "admin@docstudio.com",
-      "password": "$2b$10$/ys4RVl8E/5G2Xv/TZ7LYu3uCDBgA0EzkSn65xseMJ.bq0TGpWtbu",
-      "role": "admin",
-      "plan": "pro",
-      "dailyOperationsUsed": 0,
-      "dailyQuota": 9999,
-      "lastQuotaReset": "2026-10-03T16:11:14.732Z",
-      "createdAt": "2026-10-03T16:11:14.733Z",
-      "_id": "usr_1791043874732crzc"
-    },
-    {
-      "id": "usr_1791043874792llz3",
-      "name": "Alex Rivera (Pro)",
-      "email": "pro@docstudio.com",
-      "password": "$2b$10$zwGfRZ0hMaLuwnxQN49JnuJ/j6UfM22yamZtF7TNGp56/wR2l73FW",
-      "role": "user",
-      "plan": "pro",
-      "dailyOperationsUsed": 0,
-      "dailyQuota": 9999,
-      "lastQuotaReset": "2026-10-03T16:11:14.792Z",
-      "createdAt": "2026-10-03T16:11:14.792Z",
-      "_id": "usr_1791043874792llz3"
-    },
-    {
-      "id": "usr_1791043874853ieri",
-      "name": "Demo Free User",
-      "email": "demo@docstudio.com",
-      "password": "$2b$10$j8iCUT5dgrJdKqb25dH.me5K2d5o44f61fwQtsGcCnIdYRuBIKjXu",
-      "role": "user",
-      "plan": "free",
-      "dailyOperationsUsed": 0,
-      "dailyQuota": 5,
-      "lastQuotaReset": "2026-10-03T16:11:14.853Z",
-      "createdAt": "2026-10-03T16:11:14.853Z",
-      "_id": "usr_1791043874853ieri"
-    },
-    {
       "id": "usr_1791044602872r8eb",
       "name": "Prince (Super Admin)",
       "email": "prince86944@gmail.com",
@@ -83,32 +44,6 @@
       "lastQuotaReset": "2026-10-04T06:11:27.997Z",
       "createdAt": "2026-10-04T06:11:28.004Z",
       "_id": "usr_17910942879972idp"
-    },
-    {
-      "id": "usr_1791094367418gw0t",
-      "name": "Rahul Test",
-      "email": "rahul.test@gmail.com",
-      "password": "$2b$10$5pILK6iuofepuuWMwnVeAeVjEJaFe8LhbskCpIa7vYF5XD.GFWham",
-      "role": "user",
-      "plan": "free",
-      "dailyOperationsUsed": 0,
-      "dailyQuota": 5,
-      "lastQuotaReset": "2026-10-04T06:12:47.418Z",
-      "createdAt": "2026-10-04T06:12:47.418Z",
-      "_id": "usr_1791094367418gw0t"
-    },
-    {
-      "id": "usr_1791097196468awzh",
-      "name": "testuser",
-      "email": "testuser@gmail.com",
-      "password": "$2b$10$M63MjQpsgxrfHGXg7CJS7ORuTXh/IVwseVGpvEGYnI2g.PB/LccAq",
-      "role": "user",
-      "plan": "free",
-      "dailyOperationsUsed": 0,
-      "dailyQuota": 5,
-      "lastQuotaReset": "2026-10-04T06:59:56.468Z",
-      "createdAt": "2026-10-04T06:59:56.468Z",
-      "_id": "usr_1791097196468awzh"
     },
     {
       "id": "usr_1791112667466rug2",

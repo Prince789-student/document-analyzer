@@ -2027,13 +2027,9 @@ class DocuMatrixStudioApp {
         if (isAdmin) {
           this.userPlanBadge.textContent = 'ADMIN';
           this.userPlanBadge.className = 'user-plan-badge admin';
-        } else if (user.plan === 'pro') {
-          const dBadge = user.planDuration === 'daily' ? 'PRO (1D)' : (user.planDuration === 'yearly' ? 'PRO (1Y)' : 'PRO');
-          this.userPlanBadge.textContent = dBadge;
-          this.userPlanBadge.className = 'user-plan-badge pro';
         } else {
-          this.userPlanBadge.textContent = 'FREE';
-          this.userPlanBadge.className = 'user-plan-badge free';
+          this.userPlanBadge.textContent = 'FREE UNLIMITED';
+          this.userPlanBadge.className = 'user-plan-badge pro';
         }
       }
 
@@ -2048,31 +2044,26 @@ class DocuMatrixStudioApp {
       if (this.dropdownPlanTitle) {
         if (isAdmin) {
           this.dropdownPlanTitle.textContent = 'Super Admin • Lifetime Access';
-        } else if (user.plan === 'pro') {
-          const durText = user.planDuration === 'daily' ? 'Daily Pass (₹5)' : (user.planDuration === 'yearly' ? 'Yearly Pro (₹1,000)' : 'Monthly Pro (₹100)');
-          this.dropdownPlanTitle.textContent = `DocStudio Pro • ${durText}`;
         } else {
-          this.dropdownPlanTitle.textContent = 'DocStudio Free Starter (5 ops/day)';
+          this.dropdownPlanTitle.textContent = 'DocStudio Unlimited • 100% Free Access';
         }
       }
 
-      const isUnlimited = isAdmin || user.plan === 'pro' || user.plan === 'enterprise';
       if (this.userQuotaCount) {
-        this.userQuotaCount.textContent = isUnlimited ? 'Unlimited' : `${Math.max(0, 5 - (user.dailyOperationsUsed || 0))} / 5 left today`;
+        this.userQuotaCount.textContent = 'Unlimited (Free Access)';
       }
       if (this.userQuotaFill) {
-        const pct = isUnlimited ? 100 : Math.min(100, ((user.dailyOperationsUsed || 0) / 5) * 100);
-        this.userQuotaFill.style.width = `${pct}%`;
+        this.userQuotaFill.style.width = '100%';
       }
 
       if (this.dropdownAdminBtn) {
         this.dropdownAdminBtn.style.display = isAdmin ? 'flex' : 'none';
       }
       if (this.dropdownUpgradeBtn) {
-        this.dropdownUpgradeBtn.style.display = isUnlimited ? 'none' : 'flex';
+        this.dropdownUpgradeBtn.style.display = 'none';
       }
       if (this.openPricingBtn) {
-        this.openPricingBtn.style.display = isUnlimited ? 'none' : 'inline-flex';
+        this.openPricingBtn.style.display = 'none';
       }
 
       // Mobile Bottom Dock Account state
@@ -2434,32 +2425,7 @@ class DocuMatrixStudioApp {
   }
 
   openPricingModal() {
-    if (authService.isPro()) {
-      toast.success('Your account already has DocStudio Pro active with unlimited operations!');
-      return;
-    }
-
-    // Pehle Login Check: Agar login nahi hai to pehle Login karne ko kahega
-    if (!authService.isLoggedIn()) {
-      this.pendingOpenPricingAfterLogin = true;
-      toast.info('DocStudio Pro subscription lene ke liye pehle apna Google account sign in karein.');
-      this.openAuthModal('signin');
-      return;
-    }
-
-    if (this.pricingModalOverlay) {
-      this.pricingModalOverlay.style.display = 'flex';
-      this.pricingModalOverlay.setAttribute('aria-hidden', 'false');
-      if (typeof this.updateSelectedTier === 'function') {
-        this.updateSelectedTier(this.selectedPlanDuration || 'monthly', this.selectedPlanAmount || 100);
-      }
-      if (this.inputPayerEmail) {
-        const u = authService.getUser();
-        this.inputPayerEmail.value = (u && u.email) ? u.email : '';
-        this.inputPayerEmail.readOnly = true;
-      }
-    }
-    this.refreshIcons();
+    toast.success('🎉 Sabhi document tools abhi bilkul FREE hain! Unlimited operations unlocked.');
   }
 
   closePricingModal() {

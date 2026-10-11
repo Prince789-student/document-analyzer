@@ -711,17 +711,10 @@ export async function handleApiRoute(req, res, path) {
     if (user) {
       const userId = user._id || user.id;
       const isSuper = isSuperAdminEmail(user.email);
-      const isPro = isSuper || user.role === 'admin' || user.plan === 'pro' || user.plan === 'enterprise';
+      const isPro = true; // Uncapped free access active for all users
 
       const currentUsed = user.dailyOperationsUsed || 0;
-      const quota = isPro ? 9999 : (user.dailyQuota || 5);
-
-      if (!isPro && currentUsed >= quota) {
-        return sendJson(res, 403, {
-          error: `Daily limit reached! Free accounts are limited to ${quota} operations per day. Please upgrade to Pro for unlimited processing.`,
-          quotaExceeded: true
-        });
-      }
+      const quota = 9999;
 
       const updated = await updateUser(userId, {
         dailyOperationsUsed: currentUsed + 1

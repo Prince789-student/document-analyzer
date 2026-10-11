@@ -39,7 +39,7 @@ class AuthService {
   }
 
   isPro() {
-    return this.isAdmin() || (this.user && (this.user.plan === 'pro' || this.user.plan === 'enterprise'));
+    return true; // 100% Free Access enabled
   }
 
   getUser() {
@@ -62,9 +62,7 @@ class AuthService {
   }
 
   getQuotaRemaining() {
-    if (!this.user) return 5;
-    if (this.isPro()) return 'Unlimited';
-    return Math.max(0, (this.user.dailyQuota || 5) - (this.user.dailyOperationsUsed || 0));
+    return 'Unlimited';
   }
 
   async login(email, password) {
@@ -313,76 +311,7 @@ class AuthService {
   }
 
   async checkAndRecordUsage(toolId, filename) {
-    if (this.isPro()) {
-      return { allowed: true, remaining: 'Unlimited' };
-    }
-
-    // 1. Guest usage check
-    if (!this.user) {
-      const guestCount = parseInt(localStorage.getItem('docstudio_guest_ops') || '0', 10);
-      if (guestCount >= 5) {
-        return {
-          allowed: false,
-          error: 'Daily limit reached! Free guests are limited to 5 operations per day. Please sign in or upgrade to Pro for unlimited operations.',
-          quotaExceeded: true
-        };
-      }
-      localStorage.setItem('docstudio_guest_ops', (guestCount + 1).toString());
-      this.notifyAuthChange();
-      return { allowed: true, remaining: 5 - (guestCount + 1) };
-    }
-
-    // 2. Free logged-in user check
-    const currentUsed = Number(this.user.dailyOperationsUsed || 0);
-    const quota = Number(this.user.dailyQuota || 5);
-
-    if (currentUsed >= quota) {
-      return {
-        allowed: false,
-        error: `Daily limit reached! You have completed all ${quota} free operations today. Please upgrade to Pro for unlimited operations.`,
-        quotaExceeded: true
-      };
-    }
-
-    try {
-      const res = await fetch('/api/usage/record', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`
-        },
-        body: JSON.stringify({ toolId, filename })
-      });
-      const data = await res.json();
-      if (!res.ok || res.status === 403 || data.quotaExceeded) {
-        this.user.dailyOperationsUsed = quota;
-        localStorage.setItem('docstudio_user', JSON.stringify(this.user));
-        this.notifyAuthChange();
-        return {
-          allowed: false,
-          error: data.error || 'Daily limit reached! Free accounts are limited to 5 operations per day.',
-          quotaExceeded: true
-        };
-      }
-      this.user.dailyOperationsUsed = currentUsed + 1;
-      localStorage.setItem('docstudio_user', JSON.stringify(this.user));
-      this.notifyAuthChange();
-      return { allowed: true, remaining: Math.max(0, quota - (currentUsed + 1)) };
-    } catch (e) {
-      // Offline fallback: still enforce limit strictly
-      const newUsed = currentUsed + 1;
-      this.user.dailyOperationsUsed = newUsed;
-      localStorage.setItem('docstudio_user', JSON.stringify(this.user));
-      this.notifyAuthChange();
-      if (newUsed > quota) {
-        return {
-          allowed: false,
-          error: `Daily limit reached! You have completed all ${quota} free operations today.`,
-          quotaExceeded: true
-        };
-      }
-      return { allowed: true, remaining: Math.max(0, quota - newUsed) };
-    }
+    return { allowed: true, remaining: 'Unlimited' };
   }
 
   notifyAuthChange() {

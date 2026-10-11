@@ -572,7 +572,12 @@ export async function handleApiRoute(req, res, path) {
         });
       }
 
-      // Check dummy/fake patterns
+      // Check dummy/fake/synthetic patterns
+      if (cleanUtr.startsWith('AUTO') || cleanUtr.includes('AUTO') || cleanUtr.startsWith('UPI')) {
+        return sendJson(res, 400, {
+          error: 'Automatic or temporary reference tokens are not valid UTRs. Please enter the authentic 12-digit UTR (UPI Reference Number) from your payment receipt in GPay / PhonePe / Paytm.'
+        });
+      }
       const isRepeated = /^([0-9a-zA-Z])\1+$/.test(cleanUtr);
       const isDummy = ['123456789012', '1234567890', '012345678901', 'TESTUTR12345', '987654321098'].includes(cleanUtr);
       if (isRepeated || isDummy) {

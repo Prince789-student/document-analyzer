@@ -5473,6 +5473,44 @@ button {
   color: rgba(255, 255, 255, 0.92);
 }
 
+.mobile-upi-step-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.upi-step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upi-step-num {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.upi-step-num.step-green {
+  background: #10b981;
+}
+
+.upi-step-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 0;
+}
+
 .mobile-utr-verify-wrap {
   display: flex;
   flex-direction: column;

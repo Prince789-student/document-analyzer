@@ -1796,60 +1796,8 @@ class DocuMatrixStudioApp {
     };
     this.updateSelectedTier = updateSelectedTier;
 
-    // Auto-Verify Handler (Verifies and activates Pro automatically upon returning from UPI App)
-    const triggerAutoVerify = async (silent = false) => {
-      const sessionStr = localStorage.getItem('docstudio_pending_upi');
-      if (!sessionStr) return;
-      let session;
-      try {
-        session = JSON.parse(sessionStr);
-      } catch {
-        return;
-      }
-      if (!session || !session.txnRef) return;
-
-      // Don't auto-verify if less than 2.5 seconds elapsed (unless user manually tapped activate button)
-      if (Date.now() - session.startedAt < 2500 && silent) {
-        return;
-      }
-
-      const user = authService.getUser();
-      const payerEmail = session.payerEmail || user?.email;
-      if (!payerEmail) {
-        if (!silent) toast.error('Please sign in to complete Pro verification.');
-        return;
-      }
-
-      if (this.isVerifyingUpi) return;
-      this.isVerifyingUpi = true;
-
-      if (!silent) {
-        toast.info('⚡ Verifying UPI payment & activating Pro automatically...');
-      }
-
-      const success = await authService.upgradeToPro(
-        'UPI',
-        session.amount,
-        session.duration,
-        session.txnRef,
-        payerEmail
-      );
-
-      this.isVerifyingUpi = false;
-
-      if (success) {
-        localStorage.removeItem('docstudio_pending_upi');
-        if (this.upiAutoVerifyCard) this.upiAutoVerifyCard.style.display = 'none';
-        this.closePricingModal();
-        toast.success(`🎉 DocStudio Pro (${(session.duration || 'monthly').toUpperCase()}) successfully activated! Unlimited operations unlocked.`);
-
-        // Prompt security modal if phone or pincode missing
-        const updatedUser = authService.getUser();
-        if (updatedUser && (!updatedUser.phone || !updatedUser.pincode)) {
-          setTimeout(() => this.openSecurityModal(), 1200);
-        }
-      }
-    };
+    // Clean any legacy pending upi tokens
+    localStorage.removeItem('docstudio_pending_upi');
 
     // Primary 1-Tap UPI Launch (All UPI Apps: PhonePe / GPay / Paytm / BHIM)
     this.btnUpiDeeplink?.addEventListener('click', (e) => {
@@ -1863,54 +1811,17 @@ class DocuMatrixStudioApp {
 
       const upiId = this.activeUpiId || 'apnacollegebihar@slc';
       const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
-      const payeeName = 'DocStudio Pro';
-      const txnRef = `UPI/AUTO-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      const payeeName = 'Prince Kumar';
 
-      const session = {
-        txnRef,
-        amount: this.selectedPlanAmount,
-        duration: this.selectedPlanDuration,
-        startedAt: Date.now(),
-        payerEmail
-      };
-      localStorage.setItem('docstudio_pending_upi', JSON.stringify(session));
+      // Standard clean NPCI UPI URI: NO slashes, NO unsupported tr parameter that breaks bank switches
+      const upiPayload = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
 
-      // Show live auto-verification radar
-      if (this.upiAutoVerifyCard) {
-        this.upiAutoVerifyCard.style.display = 'flex';
-        this.upiAutoVerifyCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
-      toast.info('Opening UPI App... Payment complete karte hi website par automatically Pro activate ho jayega.');
-
-      const upiPayload = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=${encodeURIComponent('DocStudioPro ' + txnRef)}&tr=${encodeURIComponent(txnRef)}`;
+      toast.info('UPI App open ho raha hai... Payment complete karne ke baad 12-digit UTR enter karein.');
 
       try {
         window.location.href = upiPayload;
       } catch (err) {
         window.location.assign(upiPayload);
-      }
-    });
-
-    // Instant Activate Button Click (If user completed payment and wants immediate confirmation)
-    this.btnInstantAutoVerify?.addEventListener('click', () => {
-      triggerAutoVerify(false);
-    });
-
-    // Auto-detect return to website when user switches back from UPI app!
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        const sessionStr = localStorage.getItem('docstudio_pending_upi');
-        if (sessionStr) {
-          setTimeout(() => triggerAutoVerify(false), 800);
-        }
-      }
-    });
-
-    window.addEventListener('focus', () => {
-      const sessionStr = localStorage.getItem('docstudio_pending_upi');
-      if (sessionStr) {
-        setTimeout(() => triggerAutoVerify(false), 800);
       }
     });
 

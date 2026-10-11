@@ -91,8 +91,8 @@ function readLocalDb() {
         subscriptions: [],
         logs: [],
         config: {
-          upiId: 'apnacollegebihar@slc',
-          upiName: 'DocStudio Pro',
+          upiId: 'prince1631@ptaxis',
+          upiName: 'Prince Kumar',
           qrCodeUrl: '/upi-qr.png'
         }
       };
@@ -103,12 +103,13 @@ function readLocalDb() {
     const parsed = JSON.parse(raw);
     if (!parsed.config || !parsed.config.upiId) {
       parsed.config = {
-        upiId: 'apnacollegebihar@slc',
-        upiName: 'DocStudio Pro',
+        upiId: 'prince1631@ptaxis',
+        upiName: 'Prince Kumar',
         qrCodeUrl: '/upi-qr.png'
       };
     } else {
-      parsed.config.upiId = 'apnacollegebihar@slc';
+      parsed.config.upiId = 'prince1631@ptaxis';
+      parsed.config.upiName = 'Prince Kumar';
       parsed.config.qrCodeUrl = '/upi-qr.png';
     }
     return parsed;
@@ -118,8 +119,8 @@ function readLocalDb() {
       subscriptions: [],
       logs: [],
       config: {
-        upiId: 'apnacollegebihar@slc',
-        upiName: 'DocStudio Pro',
+        upiId: 'prince1631@ptaxis',
+        upiName: 'Prince Kumar',
         qrCodeUrl: '/upi-qr.png'
       }
     };
@@ -137,8 +138,8 @@ function writeLocalDb(data) {
 export async function getAppConfig() {
   const db = readLocalDb();
   return db.config || {
-    upiId: 'apnacollegebihar@slc',
-    upiName: 'DocStudio Pro',
+    upiId: 'prince1631@ptaxis',
+    upiName: 'Prince Kumar',
     qrCodeUrl: '/upi-qr.png'
   };
 }

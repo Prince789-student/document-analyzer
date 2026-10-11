@@ -54,11 +54,11 @@ class AuthService {
     }
     const phone = String(this.user.phone || localStorage.getItem('docstudio_user_phone_' + email) || '').trim().replace(/[^0-9]/g, '');
     const pincode = String(this.user.pincode || localStorage.getItem('docstudio_user_pincode_' + email) || '').trim().replace(/[^0-9]/g, '');
-    if (phone.length >= 10 || pincode.length >= 6 || !!this.user.profileVerified || this.isAdmin() || this.isPro()) {
+    if ((phone.length >= 10 && pincode.length >= 6) || !!this.user.profileVerified || this.isAdmin() || this.isPro()) {
       localStorage.setItem('docstudio_security_verified_' + email, 'true');
       return true;
     }
-    return true;
+    return false;
   }
 
   getQuotaRemaining() {

@@ -591,7 +591,7 @@
       "id": "log_1791046254525",
       "userEmail": "rahul@gmail.com",
       "action": "CONTACT_SUBMITTED",
-      "details": "From: Rahul (rahul@gmail.com) | Subject: Pro Subscription | Message: I paid via UPI ID apnacollegebihar@slc, activate my pro!",
+      "details": "From: Rahul (rahul@gmail.com) | Subject: Pro Subscription | Message: I paid via UPI ID prince1631@ptaxis, activate my pro!",
       "createdAt": "2026-10-03T16:50:54.525Z"
     },
     {
@@ -644,8 +644,8 @@
     }
   ],
   "config": {
-    "upiId": "apnacollegebihar@slc",
-    "upiName": "DocStudio Pro",
+    "upiId": "prince1631@ptaxis",
+    "upiName": "Prince Kumar",
     "qrCodeUrl": "/upi-qr.png"
   }
 }

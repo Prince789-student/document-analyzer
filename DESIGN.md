@@ -123,9 +123,9 @@
   2. **Monthly Pro**: ₹100 / month (Standard / Featured)
   3. **Yearly Pro**: ₹1,000 / year (Best ROI)
 - **Fast UPI Drawer**:
-  - Registered UPI ID: `apnacollegebihar@slc` with 1-click clipboard copy
+  - Registered UPI ID: `prince1631@ptaxis` with 1-click clipboard copy
   - Official QR image (`/upi-qr.png`)
-  - Deep link for 1-click launch on mobile (`upi://pay?pa=apnacollegebihar@slc&pn=DocStudio&am=100...`)
+  - Deep link for 1-click launch on mobile (`upi://pay?pa=prince1631@ptaxis&pn=Prince%20Kumar&am=100...`)
   - Optional UTR reference input and instant Pro activation button.
 
 ### 4.3 Google Authentication Dialog

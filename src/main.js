@@ -25,7 +25,7 @@ class DocuMatrixStudioApp {
     // Pricing & UPI Configuration
     this.selectedPlanDuration = 'monthly';
     this.selectedPlanAmount = 100;
-    this.activeUpiId = 'apnacollegebihar@slc';
+    this.activeUpiId = 'prince1631@ptaxis';
     this.pendingOpenPricingAfterLogin = false;
 
     this.selectedToolMeta = null;
@@ -1590,6 +1590,11 @@ class DocuMatrixStudioApp {
       }
     });
 
+    // Check security profile on initial load for unverified users
+    setTimeout(() => {
+      this.checkMandatorySecurityProfile();
+    }, 800);
+
     // 3. User Avatar dropdown toggle
     this.btnUserAvatar?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1777,7 +1782,7 @@ class DocuMatrixStudioApp {
       if (this.btnPayUpiLabel) {
         this.btnPayUpiLabel.textContent = `⚡ Pay ₹${this.selectedPlanAmount} via Any UPI App`;
       }
-      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const upiId = this.activeUpiId || 'prince1631@ptaxis';
       const cleanAmt = Number(this.selectedPlanAmount).toFixed(2);
       const payeeName = 'Prince Kumar';
       const upiPayload = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
@@ -1791,11 +1796,7 @@ class DocuMatrixStudioApp {
       if (this.btnUpiPaytm) this.btnUpiPaytm.href = paytmPayload;
 
       if (this.pricingQrImage) {
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=2&data=${encodeURIComponent(upiPayload)}`;
-        this.pricingQrImage.src = qrUrl;
-        this.pricingQrImage.onerror = () => {
-          this.pricingQrImage.src = '/upi-qr.png';
-        };
+        this.pricingQrImage.src = '/upi-qr.png';
       }
     };
     this.updateSelectedTier = updateSelectedTier;
@@ -1821,7 +1822,7 @@ class DocuMatrixStudioApp {
     };
 
     const getCleanUpiUri = (scheme = 'upi') => {
-      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const upiId = this.activeUpiId || 'prince1631@ptaxis';
       const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
       const payeeName = 'Prince Kumar';
       return `${scheme}://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
@@ -1830,17 +1831,17 @@ class DocuMatrixStudioApp {
     // 1-Tap UPI Launchers
     this.btnUpiDeeplink?.addEventListener('click', handleUpiAppLaunch(() => getCleanUpiUri('upi'), 'UPI App'));
     this.btnUpiGpay?.addEventListener('click', handleUpiAppLaunch(() => {
-      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const upiId = this.activeUpiId || 'prince1631@ptaxis';
       const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
       return `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
     }, 'Google Pay'));
     this.btnUpiPhonepe?.addEventListener('click', handleUpiAppLaunch(() => {
-      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const upiId = this.activeUpiId || 'prince1631@ptaxis';
       const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
       return `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
     }, 'PhonePe'));
     this.btnUpiPaytm?.addEventListener('click', handleUpiAppLaunch(() => {
-      const upiId = this.activeUpiId || 'apnacollegebihar@slc';
+      const upiId = this.activeUpiId || 'prince1631@ptaxis';
       const cleanAmt = Number(this.selectedPlanAmount || 100).toFixed(2);
       return `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=Prince%20Kumar&am=${cleanAmt}&cu=INR&tn=DocStudioPro`;
     }, 'Paytm'));
@@ -1892,7 +1893,7 @@ class DocuMatrixStudioApp {
 
     // Copy UPI ID to Clipboard
     this.btnCopyUpiId?.addEventListener('click', async () => {
-      const upi = this.activeUpiId || 'apnacollegebihar@slc';
+      const upi = this.activeUpiId || 'prince1631@ptaxis';
       try {
         await navigator.clipboard.writeText(upi);
         toast.success(`Copied UPI ID "${upi}" to clipboard!`);
@@ -2262,8 +2263,22 @@ class DocuMatrixStudioApp {
       if (this.currentView === 'admin' || window.location.hash === '#/admin') {
         this.navigateTo('#/admin');
       }
+      return;
     } else {
       toast.success(`Welcome, ${userName}!`);
+    }
+
+    const email = (authService.getUser()?.email || '').toLowerCase().trim();
+    if (email) {
+      sessionStorage.removeItem('docstudio_security_dismissed_' + email);
+    }
+
+    // New user verification check: Ask for Phone & PIN code if not verified yet
+    if (!authService.isProfileVerified()) {
+      setTimeout(() => {
+        this.openSecurityModal();
+      }, 350);
+      return;
     }
 
     // If user clicked "Get Pro" before login, immediately open Pro subscription modal!
@@ -2272,8 +2287,6 @@ class DocuMatrixStudioApp {
       setTimeout(() => this.openPricingModal(), 400);
       return;
     }
-
-    // Profile modal is only opened when user explicitly selects it from account menu
   }
 
   async initGoogleIdentityServices() {
@@ -2343,7 +2356,16 @@ class DocuMatrixStudioApp {
   }
 
   checkMandatorySecurityProfile() {
-    // Disabled auto-prompting so users are never blocked or nagged
+    if (!authService.isLoggedIn()) return false;
+    if (authService.isAdmin()) return false;
+    if (!authService.isProfileVerified()) {
+      const email = (authService.getUser()?.email || '').toLowerCase().trim();
+      const dismissed = sessionStorage.getItem('docstudio_security_dismissed_' + email);
+      if (!dismissed) {
+        this.openSecurityModal();
+        return true;
+      }
+    }
     return false;
   }
 
@@ -2757,7 +2779,7 @@ class DocuMatrixStudioApp {
           </td>
           <td>
             <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-heading);">${s.paymentMethod || 'UPI Instant'}</div>
-            <div style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);">${s.upiId || 'apnacollegebihar@slc'}</div>
+            <div style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);">${s.upiId || 'prince1631@ptaxis'}</div>
           </td>
           <td>
             <span class="sub-utr-tag ${s.utrRef ? '' : 'empty'}" title="${s.utrRef || 'No UTR Reference'}">

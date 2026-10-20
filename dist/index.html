@@ -64,7 +64,7 @@
   <!-- Modern Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600&family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -72,9 +72,9 @@
   <!-- Google Identity Services (GSI) OAuth -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <script type="module" crossorigin src="/assets/index-5qVefqt4.js"></script>
+  <script type="module" crossorigin src="/assets/index-BX7affiL.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-C0FnF6B9.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-DY4icV_s.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-jY3VE0lQ.css">
 </head>
 <body>
   <div id="app" class="app-root">
@@ -362,7 +362,7 @@
       <!-- Search Meta Indicator -->
       <div class="directory-meta-bar">
         <div class="meta-left-group">
-          <span id="current-category-label" class="current-cat-name">All Tools</span>
+          <h2 id="current-category-label" class="current-cat-name">All Tools</h2>
           <span id="tools-count-badge" class="count-tag">30 Tools</span>
         </div>
         <div id="search-feedback-chip" class="search-feedback-chip" style="display: none;">
@@ -372,7 +372,7 @@
       </div>
 
       <!-- 30 Tools Directory Grid -->
-      <section class="tools-directory-section">
+      <section class="tools-directory-section" aria-labelledby="current-category-label">
         <div class="tools-directory-grid" id="tools-directory-grid">
           <!-- Dynamically populated tool cards -->
         </div>

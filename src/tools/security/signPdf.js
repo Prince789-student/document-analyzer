@@ -18,6 +18,15 @@ export const signPdfTool = {
     this.signatureDataUrl = null;
     this.activePageNum = 1;
 
+    // Lazy-load signature script fonts only when entering Digital Signatures studio
+    if (!document.getElementById('sig-fonts-link')) {
+      const link = document.createElement('link');
+      link.id = 'sig-fonts-link';
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600&family=Dancing+Script:wght@600;700&family=Great+Vibes&display=swap';
+      document.head.appendChild(link);
+    }
+
     let totalPages = 1;
     let pdfJs = null;
     try {

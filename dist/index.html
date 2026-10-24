@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>DocStudio — Next-Gen Client-Side PDF Engine</title>
   <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="canonical" href="https://document-analyzer-one.vercel.app/">
+  <link rel="canonical" id="canonical-url" href="https://document-analyzer-one.vercel.app/">
   <meta name="description" content="DocStudio: Decentralized, private document engineering suite. 30 professional PDF tools (Merge, Split, Compress, Convert, OCR, Sign) running 100% locally in browser WebAssembly with zero data retention.">
   <meta name="keywords" content="pdf editor, merge pdf, split pdf, compress pdf, word to pdf, pdf to word, excel to pdf, ocr pdf, sign pdf, protect pdf, client side pdf, private pdf tools, DocStudio">
   <meta name="author" content="DocStudio">
@@ -72,9 +72,9 @@
   <!-- Google Identity Services (GSI) OAuth -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <script type="module" crossorigin src="/assets/index-BX7affiL.js"></script>
+  <script type="module" crossorigin src="/assets/index-DrPXf4D_.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-C0FnF6B9.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-jY3VE0lQ.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-D49nCAzc.css">
 </head>
 <body>
   <div id="app" class="app-root">
@@ -86,7 +86,7 @@
       <div class="studio-header__inner">
 
         <!-- Unique Brand Logo -->
-        <div class="brand-container" id="brand-home-link" title="DocStudio Home">
+        <a href="/" class="brand-container" id="brand-home-link" title="DocStudio Home" style="text-decoration:none; color:inherit;">
           <div class="brand-logo-wrap">
             <img src="/logo.png" alt="DocStudio Logo" class="brand-logo-img">
             <span class="brand-pulse-dot"></span>
@@ -95,7 +95,7 @@
             <div class="brand-name">Doc<span class="brand-name__accent">Studio</span></div>
             <span class="brand-tagline">30-in-1 WebAssembly Engine</span>
           </div>
-        </div>
+        </a>
 
         <!-- MAIN TOOL TABS NAVIGATION -->
         <nav class="header-nav-tabs" id="header-nav-tabs" aria-label="Main Tool Navigation">
@@ -108,46 +108,46 @@
             <div class="nav-dropdown-pane nav-convert-pane" id="menu-convert-dropdown">
               <div class="nav-dropdown-col">
                 <div class="nav-col-header">CONVERT TO PDF</div>
-                <a href="#/jpg-to-pdf" class="nav-dropdown-link" data-nav-tool="jpg-to-pdf">
+                <a href="/jpg-to-pdf" class="nav-dropdown-link" data-nav-tool="jpg-to-pdf">
                   <i data-lucide="image" class="link-ic" style="color: #eab308;"></i>
                   <span>JPG to PDF</span>
                 </a>
-                <a href="#/word-to-pdf" class="nav-dropdown-link" data-nav-tool="word-to-pdf">
+                <a href="/word-to-pdf" class="nav-dropdown-link" data-nav-tool="word-to-pdf">
                   <i data-lucide="file-text" class="link-ic" style="color: #2563eb;"></i>
                   <span>WORD to PDF</span>
                 </a>
-                <a href="#/powerpoint-to-pdf" class="nav-dropdown-link" data-nav-tool="powerpoint-to-pdf">
+                <a href="/powerpoint-to-pdf" class="nav-dropdown-link" data-nav-tool="powerpoint-to-pdf">
                   <i data-lucide="presentation" class="link-ic" style="color: #ea580c;"></i>
                   <span>POWERPOINT to PDF</span>
                 </a>
-                <a href="#/excel-to-pdf" class="nav-dropdown-link" data-nav-tool="excel-to-pdf">
+                <a href="/excel-to-pdf" class="nav-dropdown-link" data-nav-tool="excel-to-pdf">
                   <i data-lucide="file-spreadsheet" class="link-ic" style="color: #16a34a;"></i>
                   <span>EXCEL to PDF</span>
                 </a>
-                <a href="#/html-to-pdf" class="nav-dropdown-link" data-nav-tool="html-to-pdf">
+                <a href="/html-to-pdf" class="nav-dropdown-link" data-nav-tool="html-to-pdf">
                   <i data-lucide="code-2" class="link-ic" style="color: #8b5cf6;"></i>
                   <span>HTML to PDF</span>
                 </a>
               </div>
               <div class="nav-dropdown-col">
                 <div class="nav-col-header">CONVERT FROM PDF</div>
-                <a href="#/pdf-to-jpg" class="nav-dropdown-link" data-nav-tool="pdf-to-jpg">
+                <a href="/pdf-to-jpg" class="nav-dropdown-link" data-nav-tool="pdf-to-jpg">
                   <i data-lucide="images" class="link-ic" style="color: #f59e0b;"></i>
                   <span>PDF to JPG</span>
                 </a>
-                <a href="#/pdf-to-word" class="nav-dropdown-link" data-nav-tool="pdf-to-word">
+                <a href="/pdf-to-word" class="nav-dropdown-link" data-nav-tool="pdf-to-word">
                   <i data-lucide="file-text" class="link-ic" style="color: #3b82f6;"></i>
                   <span>PDF to WORD</span>
                 </a>
-                <a href="#/pdf-to-powerpoint" class="nav-dropdown-link" data-nav-tool="pdf-to-powerpoint">
+                <a href="/pdf-to-powerpoint" class="nav-dropdown-link" data-nav-tool="pdf-to-powerpoint">
                   <i data-lucide="presentation" class="link-ic" style="color: #f97316;"></i>
                   <span>PDF to POWERPOINT</span>
                 </a>
-                <a href="#/pdf-to-excel" class="nav-dropdown-link" data-nav-tool="pdf-to-excel">
+                <a href="/pdf-to-excel" class="nav-dropdown-link" data-nav-tool="pdf-to-excel">
                   <i data-lucide="file-spreadsheet" class="link-ic" style="color: #10b981;"></i>
                   <span>PDF to EXCEL</span>
                 </a>
-                <a href="#/pdf-to-pdfa" class="nav-dropdown-link" data-nav-tool="pdf-to-pdfa">
+                <a href="/pdf-to-pdfa" class="nav-dropdown-link" data-nav-tool="pdf-to-pdfa">
                   <i data-lucide="archive" class="link-ic" style="color: #6366f1;"></i>
                   <span>PDF to PDF/A</span>
                 </a>
@@ -164,34 +164,34 @@
             <div class="nav-dropdown-pane nav-all-tools-pane" id="menu-all-tools-dropdown">
               <div class="nav-dropdown-col">
                 <div class="nav-col-header">ORGANIZE PDF</div>
-                <a href="#/merge-pdf" class="nav-dropdown-link" data-nav-tool="merge-pdf"><i data-lucide="layers" class="link-ic" style="color:#ef4444;"></i><span>Merge PDF</span></a>
-                <a href="#/split-pdf" class="nav-dropdown-link" data-nav-tool="split-pdf"><i data-lucide="scissors" class="link-ic" style="color:#f97316;"></i><span>Split PDF</span></a>
-                <a href="#/remove-pages" class="nav-dropdown-link" data-nav-tool="remove-pages"><i data-lucide="trash-2" class="link-ic" style="color:#e11d48;"></i><span>Remove Pages</span></a>
-                <a href="#/extract-pages" class="nav-dropdown-link" data-nav-tool="extract-pages"><i data-lucide="file-symlink" class="link-ic" style="color:#d97706;"></i><span>Extract Pages</span></a>
-                <a href="#/organize-pdf" class="nav-dropdown-link" data-nav-tool="organize-pdf"><i data-lucide="layout-dashboard" class="link-ic" style="color:#ea580c;"></i><span>Organize PDF</span></a>
-                <a href="#/scan-to-pdf" class="nav-dropdown-link" data-nav-tool="scan-to-pdf"><i data-lucide="camera" class="link-ic" style="color:#0284c7;"></i><span>Scan to PDF</span></a>
+                <a href="/merge-pdf" class="nav-dropdown-link" data-nav-tool="merge-pdf"><i data-lucide="layers" class="link-ic" style="color:#ef4444;"></i><span>Merge PDF</span></a>
+                <a href="/split-pdf" class="nav-dropdown-link" data-nav-tool="split-pdf"><i data-lucide="scissors" class="link-ic" style="color:#f97316;"></i><span>Split PDF</span></a>
+                <a href="/remove-pages" class="nav-dropdown-link" data-nav-tool="remove-pages"><i data-lucide="trash-2" class="link-ic" style="color:#e11d48;"></i><span>Remove Pages</span></a>
+                <a href="/extract-pages" class="nav-dropdown-link" data-nav-tool="extract-pages"><i data-lucide="file-symlink" class="link-ic" style="color:#d97706;"></i><span>Extract Pages</span></a>
+                <a href="/organize-pdf" class="nav-dropdown-link" data-nav-tool="organize-pdf"><i data-lucide="layout-dashboard" class="link-ic" style="color:#ea580c;"></i><span>Organize PDF</span></a>
+                <a href="/scan-to-pdf" class="nav-dropdown-link" data-nav-tool="scan-to-pdf"><i data-lucide="camera" class="link-ic" style="color:#0284c7;"></i><span>Scan to PDF</span></a>
               </div>
               <div class="nav-dropdown-col">
                 <div class="nav-col-header">OPTIMIZE PDF</div>
-                <a href="#/compress-pdf" class="nav-dropdown-link" data-nav-tool="compress-pdf"><i data-lucide="minimize-2" class="link-ic" style="color:#10b981;"></i><span>Compress PDF</span></a>
-                <a href="#/repair-pdf" class="nav-dropdown-link" data-nav-tool="repair-pdf"><i data-lucide="wrench" class="link-ic" style="color:#14b8a6;"></i><span>Repair PDF</span></a>
-                <a href="#/ocr-pdf" class="nav-dropdown-link" data-nav-tool="ocr-pdf"><i data-lucide="scan-text" class="link-ic" style="color:#06b6d4;"></i><span>OCR PDF</span></a>
+                <a href="/compress-pdf" class="nav-dropdown-link" data-nav-tool="compress-pdf"><i data-lucide="minimize-2" class="link-ic" style="color:#10b981;"></i><span>Compress PDF</span></a>
+                <a href="/repair-pdf" class="nav-dropdown-link" data-nav-tool="repair-pdf"><i data-lucide="wrench" class="link-ic" style="color:#14b8a6;"></i><span>Repair PDF</span></a>
+                <a href="/ocr-pdf" class="nav-dropdown-link" data-nav-tool="ocr-pdf"><i data-lucide="scan-text" class="link-ic" style="color:#06b6d4;"></i><span>OCR PDF</span></a>
               </div>
               <div class="nav-dropdown-col">
                 <div class="nav-col-header">EDIT & PAGES</div>
-                <a href="#/rotate-pdf" class="nav-dropdown-link" data-nav-tool="rotate-pdf"><i data-lucide="rotate-cw" class="link-ic" style="color:#6366f1;"></i><span>Rotate PDF</span></a>
-                <a href="#/page-numbers" class="nav-dropdown-link" data-nav-tool="page-numbers"><i data-lucide="binary" class="link-ic" style="color:#8b5cf6;"></i><span>Page Numbers</span></a>
-                <a href="#/add-watermark" class="nav-dropdown-link" data-nav-tool="add-watermark"><i data-lucide="stamp" class="link-ic" style="color:#a855f7;"></i><span>Add Watermark</span></a>
-                <a href="#/crop-pdf" class="nav-dropdown-link" data-nav-tool="crop-pdf"><i data-lucide="crop" class="link-ic" style="color:#d946ef;"></i><span>Crop PDF</span></a>
-                <a href="#/edit-pdf" class="nav-dropdown-link" data-nav-tool="edit-pdf"><i data-lucide="edit-3" class="link-ic" style="color:#ec4899;"></i><span>Edit PDF</span></a>
+                <a href="/rotate-pdf" class="nav-dropdown-link" data-nav-tool="rotate-pdf"><i data-lucide="rotate-cw" class="link-ic" style="color:#6366f1;"></i><span>Rotate PDF</span></a>
+                <a href="/page-numbers" class="nav-dropdown-link" data-nav-tool="page-numbers"><i data-lucide="binary" class="link-ic" style="color:#8b5cf6;"></i><span>Page Numbers</span></a>
+                <a href="/add-watermark" class="nav-dropdown-link" data-nav-tool="add-watermark"><i data-lucide="stamp" class="link-ic" style="color:#a855f7;"></i><span>Add Watermark</span></a>
+                <a href="/crop-pdf" class="nav-dropdown-link" data-nav-tool="crop-pdf"><i data-lucide="crop" class="link-ic" style="color:#d946ef;"></i><span>Crop PDF</span></a>
+                <a href="/edit-pdf" class="nav-dropdown-link" data-nav-tool="edit-pdf"><i data-lucide="edit-3" class="link-ic" style="color:#ec4899;"></i><span>Edit PDF</span></a>
               </div>
               <div class="nav-dropdown-col">
                 <div class="nav-col-header">SECURITY</div>
-                <a href="#/unlock-pdf" class="nav-dropdown-link" data-nav-tool="unlock-pdf"><i data-lucide="unlock" class="link-ic" style="color:#10b981;"></i><span>Unlock PDF</span></a>
-                <a href="#/protect-pdf" class="nav-dropdown-link" data-nav-tool="protect-pdf"><i data-lucide="lock" class="link-ic" style="color:#ef4444;"></i><span>Protect PDF</span></a>
-                <a href="#/sign-pdf" class="nav-dropdown-link" data-nav-tool="sign-pdf"><i data-lucide="pen-tool" class="link-ic" style="color:#6366f1;"></i><span>Sign PDF</span></a>
-                <a href="#/redact-pdf" class="nav-dropdown-link" data-nav-tool="redact-pdf"><i data-lucide="eye-off" class="link-ic" style="color:#334155;"></i><span>Redact PDF</span></a>
-                <a href="#/compare-pdf" class="nav-dropdown-link" data-nav-tool="compare-pdf"><i data-lucide="git-compare" class="link-ic" style="color:#8b5cf6;"></i><span>Compare PDF</span></a>
+                <a href="/unlock-pdf" class="nav-dropdown-link" data-nav-tool="unlock-pdf"><i data-lucide="unlock" class="link-ic" style="color:#10b981;"></i><span>Unlock PDF</span></a>
+                <a href="/protect-pdf" class="nav-dropdown-link" data-nav-tool="protect-pdf"><i data-lucide="lock" class="link-ic" style="color:#ef4444;"></i><span>Protect PDF</span></a>
+                <a href="/sign-pdf" class="nav-dropdown-link" data-nav-tool="sign-pdf"><i data-lucide="pen-tool" class="link-ic" style="color:#6366f1;"></i><span>Sign PDF</span></a>
+                <a href="/redact-pdf" class="nav-dropdown-link" data-nav-tool="redact-pdf"><i data-lucide="eye-off" class="link-ic" style="color:#334155;"></i><span>Redact PDF</span></a>
+                <a href="/compare-pdf" class="nav-dropdown-link" data-nav-tool="compare-pdf"><i data-lucide="git-compare" class="link-ic" style="color:#8b5cf6;"></i><span>Compare PDF</span></a>
               </div>
             </div>
           </div>
@@ -415,12 +415,12 @@
       <footer class="studio-footer">
         <div class="footer-inner">
           <div class="footer-brand-col">
-            <div class="brand-container">
+            <a href="/" class="brand-container" title="DocStudio Home" style="text-decoration:none; color:inherit;">
               <img src="/logo.png" alt="DocStudio Logo" class="brand-logo-img">
               <div class="brand-titles">
                 <div class="brand-name">Doc<span class="brand-name__accent">Studio</span></div>
               </div>
-            </div>
+            </a>
             <p class="footer-copy">
               The modern standard for decentralized, confidential document management and multi-format conversion.
             </p>
@@ -428,46 +428,46 @@
           <div class="footer-links-col">
             <h5>Organize & Optimize</h5>
             <ul>
-              <li><a href="#/merge-pdf" data-route-tool="merge-pdf">Merge PDF</a></li>
-              <li><a href="#/split-pdf" data-route-tool="split-pdf">Split PDF</a></li>
-              <li><a href="#/compress-pdf" data-route-tool="compress-pdf">Compress PDF</a></li>
-              <li><a href="#/organize-pdf" data-route-tool="organize-pdf">Organize Pages</a></li>
-              <li><a href="#/ocr-pdf" data-route-tool="ocr-pdf">OCR Text Recognition</a></li>
+              <li><a href="/merge-pdf" data-route-tool="merge-pdf">Merge PDF</a></li>
+              <li><a href="/split-pdf" data-route-tool="split-pdf">Split PDF</a></li>
+              <li><a href="/compress-pdf" data-route-tool="compress-pdf">Compress PDF</a></li>
+              <li><a href="/organize-pdf" data-route-tool="organize-pdf">Organize Pages</a></li>
+              <li><a href="/ocr-pdf" data-route-tool="ocr-pdf">OCR Text Recognition</a></li>
             </ul>
           </div>
           <div class="footer-links-col">
             <h5>Conversions</h5>
             <ul>
-              <li><a href="#/pdf-to-word" data-route-tool="pdf-to-word">PDF to Word</a></li>
-              <li><a href="#/word-to-pdf" data-route-tool="word-to-pdf">Word to PDF</a></li>
-              <li><a href="#/pdf-to-excel" data-route-tool="pdf-to-excel">PDF to Excel</a></li>
-              <li><a href="#/excel-to-pdf" data-route-tool="excel-to-pdf">Excel to PDF</a></li>
-              <li><a href="#/jpg-to-pdf" data-route-tool="jpg-to-pdf">Image to PDF</a></li>
+              <li><a href="/pdf-to-word" data-route-tool="pdf-to-word">PDF to Word</a></li>
+              <li><a href="/word-to-pdf" data-route-tool="word-to-pdf">Word to PDF</a></li>
+              <li><a href="/pdf-to-excel" data-route-tool="pdf-to-excel">PDF to Excel</a></li>
+              <li><a href="/excel-to-pdf" data-route-tool="excel-to-pdf">Excel to PDF</a></li>
+              <li><a href="/jpg-to-pdf" data-route-tool="jpg-to-pdf">Image to PDF</a></li>
             </ul>
           </div>
           <div class="footer-links-col">
             <h5>Security & Studio</h5>
             <ul>
-              <li><a href="#/protect-pdf" data-route-tool="protect-pdf">Protect & Encrypt</a></li>
-              <li><a href="#/unlock-pdf" data-route-tool="unlock-pdf">Unlock PDF</a></li>
-              <li><a href="#/sign-pdf" data-route-tool="sign-pdf">Digital Signatures</a></li>
-              <li><a href="#/redact-pdf" data-route-tool="redact-pdf">Blackout & Redact</a></li>
-              <li><a href="#/compare-pdf" data-route-tool="compare-pdf">Visual Difference Diff</a></li>
+              <li><a href="/protect-pdf" data-route-tool="protect-pdf">Protect & Encrypt</a></li>
+              <li><a href="/unlock-pdf" data-route-tool="unlock-pdf">Unlock PDF</a></li>
+              <li><a href="/sign-pdf" data-route-tool="sign-pdf">Digital Signatures</a></li>
+              <li><a href="/redact-pdf" data-route-tool="redact-pdf">Blackout & Redact</a></li>
+              <li><a href="/compare-pdf" data-route-tool="compare-pdf">Visual Difference Diff</a></li>
             </ul>
           </div>
           <div class="footer-links-col">
             <h5>Legal & Support</h5>
             <ul>
-              <li><a href="#/privacy" data-route-legal="privacy">Privacy Policy</a></li>
-              <li><a href="#/terms" data-route-legal="terms">Terms of Service</a></li>
-              <li><a href="#/refund" data-route-legal="refund">Refund & Cancellation</a></li>
-              <li><a href="#/about" data-route-legal="about">About DocStudio</a></li>
-              <li><a href="#/contact" data-route-legal="contact">Contact Support</a></li>
+              <li><a href="/privacy" data-route-legal="privacy">Privacy Policy</a></li>
+              <li><a href="/terms" data-route-legal="terms">Terms of Service</a></li>
+              <li><a href="/refund" data-route-legal="refund">Refund & Cancellation</a></li>
+              <li><a href="/about" data-route-legal="about">About DocStudio</a></li>
+              <li><a href="/contact" data-route-legal="contact">Contact Support</a></li>
             </ul>
           </div>
         </div>
         <div class="footer-bottom-line">
-          <span>&copy; 2026 DocStudio &bull; Decentralized In-Browser Document Engine &bull; <a href="#/privacy" style="color:var(--text-muted); text-decoration:underline;">Privacy</a> &bull; <a href="#/terms" style="color:var(--text-muted); text-decoration:underline;">Terms</a> &bull; <a href="#/refund" style="color:var(--text-muted); text-decoration:underline;">Refunds</a> &bull; <a href="#/contact" style="color:var(--text-muted); text-decoration:underline;">Contact</a></span>
+          <span>&copy; 2026 DocStudio &bull; Decentralized In-Browser Document Engine &bull; <a href="/privacy" data-route-legal="privacy" style="color:var(--text-muted); text-decoration:underline;">Privacy</a> &bull; <a href="/terms" data-route-legal="terms" style="color:var(--text-muted); text-decoration:underline;">Terms</a> &bull; <a href="/refund" data-route-legal="refund" style="color:var(--text-muted); text-decoration:underline;">Refunds</a> &bull; <a href="/contact" data-route-legal="contact" style="color:var(--text-muted); text-decoration:underline;">Contact</a></span>
         </div>
       </footer>
     </main>

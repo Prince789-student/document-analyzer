@@ -314,9 +314,9 @@ class DocuMatrixStudioApp {
         this.categoryPillsBar.querySelectorAll('.category-filter-pill').forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
         if (catId === 'all') {
-          this.navigateTo('#/');
+          this.navigateTo('/');
         } else {
-          this.navigateTo(`#/category/${catId}`);
+          this.navigateTo(`/category/${catId}`);
         }
         this.renderToolsGrid();
       });
@@ -374,7 +374,7 @@ class DocuMatrixStudioApp {
             </div>
 
             <div class="card-main-content">
-              <h3>${t.title}</h3>
+              <h3><a href="/${t.id}" class="card-title-link" data-tool-id="${t.id}">${t.title}</a></h3>
               <p>${t.description}</p>
             </div>
 
@@ -389,8 +389,9 @@ class DocuMatrixStudioApp {
       }).join('');
 
       this.toolsDirectoryGrid.querySelectorAll('.studio-tool-card').forEach(card => {
-        card.addEventListener('click', () => {
-          this.navigateTo(`#/${card.dataset.toolId}`);
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.navigateTo(`/${card.dataset.toolId}`);
         });
       });
     }
@@ -442,8 +443,15 @@ class DocuMatrixStudioApp {
   /* --------------------------------------------------------------------------
      Single Page Application (SPA) Router
      -------------------------------------------------------------------------- */
+  /* --------------------------------------------------------------------------
+     Single Page Application (SPA) Router (Clean Paths + Backward-Compatible Hash)
+     -------------------------------------------------------------------------- */
   initRouter() {
     this.checkGoogleOAuthRedirect();
+
+    window.addEventListener('popstate', () => {
+      this.handleRouting();
+    });
 
     window.addEventListener('hashchange', () => {
       this.handleRouting();
@@ -453,18 +461,53 @@ class DocuMatrixStudioApp {
     this.handleRouting();
   }
 
-  navigateTo(hashPath, replace = false) {
-    if (!hashPath.startsWith('#/')) {
-      hashPath = '#/' + hashPath.replace(/^#?\/?/, '');
-    }
+  navigateTo(targetPath, replace = false) {
+    if (!targetPath) targetPath = '/';
+    const clean = targetPath.replace(/^#?\/?/, '').trim();
+    const newPath = clean ? `/${clean}` : '/';
+
     if (replace) {
-      window.location.replace(hashPath);
-    } else {
-      if (window.location.hash !== hashPath) {
-        window.location.hash = hashPath;
-      } else {
-        this.handleRouting();
+      if (window.location.pathname !== newPath || window.location.hash) {
+        history.replaceState(null, '', newPath);
       }
+    } else {
+      if (window.location.pathname !== newPath || window.location.hash) {
+        history.pushState(null, '', newPath);
+      }
+    }
+    this.handleRouting();
+  }
+
+  updateCanonicalAndMeta(routePath, title = null, description = null) {
+    const baseOrigin = 'https://document-analyzer-one.vercel.app';
+    const cleanRoute = (routePath || '').replace(/^#?\/?/, '').trim();
+    const canonicalUrl = cleanRoute && cleanRoute !== 'home' ? `${baseOrigin}/${cleanRoute}` : `${baseOrigin}/`;
+
+    // 1. Update or create Canonical Link
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = 'canonical';
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', canonicalUrl);
+
+    // 2. OpenGraph & Twitter URLs
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', canonicalUrl);
+    document.querySelector('meta[name="twitter:url"]')?.setAttribute('content', canonicalUrl);
+
+    // 3. Document Title
+    if (title) {
+      document.title = title;
+      document.querySelector('meta[property="og:title"]')?.setAttribute('content', title);
+      document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', title);
+    }
+
+    // 4. Meta Description
+    if (description) {
+      document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+      document.querySelector('meta[property="og:description"]')?.setAttribute('content', description);
+      document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', description);
     }
   }
 
@@ -475,6 +518,10 @@ class DocuMatrixStudioApp {
 
     if (rawHash) {
       clean = rawHash;
+      // Seamlessly upgrade legacy hash bookmarks to clean pathnames
+      try {
+        history.replaceState(null, '', clean ? `/${clean}` : '/');
+      } catch (e) {}
     } else if (rawPath && rawPath !== 'index.html') {
       clean = rawPath;
     }
@@ -485,7 +532,7 @@ class DocuMatrixStudioApp {
       return;
     }
 
-    // Admin portal route: #/admin or /admin
+    // Admin portal route: /admin
     if (clean === 'admin') {
       if (!authService.isAdmin()) {
         toast.info('Please sign in as Super Admin (prince86944@gmail.com) to access the Admin Portal.');
@@ -497,7 +544,7 @@ class DocuMatrixStudioApp {
       return;
     }
 
-    // Legal, Compliance & Support routes: #/privacy, #/terms, #/refund, #/about, #/contact
+    // Legal, Compliance & Support routes: /privacy, /terms, /refund, /about, /contact
     if (['privacy', 'terms', 'refund', 'about', 'contact'].includes(clean)) {
       this.showLegalView(clean, false);
       return;
@@ -508,7 +555,7 @@ class DocuMatrixStudioApp {
       return;
     }
 
-    // Category filter route: #/category/:catId
+    // Category filter route: /category/:catId
     if (clean.startsWith('category/')) {
       const catId = clean.replace('category/', '').trim();
       const catObj = CATEGORIES.find(c => c.id === catId);
@@ -521,19 +568,20 @@ class DocuMatrixStudioApp {
         }
         this.showHomeView(false);
         this.renderToolsGrid();
-        document.title = `${catObj.name} — DocStudio`;
+        const catTitle = `${catObj.name} — DocStudio`;
+        this.updateCanonicalAndMeta(clean, catTitle, `Explore high-performance ${catObj.name} tools running 100% locally in your browser.`);
         return;
       }
     }
 
-    // Tool Studio route: #/:toolId
+    // Tool Studio route: /:toolId
     const toolId = clean.split('/')[0];
     const meta = TOOLS.find(t => t.id === toolId);
     if (meta) {
       this.showToolView(toolId, null, false);
     } else {
       // Unknown route fallback
-      this.navigateTo('#/', true);
+      this.navigateTo('/', true);
     }
   }
 
@@ -546,10 +594,11 @@ class DocuMatrixStudioApp {
   /* --------------------------------------------------------------------------
      Navigation Views (Home Directory vs Studio Tool View vs Admin Portal vs Legal)
      -------------------------------------------------------------------------- */
-  showHomeView(updateHash = true) {
+  showHomeView(updateUrl = true) {
     this.setMobileDockActive('home');
-    if (updateHash && window.location.hash !== '#/' && window.location.hash !== '') {
-      this.navigateTo('#/');
+    const curPath = (window.location.pathname || '').replace(/^\//, '').replace(/\/$/, '').trim();
+    if (updateUrl && curPath !== '' && curPath !== 'index.html') {
+      this.navigateTo('/');
       return;
     }
 
@@ -565,12 +614,17 @@ class DocuMatrixStudioApp {
     this.activeFiles = [];
     this.lastProcessedResult = null;
     this.updateNavTabsActiveState(null);
-    document.title = 'DocStudio — Next-Gen Client-Side PDF Engine';
+    this.updateCanonicalAndMeta(
+      '',
+      'DocStudio — Next-Gen Client-Side PDF Engine',
+      'DocStudio: Decentralized, private document engineering suite. 30 professional PDF tools (Merge, Split, Compress, Convert, OCR, Sign) running 100% locally in browser WebAssembly with zero data retention.'
+    );
   }
 
-  showAdminView(updateHash = true) {
-    if (updateHash && window.location.hash !== '#/admin') {
-      this.navigateTo('#/admin');
+  showAdminView(updateUrl = true) {
+    const curPath = (window.location.pathname || '').replace(/^\//, '').replace(/\/$/, '').trim();
+    if (updateUrl && curPath !== 'admin') {
+      this.navigateTo('/admin');
       return;
     }
 
@@ -581,15 +635,16 @@ class DocuMatrixStudioApp {
     if (this.legalView) this.legalView.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    document.title = 'Admin Command Center — DocStudio';
+    this.updateCanonicalAndMeta('admin', 'Admin Command Center — DocStudio', 'Super Admin Command Center for DocStudio.');
     this.updateNavTabsActiveState(null);
     this.loadAdminDashboard();
     this.refreshIcons();
   }
 
-  showLegalView(section = 'privacy', updateHash = true) {
-    if (updateHash && window.location.hash !== `#/${section}`) {
-      this.navigateTo(`#/${section}`);
+  showLegalView(section = 'privacy', updateUrl = true) {
+    const curPath = (window.location.pathname || '').replace(/^\//, '').replace(/\/$/, '').trim();
+    if (updateUrl && curPath !== section) {
+      this.navigateTo(`/${section}`);
       return;
     }
 
@@ -619,7 +674,14 @@ class DocuMatrixStudioApp {
       about: 'About DocStudio — Engineering Principles',
       contact: 'Contact Support & Help Desk — DocStudio'
     };
-    document.title = titles[section] || 'Compliance & Support — DocStudio';
+    const descriptions = {
+      privacy: 'DocStudio Privacy Policy. 100% decentralized, client-side document processing with zero server retention.',
+      terms: 'DocStudio Terms of Service and user agreement for document processing services.',
+      refund: 'DocStudio Refund and Cancellation Policy for PRO subscriptions.',
+      about: 'About DocStudio: Next-generation client-side WebAssembly document engineering platform.',
+      contact: 'Contact DocStudio customer support and engineering help desk.'
+    };
+    this.updateCanonicalAndMeta(section, titles[section] || 'Compliance & Support — DocStudio', descriptions[section]);
     this.updateNavTabsActiveState(null);
     this.refreshIcons();
   }
@@ -649,12 +711,13 @@ class DocuMatrixStudioApp {
     document.getElementById('btn-all-tools-dropdown')?.classList.add('active');
   }
 
-  async showToolView(toolId, preloadedFiles = null, updateHash = true) {
-    if (updateHash && window.location.hash !== `#/${toolId}`) {
+  async showToolView(toolId, preloadedFiles = null, updateUrl = true) {
+    const curPath = (window.location.pathname || '').replace(/^\//, '').replace(/\/$/, '').trim();
+    if (updateUrl && curPath !== toolId) {
       if (preloadedFiles) {
         this.pendingFilesForRoute = preloadedFiles;
       }
-      this.navigateTo(`#/${toolId}`);
+      this.navigateTo(`/${toolId}`);
       return;
     }
 
@@ -675,7 +738,11 @@ class DocuMatrixStudioApp {
     this.pendingFilesForRoute = null;
     this.activeFiles = [...filesToLoad];
 
-    document.title = `${meta.title} — DocStudio`;
+    this.updateCanonicalAndMeta(
+      toolId,
+      `${meta.title} — DocStudio`,
+      `${meta.description} 100% client-side WebAssembly privacy with zero upload and instant processing.`
+    );
     this.updateNavTabsActiveState(toolId);
 
     // Switch Views
@@ -1335,13 +1402,13 @@ class DocuMatrixStudioApp {
     // Mobile Bottom Navigation Dock Buttons
     this.mobileDockHome?.addEventListener('click', () => {
       this.setMobileDockActive('home');
-      this.navigateTo('#/');
+      this.navigateTo('/');
     });
 
     this.mobileDockSearch?.addEventListener('click', () => {
       this.setMobileDockActive('search');
       if (this.currentView !== 'home') {
-        this.navigateTo('#/');
+        this.navigateTo('/');
       }
       setTimeout(() => {
         if (this.globalSearchInput) {
@@ -1374,8 +1441,14 @@ class DocuMatrixStudioApp {
     });
 
     // Brand Logo & Back to Directory (SPA Routing)
-    this.brandHomeLink?.addEventListener('click', () => this.navigateTo('#/'));
-    this.btnBackToDirectory?.addEventListener('click', () => this.navigateTo('#/'));
+    this.brandHomeLink?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.navigateTo('/');
+    });
+    this.btnBackToDirectory?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.navigateTo('/');
+    });
 
     // Top Navbar Tool Tabs & Dropdown Links (SPA Routing)
     document.querySelectorAll('[data-nav-tool]').forEach(link => {
@@ -1383,7 +1456,7 @@ class DocuMatrixStudioApp {
         e.preventDefault();
         const toolId = link.dataset.navTool;
         document.querySelectorAll('.nav-tab-dropdown').forEach(d => d.classList.remove('open'));
-        this.navigateTo(`#/${toolId}`);
+        this.navigateTo(`/${toolId}`);
       });
     });
 
@@ -1412,12 +1485,21 @@ class DocuMatrixStudioApp {
       }
     });
 
-    // Footer route links
+    // Footer route links for Tools
     document.querySelectorAll('[data-route-tool]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const toolId = link.dataset.routeTool;
-        this.navigateTo(`#/${toolId}`);
+        this.navigateTo(`/${toolId}`);
+      });
+    });
+
+    // Footer route links for Legal / Compliance
+    document.querySelectorAll('[data-route-legal]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = link.dataset.routeLegal;
+        this.navigateTo(`/${target}`);
       });
     });
 
@@ -1565,7 +1647,7 @@ class DocuMatrixStudioApp {
     });
 
     this.btnReturnDirectory?.addEventListener('click', () => {
-      this.navigateTo('#/');
+      this.navigateTo('/');
     });
 
     // Global Shortcuts
@@ -1581,7 +1663,7 @@ class DocuMatrixStudioApp {
         if (this.historyDrawerOverlay?.classList.contains('active')) {
           this.closeHistoryDrawer();
         } else if (this.currentView === 'tool') {
-          this.navigateTo('#/');
+          this.navigateTo('/');
         }
       }
     });
@@ -1598,7 +1680,7 @@ class DocuMatrixStudioApp {
     window.addEventListener('docstudio:auth-change', (e) => {
       this.updateAuthHeader(e.detail.user);
       if (this.currentView === 'admin' && !authService.isAdmin()) {
-        this.navigateTo('#/');
+        this.navigateTo('/');
       }
       if (authService.isLoggedIn() && !authService.isAdmin() && !authService.isProfileVerified()) {
         setTimeout(() => this.openSecurityModal(), 400);
@@ -1638,13 +1720,13 @@ class DocuMatrixStudioApp {
 
     this.dropdownAdminBtn?.addEventListener('click', () => {
       this.userDropdownMenu?.classList.remove('show');
-      this.navigateTo('#/admin');
+      this.navigateTo('/admin');
     });
 
     this.dropdownLogoutBtn?.addEventListener('click', () => {
       this.userDropdownMenu?.classList.remove('show');
       authService.logout();
-      this.navigateTo('#/');
+      this.navigateTo('/');
     });
 
     // 5. Google OAuth Exclusive Auth Modal Interactions
@@ -1962,7 +2044,7 @@ class DocuMatrixStudioApp {
 
     // 7. Legal, Compliance & Support Center Events
     this.btnLegalBackStudio?.addEventListener('click', () => {
-      this.navigateTo('#/');
+      this.navigateTo('/');
     });
 
     this.legalTabButtons?.forEach(btn => {
@@ -2011,7 +2093,7 @@ class DocuMatrixStudioApp {
 
     // 9. Admin Panel Topbar & Actions
     this.btnAdminReturnStudio?.addEventListener('click', () => {
-      this.navigateTo('#/');
+      this.navigateTo('/');
     });
 
     this.btnAdminRefreshUsers?.addEventListener('click', () => {
@@ -2266,8 +2348,8 @@ class DocuMatrixStudioApp {
     this.closeAuthModal();
     if (isPrince) {
       toast.success('Welcome back, Prince! Super Admin privileges active.');
-      if (this.currentView === 'admin' || window.location.hash === '#/admin') {
-        this.navigateTo('#/admin');
+      if (this.currentView === 'admin' || window.location.pathname === '/admin' || window.location.hash === '#/admin') {
+        this.navigateTo('/admin');
       }
       return;
     } else {
